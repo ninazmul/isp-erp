@@ -1,0 +1,28 @@
+import { Schema, model, models } from "mongoose";
+
+const CustomerSchema = new Schema(
+  {
+    customerCode: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
+    phone: { type: String, required: true },
+    email: { type: String },
+    address: { type: String },
+    packageName: { type: String, required: true },
+    monthlyFee: { type: Number, required: true },
+    connectionDate: { type: Date, required: true },
+    router: { type: String },
+    ipAddress: { type: String },
+    status: {
+      type: String,
+      enum: ["Active", "Inactive", "Disconnected"],
+      default: "Active",
+    },
+    notes: { type: String },
+    isDeleted: { type: Boolean, default: false },
+  },
+  { timestamps: true },
+);
+
+const Customer = models.Customer || model("Customer", CustomerSchema);
+
+export default Customer;
