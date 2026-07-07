@@ -7,9 +7,6 @@ export * from "./bill.actions";
 // Expenses
 export * from "./expense.actions";
 
-// Settings
-export * from "./setting.actions";
-
 // Dashboard
 export * from "./dashboard.actions";
 

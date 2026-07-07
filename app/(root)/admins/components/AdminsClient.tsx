@@ -117,7 +117,7 @@ export default function AdminsClient({
               <Plus className="mr-2 h-4 w-4" /> Add Admin
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-2xl bg-white">
             <DialogHeader>
               <DialogTitle>Add New Admin</DialogTitle>
             </DialogHeader>

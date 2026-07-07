@@ -6,14 +6,12 @@ import html2canvas from "html2canvas";
 import { DownloadCloud, Printer } from "lucide-react";
 import InvoiceTemplate from "./InvoiceTemplate";
 import { Button } from "@/components/ui/button";
-import type { Bill, Settings } from "@/types";
+import type { Bill } from "@/types";
 
 export default function InvoiceDownloader({
   bill,
-  settings,
 }: {
   bill: Bill;
-  settings: Settings;
 }) {
   const invoiceRef = useRef<HTMLDivElement>(null);
 
@@ -88,7 +86,7 @@ export default function InvoiceDownloader({
 
       {/* Hidden Invoice Template */}
       <div ref={invoiceRef} className="absolute left-[-9999px] top-0">
-        <InvoiceTemplate bill={bill} settings={settings} />
+        <InvoiceTemplate bill={bill} />
       </div>
     </div>
   );

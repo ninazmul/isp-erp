@@ -1,15 +1,11 @@
 import Image from "next/image";
-import type { Bill, Settings } from "@/types";
+import type { Bill } from "@/types";
 
 type InvoiceTemplateProps = {
   bill: Bill;
-  settings: Settings;
 };
 
-export default function InvoiceTemplate({
-  bill,
-  settings,
-}: InvoiceTemplateProps) {
+export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
   const formatDate = (date: Date | string | undefined) =>
     date ? new Date(date).toLocaleDateString() : "N/A";
 
@@ -29,12 +25,6 @@ export default function InvoiceTemplate({
             unoptimized
             className="object-contain"
           />
-          {settings.companyName && (
-            <p className="font-bold mt-2">{settings.companyName}</p>
-          )}
-          {settings.phone && <p>{settings.phone}</p>}
-          {settings.email && <p>{settings.email}</p>}
-          {settings.address && <p>{settings.address}</p>}
         </div>
 
         <div className="text-right">

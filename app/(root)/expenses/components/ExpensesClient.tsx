@@ -115,7 +115,7 @@ export default function ExpensesClient({
               <Plus className="mr-2 h-4 w-4" /> Add Expense
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl bg-white">
             <DialogHeader>
               <DialogTitle>Add New Expense</DialogTitle>
             </DialogHeader>
@@ -137,12 +137,15 @@ export default function ExpensesClient({
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-xs"
         />
-        <Select value={category} onValueChange={setCategory}>
+        <Select
+          value={category || "all"}
+          onValueChange={(value) => setCategory(value === "all" ? "" : value)}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All</SelectItem>
+            <SelectItem value="all">All</SelectItem>
             <SelectItem value="Bandwidth">Bandwidth</SelectItem>
             <SelectItem value="Electricity">Electricity</SelectItem>
             <SelectItem value="Salary">Salary</SelectItem>
@@ -229,7 +232,7 @@ export default function ExpensesClient({
                         <Edit className="h-4 w-4" />
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
+                    <DialogContent className="max-w-2xl bg-white">
                       <DialogHeader>
                         <DialogTitle>Edit Expense</DialogTitle>
                       </DialogHeader>

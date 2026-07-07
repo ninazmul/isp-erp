@@ -15,7 +15,6 @@ import {
   LayoutDashboard,
   Users,
   TrendingUp,
-  Settings,
   Receipt,
   Wallet,
   UserPlus,
@@ -68,16 +67,6 @@ const sidebarSections = [
         title: "Manage Admins",
         url: "/admins",
         icon: UserPlus,
-      },
-    ],
-  },
-  {
-    label: "Settings",
-    items: [
-      {
-        title: "Settings",
-        url: "/settings",
-        icon: Settings,
       },
     ],
   },

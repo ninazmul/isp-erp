@@ -92,7 +92,7 @@ export default function CustomersClient({
               <Plus className="mr-2 h-4 w-4" /> Add Customer
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl bg-white">
             <DialogHeader>
               <DialogTitle>Add New Customer</DialogTitle>
             </DialogHeader>
@@ -114,12 +114,15 @@ export default function CustomersClient({
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-xs"
         />
-        <Select value={status} onValueChange={setStatus}>
+        <Select
+          value={status || "all"}
+          onValueChange={(value) => setStatus(value === "all" ? "" : value)}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All</SelectItem>
+            <SelectItem value="all">All</SelectItem>
             <SelectItem value="Active">Active</SelectItem>
             <SelectItem value="Inactive">Inactive</SelectItem>
             <SelectItem value="Disconnected">Disconnected</SelectItem>
@@ -170,7 +173,7 @@ export default function CustomersClient({
                         <Edit className="h-4 w-4" />
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
+                    <DialogContent className="max-w-2xl bg-white">
                       <DialogHeader>
                         <DialogTitle>Edit Customer</DialogTitle>
                       </DialogHeader>

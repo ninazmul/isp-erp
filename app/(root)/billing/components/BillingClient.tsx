@@ -37,14 +37,12 @@ import {
 import GenerateBillsForm from "./GenerateBillsForm";
 import MarkPaidForm from "./MarkPaidForm";
 import InvoiceDownloader from "../../components/InvoiceDownloader";
-import type { Bill, Settings } from "@/types";
+import type { Bill } from "@/types";
 
 export default function BillingClient({
   initialBills,
-  settings,
 }: {
   initialBills: Bill[];
-  settings: Settings;
 }) {
   const [bills, setBills] = useState(initialBills);
   const [search, setSearch] = useState("");
@@ -124,7 +122,7 @@ export default function BillingClient({
               <Plus className="mr-2 h-4 w-4" /> Generate Monthly Bills
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-2xl bg-white">
             <DialogHeader>
               <DialogTitle>Generate Monthly Bills</DialogTitle>
             </DialogHeader>
@@ -169,12 +167,15 @@ export default function BillingClient({
             ))}
           </SelectContent>
         </Select>
-        <Select value={status} onValueChange={setStatus}>
+        <Select
+          value={status || "all"}
+          onValueChange={(value) => setStatus(value === "all" ? "" : value)}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All</SelectItem>
+            <SelectItem value="all">All</SelectItem>
             <SelectItem value="Paid">Paid</SelectItem>
             <SelectItem value="Unpaid">Unpaid</SelectItem>
           </SelectContent>
@@ -234,7 +235,7 @@ export default function BillingClient({
                           <CheckCircle className="mr-2 h-4 w-4" /> Mark Paid
                         </Button>
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent className="max-w-2xl bg-white">
                         <DialogHeader>
                           <DialogTitle>Mark Bill as Paid</DialogTitle>
                         </DialogHeader>
@@ -242,7 +243,7 @@ export default function BillingClient({
                       </DialogContent>
                     </Dialog>
                   )}
-                  <InvoiceDownloader bill={bill} settings={settings} />
+                  <InvoiceDownloader bill={bill} />
                 </TableCell>
               </TableRow>
             ))}

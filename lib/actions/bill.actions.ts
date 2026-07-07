@@ -3,9 +3,10 @@
 import { connectToDatabase } from "@/lib/database";
 import Bill from "@/lib/database/models/bill.model";
 import Customer from "@/lib/database/models/customer.model";
-import Setting from "@/lib/database/models/setting.model";
 import { revalidatePath } from "next/cache";
 import type { FilterQuery } from "mongoose";
+
+const INVOICE_PREFIX = "INV";
 
 // Define types for mongoose docs
 interface BillDoc {
@@ -53,17 +54,15 @@ export async function generateMonthlyBills(month: number, year: number) {
       continue;
     }
 
-    const setting = await Setting.findOne();
-    const invoicePrefix = setting?.invoicePrefix || "INV";
     const lastBill = await Bill.findOne<BillDoc>().sort({ createdAt: -1 });
     let invoiceNum = 1;
 
     if (lastBill) {
       const lastInv = lastBill.invoiceNumber;
-      invoiceNum = parseInt(lastInv.slice(invoicePrefix.length)) + 1;
+      invoiceNum = parseInt(lastInv.slice(INVOICE_PREFIX.length)) + 1;
     }
 
-    const invoiceNumber = `${invoicePrefix}${invoiceNum.toString().padStart(6, "0")}`;
+    const invoiceNumber = `${INVOICE_PREFIX}${invoiceNum.toString().padStart(6, "0")}`;
 
     await Bill.create({
       customer: customer._id,

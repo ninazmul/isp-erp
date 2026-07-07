@@ -37,17 +37,6 @@ export interface Expense {
   description?: string;
 }
 
-export interface Settings {
-  _id?: string;
-  companyName?: string;
-  logo?: string;
-  phone?: string;
-  email?: string;
-  address?: string;
-  invoicePrefix?: string;
-  currency?: string;
-}
-
 export interface Admin {
   _id: string;
   email: string;
