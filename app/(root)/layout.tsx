@@ -28,7 +28,7 @@ export default async function AdminLayout({
     <SidebarProvider defaultOpen={defaultOpen}>
       <AdminSidebar />
       <Toaster position="top-right" />
-      <main className="flex-1 h-screen mx-auto overflow-y-auto bg-slate-50/50">
+      <main className="flex-1 min-h-dvh mx-auto overflow-y-auto bg-slate-50/80">
         <div className="sticky top-0 z-20 flex justify-between items-center px-4 py-3 w-full border-b border-purple-950/20 text-white bg-gradient-to-r from-[#3e0078] to-[#5b0ea6] shadow-md shadow-purple-950/10">
           <div className="flex items-center gap-3">
             <SidebarTrigger className="hover:bg-white/10 text-white transition-colors rounded-lg" />
@@ -42,7 +42,7 @@ export default async function AdminLayout({
             </div>
           </SignedIn>
         </div>
-        <div className="p-2 sm:p-4">{children}</div>
+        <div className="w-full">{children}</div>
       </main>
     </SidebarProvider>
   );
