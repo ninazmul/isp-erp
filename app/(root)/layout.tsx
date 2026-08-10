@@ -37,7 +37,7 @@ export default async function AdminLayout({
             </span>
           </div>
           <SignedIn>
-            <div className="p-0.5 rounded-full ring-2 ring-purple-300/30">
+            <div className="">
               <UserButton afterSwitchSessionUrl="/" />
             </div>
           </SignedIn>
