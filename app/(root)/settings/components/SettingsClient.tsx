@@ -33,7 +33,7 @@ function CategoryTab({ type }: { type: "income" | "expense" }) {
 
   useEffect(() => {
     load();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
   const handleAdd = async () => {
@@ -51,7 +51,8 @@ function CategoryTab({ type }: { type: "income" | "expense" }) {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete category "${name}"?`)) return;
     try {
       await deleteCategory(id);
       toast.success("Category deleted");
@@ -72,7 +73,11 @@ function CategoryTab({ type }: { type: "income" | "expense" }) {
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
           className="max-w-sm rounded-xl border-slate-200 text-sm"
         />
-        <Button onClick={handleAdd} disabled={loading || !newName.trim()} className="bg-[#3e0078] hover:bg-[#52029d] rounded-xl text-sm">
+        <Button
+          onClick={handleAdd}
+          disabled={loading || !newName.trim()}
+          className="bg-[#3e0078] hover:bg-[#52029d] rounded-xl text-sm"
+        >
           <Plus className="mr-2 h-4 w-4" /> Add Category
         </Button>
       </div>
@@ -84,14 +89,16 @@ function CategoryTab({ type }: { type: "income" | "expense" }) {
             key={cat._id}
             className="flex items-center gap-2 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-1.5 shadow-2xs"
           >
-            <span className="text-xs font-semibold text-slate-700">{cat.name}</span>
+            <span className="text-xs font-semibold text-slate-700">
+              {cat.name}
+            </span>
             {cat.isDefault ? (
               <span title="Default category — cannot be deleted">
                 <Lock className="w-3.5 h-3.5 text-slate-400" />
               </span>
             ) : (
               <button
-                onClick={() => handleDelete(cat._id)}
+                onClick={() => handleDelete(cat._id, cat.name)}
                 className="text-slate-400 hover:text-rose-600 transition-colors p-0.5"
                 title="Delete category"
               >
@@ -101,12 +108,15 @@ function CategoryTab({ type }: { type: "income" | "expense" }) {
           </div>
         ))}
         {categories.length === 0 && (
-          <p className="text-xs text-slate-400 py-4">No categories created yet.</p>
+          <p className="text-xs text-slate-400 py-4">
+            No categories created yet.
+          </p>
         )}
       </div>
 
       <p className="text-[11px] text-slate-400 flex items-center gap-1.5 pt-2">
-        <Lock className="w-3 h-3 text-slate-400" /> Default system categories are protected and cannot be removed
+        <Lock className="w-3 h-3 text-slate-400" /> Default system categories
+        are protected and cannot be removed
       </p>
     </div>
   );
@@ -136,19 +146,33 @@ export default function SettingsClient() {
         <CardHeader className="border-b border-slate-100">
           <CardTitle className="flex items-center gap-2 text-base font-bold text-slate-800">
             Category Management
-            <Badge variant="secondary" className="text-[10px] bg-purple-50 text-purple-700 border-purple-100 font-semibold">
+            <Badge
+              variant="secondary"
+              className="text-[10px] bg-purple-50 text-purple-700 border-purple-100 font-semibold"
+            >
               Dynamic Taxonomies
             </Badge>
           </CardTitle>
           <p className="text-xs text-slate-500">
-            Create or manage categories for income receipts and expense outflows.
+            Create or manage categories for income receipts and expense
+            outflows.
           </p>
         </CardHeader>
         <CardContent className="pt-5">
           <Tabs defaultValue="expense" className="w-full">
             <TabsList className="bg-slate-100 p-1 rounded-xl mb-4 flex flex-wrap h-auto gap-1">
-              <TabsTrigger value="expense" className="rounded-lg text-xs font-semibold">Expense Categories</TabsTrigger>
-              <TabsTrigger value="income" className="rounded-lg text-xs font-semibold">Income Categories</TabsTrigger>
+              <TabsTrigger
+                value="expense"
+                className="rounded-lg text-xs font-semibold"
+              >
+                Expense Categories
+              </TabsTrigger>
+              <TabsTrigger
+                value="income"
+                className="rounded-lg text-xs font-semibold"
+              >
+                Income Categories
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="expense">
               <CategoryTab type="expense" />

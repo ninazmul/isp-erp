@@ -2,6 +2,8 @@
 
 import { connectToDatabase } from "@/lib/database";
 import Category from "@/lib/database/models/category.model";
+import Expense from "@/lib/database/models/expense.model";
+import Income from "@/lib/database/models/income.model";
 import { revalidatePath } from "next/cache";
 
 const DEFAULT_EXPENSE_CATEGORIES = [
@@ -35,7 +37,7 @@ async function seedDefaults(type: "income" | "expense") {
   const count = await Category.countDocuments({ type });
   if (count === 0) {
     await Category.insertMany(
-      defaults.map((name) => ({ name, type, isDefault: true }))
+      defaults.map((name) => ({ name, type, isDefault: true })),
     );
   }
 }
@@ -43,7 +45,9 @@ async function seedDefaults(type: "income" | "expense") {
 export async function getCategories(type: "income" | "expense") {
   await connectToDatabase();
   await seedDefaults(type);
-  const categories = await Category.find({ type }).sort({ name: 1 }).lean<CategoryDoc[]>();
+  const categories = await Category.find({ type })
+    .sort({ name: 1 })
+    .lean<CategoryDoc[]>();
   return JSON.parse(JSON.stringify(categories));
 }
 
@@ -69,6 +73,15 @@ export async function deleteCategory(id: string) {
   const category = await Category.findById(id).lean<CategoryDoc | null>();
   if (!category) throw new Error("Category not found");
   if (category.isDefault) throw new Error("Cannot delete a default category");
+
+  const Model = category.type === "expense" ? Expense : Income;
+  const inUseCount = await Model.countDocuments({ category: category.name });
+  if (inUseCount > 0) {
+    throw new Error(
+      `Cannot delete: "${category.name}" is used by ${inUseCount} ${category.type} record(s). Reassign them first.`,
+    );
+  }
+
   await Category.findByIdAndDelete(id);
   revalidatePath("/expenses");
   revalidatePath("/income");
