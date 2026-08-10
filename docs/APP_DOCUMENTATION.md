@@ -78,6 +78,7 @@ Allows admins to:
 - Add a customer
 - Edit a customer
 - Soft-delete a customer
+- Download Excel template, import bulk customer records, and export customer data
 
 Customer fields include:
 

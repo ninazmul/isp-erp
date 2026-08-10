@@ -38,8 +38,16 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import CustomerForm from "./CustomerForm";
-import { getCustomers, deleteCustomer } from "@/lib/actions/customer.actions";
+import {
+  getCustomers,
+  deleteCustomer,
+  bulkCreateCustomers,
+} from "@/lib/actions/customer.actions";
 import type { Customer } from "@/types";
+import ExcelImportExport, {
+  type ImportResult,
+} from "@/components/shared/ExcelImportExport";
+import { downloadTemplate, exportToExcel } from "@/lib/excel";
 
 export default function CustomersClient({
   initialCustomers,
@@ -132,6 +140,84 @@ export default function CustomersClient({
     }
   };
 
+  // ── Excel Columns & Actions ─────────────────────────────────────────────
+  const CUSTOMER_HEADERS = [
+    "Name",
+    "Phone",
+    "Location",
+    "Package",
+    "Monthly Fee (৳)",
+    "Connection Date (YYYY-MM-DD)",
+    "Status",
+    "Email",
+    "Router",
+    "IP Address",
+    "Notes",
+  ];
+
+  const CUSTOMER_SAMPLE = {
+    Name: "John Doe",
+    Phone: "01700000000",
+    Location: "Gulshan",
+    Package: "Standard 10Mbps",
+    "Monthly Fee (৳)": 1000,
+    "Connection Date (YYYY-MM-DD)": new Date().toISOString().split("T")[0],
+    Status: "Active",
+    Email: "john@example.com",
+    Router: "TP-Link Archer C6",
+    "IP Address": "192.168.1.100",
+    Notes: "VIP customer",
+  };
+
+  const handleTemplate = () => {
+    downloadTemplate(
+      CUSTOMER_HEADERS,
+      CUSTOMER_SAMPLE,
+      "customer_import_template.xlsx"
+    );
+  };
+
+  const handleExport = async () => {
+    try {
+      const res = await getCustomers({
+        search,
+        status,
+        limit: 10000,
+      });
+      const rows = res.customers.map((cust: Customer) => ({
+        Name: cust.name,
+        Phone: cust.phone,
+        Location: cust.location,
+        Package: cust.packageName,
+        "Monthly Fee (৳)": cust.monthlyFee,
+        "Connection Date (YYYY-MM-DD)": new Date(cust.connectionDate)
+          .toISOString()
+          .split("T")[0],
+        Status: cust.status,
+        Email: cust.email ?? "",
+        Router: cust.router ?? "",
+        "IP Address": cust.ipAddress ?? "",
+        Notes: cust.notes ?? "",
+      }));
+      exportToExcel(
+        rows,
+        CUSTOMER_HEADERS,
+        "Customers",
+        "customer_export.xlsx"
+      );
+    } catch {
+      toast.error("Failed to export customer data");
+    }
+  };
+
+  const handleImport = async (
+    rows: Record<string, unknown>[]
+  ): Promise<ImportResult> => {
+    const result = await bulkCreateCustomers(rows);
+    loadCustomers();
+    return result;
+  };
+
   return (
     <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto">
       {/* Page Header */}
@@ -151,27 +237,35 @@ export default function CustomersClient({
           </div>
         </div>
 
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-[#3e0078] hover:bg-[#52029d] text-white shadow-md shadow-purple-900/10 rounded-xl w-full sm:w-auto">
-              <Plus className="mr-2 h-4 w-4" /> Add Customer
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-slate-800">
-                Add New Customer
-              </DialogTitle>
-            </DialogHeader>
-            <CustomerForm
-              onSuccess={() => {
-                setIsAddOpen(false);
-                loadCustomers();
-                toast.success("Customer added successfully");
-              }}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex flex-wrap items-center gap-2">
+          <ExcelImportExport
+            label="Customers"
+            onTemplate={handleTemplate}
+            onExport={handleExport}
+            onImport={handleImport}
+          />
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-[#3e0078] hover:bg-[#52029d] text-white shadow-md shadow-purple-900/10 rounded-xl w-full sm:w-auto">
+                <Plus className="mr-2 h-4 w-4" /> Add Customer
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold text-slate-800">
+                  Add New Customer
+                </DialogTitle>
+              </DialogHeader>
+              <CustomerForm
+                onSuccess={() => {
+                  setIsAddOpen(false);
+                  loadCustomers();
+                  toast.success("Customer added successfully");
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Filters & Row Limits */}

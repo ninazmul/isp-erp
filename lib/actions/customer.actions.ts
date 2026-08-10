@@ -125,3 +125,111 @@ export async function deleteCustomer(id: string) {
   await Customer.findByIdAndUpdate(id, { isDeleted: true });
   revalidatePath("/customers");
 }
+
+// ---------------------------------------------------------------------------
+// Bulk Import
+// ---------------------------------------------------------------------------
+
+import {
+  getFlexibleField,
+  safeParseDate,
+  safeParseNumber,
+  safeParseString,
+} from "@/lib/excel";
+
+export interface CustomerBulkImportResult {
+  inserted: number;
+  failed: Array<{ row: number; data: Record<string, unknown>; reason: string }>;
+}
+
+export async function bulkCreateCustomers(
+  rows: Record<string, unknown>[]
+): Promise<CustomerBulkImportResult> {
+  await connectToDatabase();
+
+  const lastCustomer = await Customer.findOne<CustomerDoc>()
+    .select("customerCode")
+    .sort({ createdAt: -1 })
+    .lean();
+
+  let nextNum = 1;
+  if (lastCustomer && lastCustomer.customerCode) {
+    const lastCode = lastCustomer.customerCode;
+    const num = parseInt(lastCode.slice(4));
+    if (!isNaN(num)) {
+      nextNum = num + 1;
+    }
+  }
+
+  let inserted = 0;
+  const failed: CustomerBulkImportResult["failed"] = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const raw = rows[i];
+    try {
+      const customerCode = `CUST${nextNum.toString().padStart(3, "0")}`;
+
+      const rawName = getFlexibleField(raw, "Name", "name", "Customer Name", "CustomerName");
+      const name = safeParseString(rawName, `Customer ${customerCode}`);
+
+      const rawPhone = getFlexibleField(raw, "Phone", "phone", "Phone Number", "Mobile", "Contact");
+      const phone = safeParseString(rawPhone, "N/A");
+
+      const rawLocation = getFlexibleField(raw, "Location", "location", "Area", "Zone");
+      const location = safeParseString(rawLocation, "General");
+
+      const rawPackage = getFlexibleField(raw, "Package", "packageName", "Package Name", "Plan");
+      const packageName = safeParseString(rawPackage, "Standard");
+
+      const rawFee = getFlexibleField(raw, "Monthly Fee (৳)", "Monthly Fee", "monthlyFee", "Fee", "Price", "Amount");
+      const monthlyFee = safeParseNumber(rawFee, 0);
+
+      const rawDate = getFlexibleField(raw, "Connection Date (YYYY-MM-DD)", "Connection Date", "connectionDate", "Date");
+      const connectionDate = safeParseDate(rawDate, new Date());
+
+      const VALID_STATUSES = ["Active", "Inactive", "Disconnected"];
+      const rawStatus = safeParseString(getFlexibleField(raw, "Status", "status"), "Active");
+      const status = VALID_STATUSES.includes(rawStatus) ? rawStatus : "Active";
+
+      const rawEmail = getFlexibleField(raw, "Email", "email", "Email Address");
+      const email = safeParseString(rawEmail, "") || undefined;
+
+      const rawRouter = getFlexibleField(raw, "Router", "router", "Router Model");
+      const router = safeParseString(rawRouter, "") || undefined;
+
+      const rawIp = getFlexibleField(raw, "IP Address", "ipAddress", "IP", "IPAddress");
+      const ipAddress = safeParseString(rawIp, "") || undefined;
+
+      const rawNotes = getFlexibleField(raw, "Notes", "notes", "Remarks", "Comment");
+      const notes = safeParseString(rawNotes, "") || undefined;
+
+      await Customer.create({
+        customerCode,
+        name,
+        phone,
+        location,
+        packageName,
+        monthlyFee,
+        connectionDate,
+        status,
+        email,
+        router,
+        ipAddress,
+        notes,
+      });
+
+      nextNum++;
+      inserted++;
+    } catch (err) {
+      failed.push({
+        row: i + 2,
+        data: raw,
+        reason: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
+  }
+
+  revalidatePath("/customers");
+  return { inserted, failed };
+}
+
