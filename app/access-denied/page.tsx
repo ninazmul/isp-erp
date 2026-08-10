@@ -1,6 +1,8 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { Button } from "@/components/ui/button";
+import ClerkSignOutButton from "@/components/shared/ClerkSignOutButton";
 import { Lock } from "lucide-react";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -19,9 +21,21 @@ export default async function AccessDeniedPage() {
             ? "You don't have permission to access this application. Please contact an administrator to get access."
             : "Please sign in to continue."}
         </p>
-        <Button asChild className="w-full bg-[#3e0078] hover:bg-[#3e0078]/90">
-          <a href={user ? "/" : "/sign-in"}>{user ? "Go Home" : "Sign In"}</a>
-        </Button>
+        {user ? (
+          <div className="flex flex-col gap-3">
+            <Button
+              asChild
+              className="w-full bg-[#3e0078] hover:bg-[#3e0078]/90"
+            >
+              <Link href="/">Go Home</Link>
+            </Button>
+            <ClerkSignOutButton />
+          </div>
+        ) : (
+          <Button asChild className="w-full bg-[#3e0078] hover:bg-[#3e0078]/90">
+            <Link href="/sign-in">Sign In</Link>
+          </Button>
+        )}
       </div>
     </div>
   );
