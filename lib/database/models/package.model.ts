@@ -8,8 +8,6 @@ const PackageSchema = new Schema(
   { timestamps: true },
 );
 
-PackageSchema.index({ name: 1 });
-
 const Package = models.Package || model("Package", PackageSchema);
 
 export default Package;

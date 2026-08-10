@@ -7,8 +7,6 @@ const LocationSchema = new Schema(
   { timestamps: true },
 );
 
-LocationSchema.index({ name: 1 });
-
 const Location = models.Location || model("Location", LocationSchema);
 
 export default Location;
