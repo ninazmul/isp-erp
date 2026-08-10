@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Lock, Plus, Settings } from "lucide-react";
+import { Trash2, Plus, Settings } from "lucide-react";
 import { toast } from "react-hot-toast";
 import {
   getCategories,
@@ -92,19 +92,13 @@ function CategoryTab({ type }: { type: "income" | "expense" }) {
             <span className="text-xs font-semibold text-slate-700">
               {cat.name}
             </span>
-            {cat.isDefault ? (
-              <span title="Default category — cannot be deleted">
-                <Lock className="w-3.5 h-3.5 text-slate-400" />
-              </span>
-            ) : (
-              <button
-                onClick={() => handleDelete(cat._id, cat.name)}
-                className="text-slate-400 hover:text-rose-600 transition-colors p-0.5"
-                title="Delete category"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            )}
+            <button
+              onClick={() => handleDelete(cat._id, cat.name)}
+              className="text-slate-400 hover:text-rose-600 transition-colors p-0.5"
+              title="Delete category"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
           </div>
         ))}
         {categories.length === 0 && (
@@ -114,9 +108,9 @@ function CategoryTab({ type }: { type: "income" | "expense" }) {
         )}
       </div>
 
-      <p className="text-[11px] text-slate-400 flex items-center gap-1.5 pt-2">
-        <Lock className="w-3 h-3 text-slate-400" /> Default system categories
-        are protected and cannot be removed
+      <p className="text-[11px] text-slate-400 pt-2">
+        Tip: Categories used by existing expense or income records cannot be
+        removed deleted until those records are reassigned.
       </p>
     </div>
   );

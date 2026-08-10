@@ -6,24 +6,6 @@ import Expense from "@/lib/database/models/expense.model";
 import Income from "@/lib/database/models/income.model";
 import { revalidatePath } from "next/cache";
 
-const DEFAULT_EXPENSE_CATEGORIES = [
-  "Bandwidth",
-  "Electricity",
-  "Salary",
-  "Maintenance",
-  "Equipment",
-  "Rent",
-  "Transport",
-  "Miscellaneous",
-];
-
-const DEFAULT_INCOME_CATEGORIES = [
-  "Connection Fee",
-  "Monthly Bill",
-  "Service Charge",
-  "Other",
-];
-
 interface CategoryDoc {
   _id: string;
   name: string;
@@ -31,20 +13,8 @@ interface CategoryDoc {
   isDefault: boolean;
 }
 
-async function seedDefaults(type: "income" | "expense") {
-  const defaults =
-    type === "expense" ? DEFAULT_EXPENSE_CATEGORIES : DEFAULT_INCOME_CATEGORIES;
-  const count = await Category.countDocuments({ type });
-  if (count === 0) {
-    await Category.insertMany(
-      defaults.map((name) => ({ name, type, isDefault: true })),
-    );
-  }
-}
-
 export async function getCategories(type: "income" | "expense") {
   await connectToDatabase();
-  await seedDefaults(type);
   const categories = await Category.find({ type })
     .sort({ name: 1 })
     .lean<CategoryDoc[]>();
@@ -72,7 +42,6 @@ export async function deleteCategory(id: string) {
   await connectToDatabase();
   const category = await Category.findById(id).lean<CategoryDoc | null>();
   if (!category) throw new Error("Category not found");
-  if (category.isDefault) throw new Error("Cannot delete a default category");
 
   const Model = category.type === "expense" ? Expense : Income;
   const inUseCount = await Model.countDocuments({ category: category.name });
