@@ -7,7 +7,7 @@ const CustomerSchema = new Schema(
     phone: { type: String, required: true },
     email: { type: String },
     address: { type: String },
-    location: { type: String },
+    location: { type: String, required: true },
     packageName: { type: String, required: true },
     monthlyFee: { type: Number, required: true },
     connectionDate: { type: Date, required: true },

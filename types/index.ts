@@ -5,7 +5,7 @@ export interface Customer {
   phone: string;
   email?: string;
   address?: string;
-  location?: string;
+  location: string;
   packageName: string;
   monthlyFee: number;
   connectionDate: Date;

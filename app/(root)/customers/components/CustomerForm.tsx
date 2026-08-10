@@ -32,7 +32,7 @@ interface Customer {
   phone: string;
   email?: string;
   address?: string;
-  location?: string;
+  location: string;
   packageName: string;
   monthlyFee: number;
   connectionDate: Date;
@@ -177,7 +177,7 @@ export default function CustomerForm({
     try {
       const payload = {
         ...data,
-        location: data.location || undefined,
+        location: data.location,
         connectionDate: new Date(data.connectionDate),
         email: data.email || undefined,
         address: data.address || undefined,
@@ -372,14 +372,10 @@ export default function CustomerForm({
           <FormField
             control={form.control}
             name="location"
+            rules={{ required: "Location is required" }}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Location{" "}
-                  <span className="text-gray-400 text-xs font-normal">
-                    (optional)
-                  </span>
-                </FormLabel>
+                <FormLabel>Location</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   value={field.value || undefined}
