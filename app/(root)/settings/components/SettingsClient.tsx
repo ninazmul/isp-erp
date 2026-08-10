@@ -47,6 +47,8 @@ function CategoryTab({ type }: { type: "income" | "expense" }) {
   const [newName, setNewName] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const isExpense = type === "expense";
+
   const load = async () => {
     const data = await getCategories(type);
     setCategories(data);
@@ -86,36 +88,61 @@ function CategoryTab({ type }: { type: "income" | "expense" }) {
   return (
     <div className="space-y-4">
       {/* Add form */}
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-col sm:flex-row gap-2.5">
         <Input
           placeholder={`New ${type} category name...`}
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-          className="max-w-sm rounded-xl border-slate-200 text-sm"
+          className="w-full sm:max-w-sm rounded-xl border-slate-200 focus-visible:ring-purple-500 text-sm"
         />
         <Button
           onClick={handleAdd}
           disabled={loading || !newName.trim()}
-          className="bg-[#3e0078] hover:bg-[#52029d] rounded-xl text-sm"
+          className={
+            isExpense
+              ? "bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white rounded-xl shadow-sm text-sm font-semibold w-full sm:w-auto"
+              : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl shadow-sm text-sm font-semibold w-full sm:w-auto"
+          }
         >
-          <Plus className="mr-2 h-4 w-4" /> Add Category
+          <Plus className="mr-2 h-4 w-4" /> Add {isExpense ? "Expense" : "Income"} Category
         </Button>
       </div>
 
       {/* Dynamic pill tags */}
-      <div className="flex flex-wrap gap-2 pt-2">
+      <div className="flex flex-wrap gap-2.5 pt-2">
         {categories.map((cat) => (
           <div
             key={cat._id}
-            className="flex items-center gap-2 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-1.5 shadow-2xs"
+            className={
+              isExpense
+                ? "flex items-center gap-2 bg-gradient-to-r from-rose-50 to-pink-50/80 border border-rose-200/80 rounded-xl px-3.5 py-1.5 shadow-2xs max-w-full hover:shadow-xs transition-all"
+                : "flex items-center gap-2 bg-gradient-to-r from-emerald-50 to-teal-50/80 border border-emerald-200/80 rounded-xl px-3.5 py-1.5 shadow-2xs max-w-full hover:shadow-xs transition-all"
+            }
           >
-            <span className="text-xs font-semibold text-slate-700">
+            <span
+              className={
+                isExpense
+                  ? "w-2 h-2 rounded-full bg-rose-500 shrink-0"
+                  : "w-2 h-2 rounded-full bg-emerald-500 shrink-0"
+              }
+            />
+            <span
+              className={
+                isExpense
+                  ? "text-xs font-bold text-rose-900 truncate"
+                  : "text-xs font-bold text-emerald-900 truncate"
+              }
+            >
               {cat.name}
             </span>
             <button
               onClick={() => handleDelete(cat._id, cat.name)}
-              className="text-slate-400 hover:text-rose-600 transition-colors p-0.5"
+              className={
+                isExpense
+                  ? "text-rose-400 hover:text-rose-700 transition-colors p-0.5 shrink-0 ml-0.5"
+                  : "text-emerald-400 hover:text-emerald-700 transition-colors p-0.5 shrink-0 ml-0.5"
+              }
               title="Delete category"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -123,13 +150,13 @@ function CategoryTab({ type }: { type: "income" | "expense" }) {
           </div>
         ))}
         {categories.length === 0 && (
-          <p className="text-xs text-slate-400 py-4">
-            No categories created yet.
+          <p className="text-xs text-slate-400 py-3">
+            No {type} categories created yet.
           </p>
         )}
       </div>
 
-      <p className="text-[11px] text-slate-400 pt-2">
+      <p className="text-[11px] text-slate-400 pt-1">
         Tip: Categories used by existing expense or income records cannot be
         removed until those records are reassigned.
       </p>
@@ -187,13 +214,13 @@ function PackageTab() {
   return (
     <div className="space-y-4">
       {/* Add form */}
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-col sm:flex-row gap-2.5">
         <Input
           placeholder="Package name (e.g. 10 Mbps)"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-          className="max-w-sm rounded-xl border-slate-200 text-sm"
+          className="w-full sm:max-w-sm rounded-xl border-slate-200 focus-visible:ring-indigo-500 text-sm"
         />
         <Input
           type="number"
@@ -203,34 +230,34 @@ function PackageTab() {
           value={newFee}
           onChange={(e) => setNewFee(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-          className="max-w-[180px] rounded-xl border-slate-200 text-sm"
+          className="w-full sm:max-w-[180px] rounded-xl border-slate-200 focus-visible:ring-indigo-500 text-sm"
         />
         <Button
           onClick={handleAdd}
           disabled={loading || !newName.trim()}
-          className="bg-[#3e0078] hover:bg-[#52029d] rounded-xl text-sm"
+          className="bg-gradient-to-r from-[#3e0078] to-[#6b11c9] hover:from-[#4c0094] hover:to-[#7c17ea] text-white rounded-xl shadow-sm text-sm font-semibold w-full sm:w-auto"
         >
           <Plus className="mr-2 h-4 w-4" /> Add Package
         </Button>
       </div>
 
       {/* Dynamic pill tags */}
-      <div className="flex flex-wrap gap-2 pt-2">
+      <div className="flex flex-wrap gap-2.5 pt-2">
         {packages.map((pkg) => (
           <div
             key={pkg._id}
-            className="flex items-center gap-2 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-1.5 shadow-2xs"
+            className="flex items-center gap-2 bg-gradient-to-r from-purple-50 to-indigo-50/80 border border-purple-200/80 rounded-xl px-3.5 py-1.5 shadow-2xs max-w-full hover:shadow-xs transition-all"
           >
-            <PackageIcon className="w-3.5 h-3.5 text-[#3e0078]" />
-            <span className="text-xs font-semibold text-slate-700">
+            <PackageIcon className="w-3.5 h-3.5 text-purple-700 shrink-0" />
+            <span className="text-xs font-bold text-purple-950 truncate">
               {pkg.name}
             </span>
-            <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded-md">
+            <span className="text-[10px] font-extrabold text-white bg-gradient-to-r from-purple-600 to-indigo-600 px-2 py-0.5 rounded-lg shrink-0 shadow-2xs">
               ৳{pkg.monthlyFee}
             </span>
             <button
               onClick={() => handleDelete(pkg._id, pkg.name)}
-              className="text-slate-400 hover:text-rose-600 transition-colors p-0.5"
+              className="text-purple-400 hover:text-rose-600 transition-colors p-0.5 shrink-0 ml-0.5"
               title="Delete package"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -238,13 +265,13 @@ function PackageTab() {
           </div>
         ))}
         {packages.length === 0 && (
-          <p className="text-xs text-slate-400 py-4">
+          <p className="text-xs text-slate-400 py-3">
             No packages created yet.
           </p>
         )}
       </div>
 
-      <p className="text-[11px] text-slate-400 pt-2">
+      <p className="text-[11px] text-slate-400 pt-1">
         Tip: Packages still assigned to customers cannot be removed until
         reassigned.
       </p>
@@ -295,37 +322,37 @@ function LocationTab() {
   return (
     <div className="space-y-4">
       {/* Add form */}
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-col sm:flex-row gap-2.5">
         <Input
           placeholder="New location name (e.g. Dhanmondi, Area-3)"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-          className="max-w-sm rounded-xl border-slate-200 text-sm"
+          className="w-full sm:max-w-sm rounded-xl border-slate-200 focus-visible:ring-emerald-500 text-sm"
         />
         <Button
           onClick={handleAdd}
           disabled={loading || !newName.trim()}
-          className="bg-[#3e0078] hover:bg-[#52029d] rounded-xl text-sm"
+          className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl shadow-sm text-sm font-semibold w-full sm:w-auto"
         >
           <Plus className="mr-2 h-4 w-4" /> Add Location
         </Button>
       </div>
 
       {/* Dynamic pill tags */}
-      <div className="flex flex-wrap gap-2 pt-2">
+      <div className="flex flex-wrap gap-2.5 pt-2">
         {locations.map((loc) => (
           <div
             key={loc._id}
-            className="flex items-center gap-2 bg-slate-50 border border-slate-200/80 rounded-xl px-3 py-1.5 shadow-2xs"
+            className="flex items-center gap-2 bg-gradient-to-r from-sky-50 to-cyan-50/80 border border-sky-200/80 rounded-xl px-3.5 py-1.5 shadow-2xs max-w-full hover:shadow-xs transition-all"
           >
-            <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="text-xs font-semibold text-slate-700">
+            <MapPin className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+            <span className="text-xs font-bold text-sky-950 truncate">
               {loc.name}
             </span>
             <button
               onClick={() => handleDelete(loc._id, loc.name)}
-              className="text-slate-400 hover:text-rose-600 transition-colors p-0.5"
+              className="text-sky-400 hover:text-rose-600 transition-colors p-0.5 shrink-0 ml-0.5"
               title="Delete location"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -333,13 +360,13 @@ function LocationTab() {
           </div>
         ))}
         {locations.length === 0 && (
-          <p className="text-xs text-slate-400 py-4">
+          <p className="text-xs text-slate-400 py-3">
             No locations created yet.
           </p>
         )}
       </div>
 
-      <p className="text-[11px] text-slate-400 pt-2">
+      <p className="text-[11px] text-slate-400 pt-1">
         Tip: Locations still assigned to customers cannot be removed until
         reassigned.
       </p>
@@ -368,13 +395,13 @@ export default function SettingsClient() {
       </div>
 
       {/* Category Management */}
-      <Card className="rounded-2xl border border-slate-100 bg-white shadow-sm overflow-hidden">
+      <Card className="rounded-2xl border border-slate-100 border-t-4 border-t-purple-600 bg-white shadow-sm overflow-hidden">
         <CardHeader className="border-b border-slate-100">
-          <CardTitle className="flex items-center gap-2 text-base font-bold text-slate-800">
-            Category Management
+          <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-base font-bold text-slate-800">
+            <span>Category Management</span>
             <Badge
               variant="secondary"
-              className="text-[10px] bg-purple-50 text-purple-700 border-purple-100 font-semibold"
+              className="w-fit text-[10px] bg-purple-100 text-purple-800 border-purple-200 font-bold px-2.5 py-0.5 rounded-md"
             >
               Dynamic Taxonomies
             </Badge>
@@ -386,16 +413,16 @@ export default function SettingsClient() {
         </CardHeader>
         <CardContent className="pt-5">
           <Tabs defaultValue="expense" className="w-full">
-            <TabsList className="bg-slate-100 p-1 rounded-xl mb-4 flex flex-wrap h-auto gap-1">
+            <TabsList className="grid grid-cols-2 sm:inline-flex sm:w-auto w-full bg-slate-100/90 p-1.5 rounded-2xl mb-5 gap-1.5 border border-slate-200/60">
               <TabsTrigger
                 value="expense"
-                className="rounded-lg text-xs font-semibold"
+                className="rounded-xl text-xs font-bold px-4 py-2 text-slate-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-600 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all text-center"
               >
                 Expense Categories
               </TabsTrigger>
               <TabsTrigger
                 value="income"
-                className="rounded-lg text-xs font-semibold"
+                className="rounded-xl text-xs font-bold px-4 py-2 text-slate-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-teal-600 data-[state=active]:text-white data-[state=active]:shadow-sm transition-all text-center"
               >
                 Income Categories
               </TabsTrigger>
@@ -411,14 +438,16 @@ export default function SettingsClient() {
       </Card>
 
       {/* Package Management */}
-      <Card className="rounded-2xl border border-slate-100 bg-white shadow-sm overflow-hidden">
+      <Card className="rounded-2xl border border-slate-100 border-t-4 border-t-indigo-600 bg-white shadow-sm overflow-hidden">
         <CardHeader className="border-b border-slate-100">
-          <CardTitle className="flex items-center gap-2 text-base font-bold text-slate-800">
-            <PackageIcon className="w-4 h-4 text-[#3e0078]" />
-            Package Management
+          <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-base font-bold text-slate-800">
+            <span className="flex items-center gap-2">
+              <PackageIcon className="w-4 h-4 text-[#3e0078]" />
+              Package Management
+            </span>
             <Badge
               variant="secondary"
-              className="text-[10px] bg-purple-50 text-purple-700 border-purple-100 font-semibold"
+              className="w-fit text-[10px] bg-indigo-100 text-indigo-800 border-indigo-200 font-bold px-2.5 py-0.5 rounded-md"
             >
               ISP Plans
             </Badge>
@@ -434,14 +463,16 @@ export default function SettingsClient() {
       </Card>
 
       {/* Location Management */}
-      <Card className="rounded-2xl border border-slate-100 bg-white shadow-sm overflow-hidden">
+      <Card className="rounded-2xl border border-slate-100 border-t-4 border-t-emerald-600 bg-white shadow-sm overflow-hidden">
         <CardHeader className="border-b border-slate-100">
-          <CardTitle className="flex items-center gap-2 text-base font-bold text-slate-800">
-            <MapPin className="w-4 h-4 text-emerald-600" />
-            Location Management
+          <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-base font-bold text-slate-800">
+            <span className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-emerald-600" />
+              Location Management
+            </span>
             <Badge
               variant="secondary"
-              className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-100 font-semibold"
+              className="w-fit text-[10px] bg-emerald-100 text-emerald-800 border-emerald-200 font-bold px-2.5 py-0.5 rounded-md"
             >
               Service Zones
             </Badge>
