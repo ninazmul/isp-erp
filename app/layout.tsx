@@ -79,8 +79,8 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={`${inter.variable} ${dmSerif.variable} font-sans`}>
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${inter.variable} ${dmSerif.variable} font-sans`} suppressHydrationWarning>
           {children}
         </body>
       </html>

@@ -30,8 +30,10 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, ChevronLeft, ChevronRight, Wallet, Search } from "lucide-react";
 import { toast } from "react-hot-toast";
 import ExpenseForm from "./ExpenseForm";
-import { getExpenses, deleteExpense } from "@/lib/actions/expense.actions";
+import { getExpenses, deleteExpense, bulkCreateExpenses } from "@/lib/actions/expense.actions";
 import { getCategories } from "@/lib/actions/category.actions";
+import ExcelImportExport, { type ImportResult } from "@/components/shared/ExcelImportExport";
+import { exportToExcel, downloadTemplate } from "@/lib/excel";
 
 interface Expense {
   _id: string;
@@ -52,6 +54,7 @@ export default function ExpensesClient({
   initialTotal?: number;
   initialTotalPages?: number;
 }) {
+  const [mounted, setMounted] = useState(false);
   const [expenses, setExpenses] = useState(initialExpenses);
   const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
   const [search, setSearch] = useState("");
@@ -70,6 +73,7 @@ export default function ExpensesClient({
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
   useEffect(() => {
+    setMounted(true);
     getCategories("expense").then(setCategories);
   }, []);
 
@@ -88,8 +92,10 @@ export default function ExpensesClient({
   }, [search, category, month, year, page, limit]);
 
   useEffect(() => {
-    loadExpenses();
-  }, [loadExpenses]);
+    if (mounted) {
+      loadExpenses();
+    }
+  }, [loadExpenses, mounted]);
 
   const handleSearchChange = (val: string) => {
     setSearch(val);
@@ -130,6 +136,52 @@ export default function ExpensesClient({
 
   const pageAmountTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
 
+  // ── Excel Columns ─────────────────────────────────────────────────────────
+  const EXPENSE_HEADERS = [
+    "Category",
+    "Amount",
+    "Date (YYYY-MM-DD)",
+    "PaymentMethod",
+    "Reference",
+    "Description",
+  ];
+
+  const EXPENSE_SAMPLE = {
+    Category: "Office Supplies",
+    Amount: 1200,
+    "Date (YYYY-MM-DD)": new Date().toISOString().split("T")[0],
+    PaymentMethod: "Cash",
+    Reference: "EXP-001",
+    Description: "Monthly office expense",
+  };
+
+  const handleTemplate = () => {
+    downloadTemplate(EXPENSE_HEADERS, EXPENSE_SAMPLE, "expense_import_template.xlsx");
+  };
+
+  const handleExport = async () => {
+    try {
+      const res = await getExpenses({ search, category, month: month && month !== "all" ? parseInt(month) : undefined, year: parseInt(year), limit: 10000 });
+      const rows = res.expenses.map((exp: Expense) => ({
+        Category: exp.category,
+        Amount: exp.amount,
+        "Date (YYYY-MM-DD)": new Date(exp.expenseDate).toISOString().split("T")[0],
+        PaymentMethod: exp.paymentMethod,
+        Reference: exp.reference ?? "",
+        Description: exp.description ?? "",
+      }));
+      exportToExcel(rows, EXPENSE_HEADERS, "Expenses", `expense_export_${year}_${month || "all"}.xlsx`);
+    } catch {
+      toast.error("Failed to export expense data");
+    }
+  };
+
+  const handleImport = async (rows: Record<string, unknown>[]): Promise<ImportResult> => {
+    const result = await bulkCreateExpenses(rows);
+    loadExpenses();
+    return result;
+  };
+
   return (
     <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto">
       {/* Page Header */}
@@ -149,25 +201,33 @@ export default function ExpensesClient({
           </div>
         </div>
 
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-[#3e0078] hover:bg-[#52029d] text-white shadow-md shadow-purple-900/10 rounded-xl w-full sm:w-auto">
-              <Plus className="mr-2 h-4 w-4" /> Add Expense
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-slate-800">Add New Expense</DialogTitle>
-            </DialogHeader>
-            <ExpenseForm
-              onSuccess={() => {
-                setIsAddOpen(false);
-                loadExpenses();
-                toast.success("Expense added successfully");
-              }}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex flex-wrap items-center gap-2">
+          <ExcelImportExport
+            label="Expenses"
+            onTemplate={handleTemplate}
+            onExport={handleExport}
+            onImport={handleImport}
+          />
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-[#3e0078] hover:bg-[#52029d] text-white shadow-md shadow-purple-900/10 rounded-xl w-full sm:w-auto">
+                <Plus className="mr-2 h-4 w-4" /> Add Expense
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold text-slate-800">Add New Expense</DialogTitle>
+              </DialogHeader>
+              <ExpenseForm
+                onSuccess={() => {
+                  setIsAddOpen(false);
+                  loadExpenses();
+                  toast.success("Expense added successfully");
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Filters & Limit Controls */}

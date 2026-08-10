@@ -20,7 +20,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getBills, getExpenses, getIncomes } from "@/lib/actions";
-import { Download, FileText, TrendingUp, TrendingDown, DollarSign, Wallet } from "lucide-react";
+import { Download, FileText, TrendingUp, TrendingDown, DollarSign, Wallet, FileSpreadsheet } from "lucide-react";
+import { exportToExcel, exportMultiSheetExcel } from "@/lib/excel";
 
 interface Bill {
   _id: string;
@@ -50,11 +51,16 @@ interface Income {
 }
 
 export default function ReportsPage() {
+  const [mounted, setMounted] = useState(false);
   const [month, setMonth] = useState((new Date().getMonth() + 1).toString());
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [bills, setBills] = useState<Bill[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const loadData = useCallback(async () => {
     const m = parseInt(month);
@@ -70,8 +76,18 @@ export default function ReportsPage() {
   }, [month, year]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (mounted) {
+      loadData();
+    }
+  }, [loadData, mounted]);
+
+  if (!mounted) {
+    return (
+      <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto min-h-[400px] flex items-center justify-center">
+        <div className="animate-pulse text-sm text-slate-400 font-medium">Loading reports...</div>
+      </div>
+    );
+  }
 
   const billingIncome = bills
     .filter((b) => b.status === "Paid")
@@ -86,24 +102,71 @@ export default function ReportsPage() {
     .filter((b) => b.status === "Unpaid")
     .reduce((sum, b) => sum + b.amount, 0);
 
-  const exportToCSV = <T extends object>(data: T[], filename: string) => {
-    if (data.length === 0) return;
-    const headers = Object.keys(data[0] || {});
-    const csv = [
-      headers.join(","),
-      ...data.map((row) =>
-        headers
-          .map((header) => JSON.stringify(row[header as keyof T] as unknown))
-          .join(",")
-      ),
-    ].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
+  // ── Excel export helpers ────────────────────────────────────────────────
+  const BILLING_INCOME_HEADERS = ["Invoice #", "Customer", "Amount", "Payment Date"];
+  const MANUAL_INCOME_HEADERS = ["Category", "Amount", "Date", "Payment Method", "Reference"];
+  const EXPENSE_HEADERS = ["Category", "Amount", "Date", "Payment Method", "Reference"];
+  const DUE_HEADERS = ["Invoice #", "Customer", "Amount Due"];
+
+  const getBillingIncomeRows = () =>
+    bills
+      .filter((b) => b.status === "Paid")
+      .map((b) => ({
+        "Invoice #": b.invoiceNumber,
+        Customer: b.customer?.name ?? "—",
+        Amount: b.amount,
+        "Payment Date": b.paymentDate ? new Date(b.paymentDate).toLocaleDateString() : "—",
+      }));
+
+  const getManualIncomeRows = () =>
+    incomes.map((inc) => ({
+      Category: inc.category,
+      Amount: inc.amount,
+      Date: new Date(inc.incomeDate).toLocaleDateString(),
+      "Payment Method": inc.paymentMethod,
+      Reference: inc.reference ?? "—",
+    }));
+
+  const getExpenseRows = () =>
+    expenses.map((exp) => ({
+      Category: exp.category,
+      Amount: exp.amount,
+      Date: new Date(exp.expenseDate).toLocaleDateString(),
+      "Payment Method": exp.paymentMethod,
+      Reference: exp.reference ?? "—",
+    }));
+
+  const getDueRows = () =>
+    bills
+      .filter((b) => b.status === "Unpaid")
+      .map((b) => ({
+        "Invoice #": b.invoiceNumber,
+        Customer: b.customer?.name ?? "—",
+        "Amount Due": b.amount,
+      }));
+
+  const handleExportBillingIncome = () =>
+    exportToExcel(getBillingIncomeRows(), BILLING_INCOME_HEADERS, "Billing Income", `billing-income-${month}-${year}.xlsx`);
+
+  const handleExportManualIncome = () =>
+    exportToExcel(getManualIncomeRows(), MANUAL_INCOME_HEADERS, "Manual Income", `manual-income-${month}-${year}.xlsx`);
+
+  const handleExportExpenses = () =>
+    exportToExcel(getExpenseRows(), EXPENSE_HEADERS, "Expenses", `expenses-${month}-${year}.xlsx`);
+
+  const handleExportDues = () =>
+    exportToExcel(getDueRows(), DUE_HEADERS, "Unpaid Dues", `dues-${month}-${year}.xlsx`);
+
+  const handleExportFullReport = () => {
+    exportMultiSheetExcel(
+      [
+        { name: "Billing Income", data: getBillingIncomeRows(), headers: BILLING_INCOME_HEADERS },
+        { name: "Manual Income", data: getManualIncomeRows(), headers: MANUAL_INCOME_HEADERS },
+        { name: "Expenses", data: getExpenseRows(), headers: EXPENSE_HEADERS },
+        { name: "Unpaid Dues", data: getDueRows(), headers: DUE_HEADERS },
+      ],
+      `full-financial-report-${monthLabel}-${year}.xlsx`
+    );
   };
 
   const monthLabel = new Date(0, parseInt(month) - 1).toLocaleString("default", { month: "long" });
@@ -126,7 +189,7 @@ export default function ReportsPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <Select value={month} onValueChange={setMonth}>
             <SelectTrigger className="w-full sm:w-[150px] rounded-xl border-slate-200 text-sm">
               <SelectValue placeholder="Select month" />
@@ -151,6 +214,13 @@ export default function ReportsPage() {
               ))}
             </SelectContent>
           </Select>
+          <Button
+            onClick={handleExportFullReport}
+            className="h-9 bg-[#3e0078] hover:bg-[#52029d] text-white rounded-xl text-xs gap-1.5 shadow-sm"
+          >
+            <FileSpreadsheet className="h-3.5 w-3.5" />
+            Full Report (.xlsx)
+          </Button>
         </div>
       </div>
 
@@ -222,15 +292,10 @@ export default function ReportsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-xl border-slate-200 text-xs self-start sm:self-auto"
-                onClick={() =>
-                  exportToCSV(
-                    bills.filter((b) => b.status === "Paid"),
-                    `billing-report-${month}-${year}.csv`
-                  )
-                }
+                className="rounded-xl border-emerald-200 text-emerald-700 text-xs hover:bg-emerald-50 self-start sm:self-auto gap-1.5"
+                onClick={handleExportBillingIncome}
               >
-                <Download className="mr-2 h-4 w-4 text-emerald-600" /> Export CSV
+                <Download className="h-3.5 w-3.5" /> Export Excel
               </Button>
             </div>
             <div className="overflow-x-auto">
@@ -280,10 +345,10 @@ export default function ReportsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-xl border-slate-200 text-xs self-start sm:self-auto"
-                onClick={() => exportToCSV(incomes, `manual-income-${month}-${year}.csv`)}
+                className="rounded-xl border-cyan-200 text-cyan-700 text-xs hover:bg-cyan-50 self-start sm:self-auto gap-1.5"
+                onClick={handleExportManualIncome}
               >
-                <Download className="mr-2 h-4 w-4 text-cyan-600" /> Export CSV
+                <Download className="h-3.5 w-3.5" /> Export Excel
               </Button>
             </div>
             <div className="overflow-x-auto">
@@ -333,10 +398,10 @@ export default function ReportsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-xl border-slate-200 text-xs self-start sm:self-auto"
-                onClick={() => exportToCSV(expenses, `expense-report-${month}-${year}.csv`)}
+                className="rounded-xl border-rose-200 text-rose-700 text-xs hover:bg-rose-50 self-start sm:self-auto gap-1.5"
+                onClick={handleExportExpenses}
               >
-                <Download className="mr-2 h-4 w-4 text-rose-600" /> Export CSV
+                <Download className="h-3.5 w-3.5" /> Export Excel
               </Button>
             </div>
             <div className="overflow-x-auto">
@@ -386,15 +451,10 @@ export default function ReportsPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-xl border-slate-200 text-xs self-start sm:self-auto"
-                onClick={() =>
-                  exportToCSV(
-                    bills.filter((b) => b.status === "Unpaid"),
-                    `due-report-${month}-${year}.csv`
-                  )
-                }
+                className="rounded-xl border-amber-200 text-amber-700 text-xs hover:bg-amber-50 self-start sm:self-auto gap-1.5"
+                onClick={handleExportDues}
               >
-                <Download className="mr-2 h-4 w-4 text-amber-600" /> Export CSV
+                <Download className="h-3.5 w-3.5" /> Export Excel
               </Button>
             </div>
             <div className="overflow-x-auto">

@@ -187,3 +187,140 @@ export async function getBillById(id: string) {
   const bill = await Bill.findById(id).populate("customer").lean();
   return JSON.parse(JSON.stringify(bill));
 }
+
+// ---------------------------------------------------------------------------
+// Bulk Import
+// ---------------------------------------------------------------------------
+
+import {
+  getFlexibleField,
+  safeParseNumber,
+  safeParseString,
+} from "@/lib/excel";
+
+export interface BillBulkImportResult {
+  inserted: number;
+  failed: Array<{ row: number; data: Record<string, unknown>; reason: string }>;
+}
+
+/**
+ * Bulk-imports billing records from an array of raw row objects.
+ * - Looks up customer by CustomerCode first, then CustomerName.
+ * - Each row is independent; a failed row never stops the rest.
+ * - Handles type coercion safely for numbers, strings, and missing fields.
+ */
+export async function bulkImportBills(
+  rows: Record<string, unknown>[]
+): Promise<BillBulkImportResult> {
+  await connectToDatabase();
+
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1;
+  const currentYear = now.getFullYear();
+
+  let inserted = 0;
+  const failed: BillBulkImportResult["failed"] = [];
+
+  // Determine starting invoice sequence
+  const lastBill = await Bill.findOne()
+    .select("invoiceNumber")
+    .sort({ createdAt: -1 })
+    .lean<RawBillDoc | null>();
+
+  let invoiceSeq = 1;
+  if (lastBill?.invoiceNumber) {
+    const parsed = parseInt(lastBill.invoiceNumber.slice(INVOICE_PREFIX.length));
+    if (!isNaN(parsed)) invoiceSeq = parsed + 1;
+  }
+
+  for (let i = 0; i < rows.length; i++) {
+    const raw = rows[i];
+    try {
+      // ---- Extract customer identifier ----
+      const rawCustomerCode = getFlexibleField(raw, "CustomerCode", "Customer Code", "customerCode", "Code", "ID");
+      const customerCode = safeParseString(rawCustomerCode, "");
+
+      const rawCustomerName = getFlexibleField(raw, "CustomerName", "Customer Name", "customerName", "Name", "Customer");
+      const customerName = safeParseString(rawCustomerName, "");
+
+      let customer = null;
+
+      if (customerCode) {
+        customer = await Customer.findOne({
+          $or: [
+            { customerCode: customerCode },
+            { customerCode: new RegExp(`^${customerCode}$`, "i") },
+          ],
+          isDeleted: false,
+        })
+          .select("_id monthlyFee")
+          .lean<{ _id: unknown; monthlyFee: number }>();
+      }
+
+      if (!customer && customerName) {
+        customer = await Customer.findOne({
+          name: new RegExp(`^${customerName}$`, "i"),
+          isDeleted: false,
+        })
+          .select("_id monthlyFee")
+          .lean<{ _id: unknown; monthlyFee: number }>();
+      }
+
+      if (!customer) {
+        throw new Error(
+          `Customer not found (CustomerCode="${customerCode}", CustomerName="${customerName}")`
+        );
+      }
+
+      // ---- Normalise Month & Year ----
+      const rawMonthVal = getFlexibleField(raw, "Month", "month", "Billing Month");
+      const parsedMonth = Math.floor(safeParseNumber(rawMonthVal, currentMonth));
+      const month = parsedMonth >= 1 && parsedMonth <= 12 ? parsedMonth : currentMonth;
+
+      const rawYearVal = getFlexibleField(raw, "Year", "year", "Billing Year");
+      const parsedYear = Math.floor(safeParseNumber(rawYearVal, currentYear));
+      const year = parsedYear > 2000 ? parsedYear : currentYear;
+
+      // ---- Amount & Status ----
+      const rawAmountVal = getFlexibleField(raw, "Amount", "amount", "Bill Amount", "Total");
+      const amount = rawAmountVal !== undefined && rawAmountVal !== null && rawAmountVal !== ""
+        ? safeParseNumber(rawAmountVal, customer.monthlyFee ?? 0)
+        : (customer.monthlyFee ?? 0);
+
+      const VALID_STATUSES = ["Paid", "Unpaid"];
+      const rawStatusVal = getFlexibleField(raw, "Status", "status", "Payment Status");
+      const rawStatus = safeParseString(rawStatusVal, "Unpaid");
+      const status = VALID_STATUSES.map(s => s.toLowerCase()).includes(rawStatus.toLowerCase())
+        ? (rawStatus.toLowerCase() === "paid" ? "Paid" : "Unpaid")
+        : "Unpaid";
+
+      // ---- Invoice Number ----
+      const rawInvoiceVal = getFlexibleField(raw, "InvoiceNumber", "Invoice Number", "invoiceNumber", "Invoice");
+      const rawInvoice = safeParseString(rawInvoiceVal, "");
+      const invoiceNumber = rawInvoice
+        ? rawInvoice
+        : `${INVOICE_PREFIX}${invoiceSeq.toString().padStart(6, "0")}`;
+      if (!rawInvoice) invoiceSeq++;
+
+      await Bill.create({
+        customer: customer._id,
+        month,
+        year,
+        amount,
+        status,
+        invoiceNumber,
+      });
+
+      inserted++;
+    } catch (err) {
+      failed.push({
+        row: i + 2,
+        data: raw,
+        reason: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
+  }
+
+  revalidatePath("/billing");
+  return { inserted, failed };
+}

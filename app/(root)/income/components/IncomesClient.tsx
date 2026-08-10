@@ -30,8 +30,10 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, ChevronLeft, ChevronRight, TrendingUp, Search } from "lucide-react";
 import { toast } from "react-hot-toast";
 import IncomeForm from "./IncomeForm";
-import { getIncomes, deleteIncome } from "@/lib/actions/income.actions";
+import { getIncomes, deleteIncome, bulkCreateIncomes } from "@/lib/actions/income.actions";
 import { getCategories } from "@/lib/actions/category.actions";
+import ExcelImportExport, { type ImportResult } from "@/components/shared/ExcelImportExport";
+import { exportToExcel, downloadTemplate } from "@/lib/excel";
 
 interface Income {
   _id: string;
@@ -52,6 +54,7 @@ export default function IncomesClient({
   initialTotal?: number;
   initialTotalPages?: number;
 }) {
+  const [mounted, setMounted] = useState(false);
   const [incomes, setIncomes] = useState(initialIncomes);
   const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
   const [search, setSearch] = useState("");
@@ -70,6 +73,7 @@ export default function IncomesClient({
   const [editingIncome, setEditingIncome] = useState<Income | null>(null);
 
   useEffect(() => {
+    setMounted(true);
     getCategories("income").then(setCategories);
   }, []);
 
@@ -88,8 +92,10 @@ export default function IncomesClient({
   }, [search, category, month, year, page, limit]);
 
   useEffect(() => {
-    loadIncomes();
-  }, [loadIncomes]);
+    if (mounted) {
+      loadIncomes();
+    }
+  }, [loadIncomes, mounted]);
 
   const handleSearchChange = (val: string) => {
     setSearch(val);
@@ -130,6 +136,52 @@ export default function IncomesClient({
 
   const pageAmountTotal = incomes.reduce((sum, i) => sum + i.amount, 0);
 
+  // ── Excel Columns ─────────────────────────────────────────────────────────
+  const INCOME_HEADERS = [
+    "Category",
+    "Amount",
+    "Date (YYYY-MM-DD)",
+    "PaymentMethod",
+    "Reference",
+    "Description",
+  ];
+
+  const INCOME_SAMPLE = {
+    Category: "Internet Service",
+    Amount: 500,
+    "Date (YYYY-MM-DD)": new Date().toISOString().split("T")[0],
+    PaymentMethod: "Cash",
+    Reference: "REC-001",
+    Description: "Monthly subscription",
+  };
+
+  const handleTemplate = () => {
+    downloadTemplate(INCOME_HEADERS, INCOME_SAMPLE, "income_import_template.xlsx");
+  };
+
+  const handleExport = async () => {
+    try {
+      const res = await getIncomes({ search, category, month: month && month !== "all" ? parseInt(month) : undefined, year: parseInt(year), limit: 10000 });
+      const rows = res.incomes.map((inc: Income) => ({
+        Category: inc.category,
+        Amount: inc.amount,
+        "Date (YYYY-MM-DD)": new Date(inc.incomeDate).toISOString().split("T")[0],
+        PaymentMethod: inc.paymentMethod,
+        Reference: inc.reference ?? "",
+        Description: inc.description ?? "",
+      }));
+      exportToExcel(rows, INCOME_HEADERS, "Income", `income_export_${year}_${month || "all"}.xlsx`);
+    } catch {
+      toast.error("Failed to export income data");
+    }
+  };
+
+  const handleImport = async (rows: Record<string, unknown>[]): Promise<ImportResult> => {
+    const result = await bulkCreateIncomes(rows);
+    loadIncomes();
+    return result;
+  };
+
   return (
     <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto">
       {/* Page Header */}
@@ -149,25 +201,33 @@ export default function IncomesClient({
           </div>
         </div>
 
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-[#3e0078] hover:bg-[#52029d] text-white shadow-md shadow-purple-900/10 rounded-xl w-full sm:w-auto">
-              <Plus className="mr-2 h-4 w-4" /> Add Income
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-slate-800">Add New Income Entry</DialogTitle>
-            </DialogHeader>
-            <IncomeForm
-              onSuccess={() => {
-                setIsAddOpen(false);
-                loadIncomes();
-                toast.success("Income added successfully");
-              }}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex flex-wrap items-center gap-2">
+          <ExcelImportExport
+            label="Income"
+            onTemplate={handleTemplate}
+            onExport={handleExport}
+            onImport={handleImport}
+          />
+          <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-[#3e0078] hover:bg-[#52029d] text-white shadow-md shadow-purple-900/10 rounded-xl w-full sm:w-auto">
+                <Plus className="mr-2 h-4 w-4" /> Add Income
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold text-slate-800">Add New Income Entry</DialogTitle>
+              </DialogHeader>
+              <IncomeForm
+                onSuccess={() => {
+                  setIsAddOpen(false);
+                  loadIncomes();
+                  toast.success("Income added successfully");
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Filters & Row Limits */}

@@ -107,3 +107,87 @@ export async function deleteExpense(id: string) {
   await Expense.findByIdAndDelete(id);
   revalidatePath("/expenses");
 }
+
+// ---------------------------------------------------------------------------
+// Bulk Import
+// ---------------------------------------------------------------------------
+
+import {
+  getFlexibleField,
+  safeParseDate,
+  safeParseNumber,
+  safeParseString,
+} from "@/lib/excel";
+
+export interface ExpenseBulkImportResult {
+  inserted: number;
+  failed: Array<{ row: number; data: Record<string, unknown>; reason: string }>;
+}
+
+/**
+ * Bulk-creates expense records from an array of raw row objects (parsed from Excel).
+ * - Each row is processed independently; a failure never aborts the loop.
+ * - Missing/invalid/mis-typed fields are safely converted and replaced with defaults.
+ */
+export async function bulkCreateExpenses(
+  rows: Record<string, unknown>[]
+): Promise<ExpenseBulkImportResult> {
+  await connectToDatabase();
+
+  const DEFAULT_CATEGORY = "Uncategorized";
+  const DEFAULT_PAYMENT_METHOD = "Cash";
+
+  let inserted = 0;
+  const failed: ExpenseBulkImportResult["failed"] = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const raw = rows[i];
+    try {
+      // ---- Extract with flexible header matching & type coercion ----
+      const rawCategory = getFlexibleField(raw, "Category", "category", "Category Name");
+      const category = safeParseString(rawCategory, DEFAULT_CATEGORY);
+
+      const rawAmount = getFlexibleField(raw, "Amount", "amount", "Total");
+      const amount = safeParseNumber(rawAmount, 0);
+
+      const rawDate = getFlexibleField(raw, "Date (YYYY-MM-DD)", "Date", "expenseDate", "Expense Date");
+      const expenseDate = safeParseDate(rawDate, new Date());
+
+      const VALID_PAYMENT_METHODS = ["Cash", "Bank Transfer", "Mobile Banking", "Cheque"];
+      const rawMethod = safeParseString(
+        getFlexibleField(raw, "PaymentMethod", "Payment Method", "paymentMethod", "Method"),
+        DEFAULT_PAYMENT_METHOD
+      );
+
+      const paymentMethod = VALID_PAYMENT_METHODS.includes(rawMethod)
+        ? rawMethod
+        : DEFAULT_PAYMENT_METHOD;
+
+      const rawRef = getFlexibleField(raw, "Reference", "reference", "Ref", "Voucher");
+      const reference = safeParseString(rawRef, "") || undefined;
+
+      const rawDesc = getFlexibleField(raw, "Description", "description", "Desc", "Notes");
+      const description = safeParseString(rawDesc, "") || undefined;
+
+      await Expense.create({
+        category,
+        amount,
+        expenseDate,
+        paymentMethod,
+        reference,
+        description,
+      });
+
+      inserted++;
+    } catch (err) {
+      failed.push({
+        row: i + 2,
+        data: raw,
+        reason: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
+  }
+
+  revalidatePath("/expenses");
+  return { inserted, failed };
+}

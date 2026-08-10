@@ -33,11 +33,14 @@ import {
   getBills,
   generateMonthlyBills,
   markBillAsPaid,
+  bulkImportBills,
 } from "@/lib/actions/bill.actions";
 import GenerateBillsForm from "./GenerateBillsForm";
 import MarkPaidForm from "./MarkPaidForm";
 import InvoiceDownloader from "../../components/InvoiceDownloader";
 import type { Bill } from "@/types";
+import ExcelImportExport, { type ImportResult } from "@/components/shared/ExcelImportExport";
+import { exportToExcel, downloadTemplate } from "@/lib/excel";
 
 export default function BillingClient({
   initialBills,
@@ -48,6 +51,7 @@ export default function BillingClient({
   initialTotal?: number;
   initialTotalPages?: number;
 }) {
+  const [mounted, setMounted] = useState(false);
   const [bills, setBills] = useState(initialBills);
   const [search, setSearch] = useState("");
   const [month, setMonth] = useState("");
@@ -64,6 +68,10 @@ export default function BillingClient({
   const [isMarkPaidOpen, setIsMarkPaidOpen] = useState(false);
   const [markingBill, setMarkingBill] = useState<Bill | null>(null);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const loadBills = useCallback(async () => {
     const res = await getBills({
       month: month && month !== "all" ? parseInt(month) : undefined,
@@ -79,8 +87,10 @@ export default function BillingClient({
   }, [search, month, year, status, page, limit]);
 
   useEffect(() => {
-    loadBills();
-  }, [loadBills]);
+    if (mounted) {
+      loadBills();
+    }
+  }, [loadBills, mounted]);
 
   const handleSearchChange = (val: string) => {
     setSearch(val);
@@ -154,6 +164,69 @@ export default function BillingClient({
 
   const pageTotalAmount = bills.reduce((sum, b) => sum + b.amount, 0);
 
+  // ── Excel Columns ─────────────────────────────────────────────────────────
+  const BILLING_IMPORT_HEADERS = [
+    "CustomerCode",
+    "CustomerName",
+    "Month",
+    "Year",
+    "Amount",
+    "Status",
+    "InvoiceNumber",
+  ];
+
+  const BILLING_EXPORT_HEADERS = [
+    "InvoiceNumber",
+    "CustomerName",
+    "CustomerCode",
+    "Month",
+    "Year",
+    "Amount",
+    "Status",
+    "PaymentDate",
+    "PaymentMethod",
+  ];
+
+  const BILLING_SAMPLE = {
+    CustomerCode: "C001",
+    CustomerName: "John Doe",
+    Month: new Date().getMonth() + 1,
+    Year: new Date().getFullYear(),
+    Amount: 500,
+    Status: "Unpaid",
+    InvoiceNumber: "",
+  };
+
+  const handleTemplate = () => {
+    downloadTemplate(BILLING_IMPORT_HEADERS, BILLING_SAMPLE, "billing_import_template.xlsx");
+  };
+
+  const handleExport = async () => {
+    try {
+      const res = await getBills({ month: month && month !== "all" ? parseInt(month) : undefined, year: parseInt(year), status, search, limit: 10000 });
+      const rows = res.bills.map((bill: Bill) => ({
+        InvoiceNumber: bill.invoiceNumber,
+        CustomerName: bill.customer?.name ?? "",
+        CustomerCode: bill.customer?.customerCode ?? "",
+        Month: bill.month,
+        Year: bill.year,
+        Amount: bill.amount,
+        Status: bill.status,
+        PaymentDate: bill.paymentDate ? new Date(bill.paymentDate).toISOString().split("T")[0] : "",
+        PaymentMethod: bill.paymentMethod ?? "",
+      }));
+      exportToExcel(rows, BILLING_EXPORT_HEADERS, "Billing", `billing_export_${year}_${month || "all"}.xlsx`);
+    } catch {
+      toast.error("Failed to export billing data");
+    }
+  };
+
+  const handleImport = async (rows: Record<string, unknown>[]): Promise<ImportResult> => {
+    const result = await bulkImportBills(rows);
+    loadBills();
+    return result;
+  };
+
   return (
     <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto">
       {/* Page Header */}
@@ -173,19 +246,27 @@ export default function BillingClient({
           </div>
         </div>
 
-        <Dialog open={isGenerateOpen} onOpenChange={setIsGenerateOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-[#3e0078] hover:bg-[#52029d] text-white shadow-md shadow-purple-900/10 rounded-xl w-full sm:w-auto">
-              <Plus className="mr-2 h-4 w-4" /> Generate Monthly Bills
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-xl bg-white rounded-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-slate-800">Generate Monthly Bills</DialogTitle>
-            </DialogHeader>
-            <GenerateBillsForm onSubmit={handleGenerate} />
-          </DialogContent>
-        </Dialog>
+        <div className="flex flex-wrap items-center gap-2">
+          <ExcelImportExport
+            label="Billing"
+            onTemplate={handleTemplate}
+            onExport={handleExport}
+            onImport={handleImport}
+          />
+          <Dialog open={isGenerateOpen} onOpenChange={setIsGenerateOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-[#3e0078] hover:bg-[#52029d] text-white shadow-md shadow-purple-900/10 rounded-xl w-full sm:w-auto">
+                <Plus className="mr-2 h-4 w-4" /> Generate Monthly Bills
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-xl bg-white rounded-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold text-slate-800">Generate Monthly Bills</DialogTitle>
+              </DialogHeader>
+              <GenerateBillsForm onSubmit={handleGenerate} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Filters & Pagination Limit Controls */}
