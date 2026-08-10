@@ -22,6 +22,9 @@ export interface Bill {
   month: number;
   year: number;
   amount: number;
+  paidAmount?: number;
+  dueAmount?: number;
+  advanceAmount?: number;
   status: string;
   paymentDate?: Date;
   paymentMethod?: string;

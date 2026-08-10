@@ -34,6 +34,9 @@ interface Payment {
   customer: { name: string };
   invoiceNumber: string;
   amount: number;
+  paidAmount?: number;
+  dueAmount?: number;
+  advanceAmount?: number;
   paymentDate: Date;
 }
 
@@ -66,6 +69,7 @@ type DashboardClientProps = {
     billing: {
       currentMonthCollection: number;
       currentMonthDue: number;
+      currentMonthAdvance: number;
       currentMonthManualIncome: number;
       currentMonthTotalIncome: number;
       currentMonthExpenses: number;
@@ -137,6 +141,8 @@ const CustomChartTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 
 export default function DashboardClient({ data }: DashboardClientProps) {
   const isProfit = data.billing.currentMonthProfit >= 0;
+  const getPaymentAmount = (payment: Payment) =>
+    payment.paidAmount ?? payment.amount;
 
   return (
     <div className="py-4 flex flex-col gap-6 px-3 lg:px-6">
@@ -266,7 +272,7 @@ export default function DashboardClient({ data }: DashboardClientProps) {
         <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">
           Current Month Financial Breakdown
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
           {/* Billing Collection */}
           <Card className="p-4 rounded-2xl border border-emerald-200/70 border-t-4 border-t-emerald-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-emerald-50/50 via-white to-white">
             <div className="flex justify-between items-center mb-1">
@@ -353,6 +359,25 @@ export default function DashboardClient({ data }: DashboardClientProps) {
             </h3>
             <p className="text-[10px] text-amber-700/80 font-bold mt-1">
               Pending Collections
+            </p>
+          </Card>
+
+          {/* Advance Amount */}
+          <Card className="p-4 rounded-2xl border border-cyan-200/70 border-t-4 border-t-cyan-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-cyan-50/50 via-white to-white">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs font-bold text-cyan-900">
+                Advance
+              </span>
+              <CreditCard className="w-4 h-4 text-cyan-600" />
+            </div>
+            <h3 className="text-lg font-black text-cyan-700">
+              ৳
+              {data.billing.currentMonthAdvance.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+              })}
+            </h3>
+            <p className="text-[10px] text-cyan-700/80 font-bold mt-1">
+              Extra Collections
             </p>
           </Card>
 
@@ -496,7 +521,7 @@ export default function DashboardClient({ data }: DashboardClientProps) {
                     </div>
                     <div className="text-right">
                       <p className="font-extrabold text-xs text-emerald-600">
-                        +৳{payment.amount.toFixed(2)}
+                        +৳{getPaymentAmount(payment).toFixed(2)}
                       </p>
                       <p className="text-[10px] text-slate-400 font-medium">
                         {new Date(payment.paymentDate).toLocaleDateString()}

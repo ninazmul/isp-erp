@@ -6,6 +6,9 @@ const BillSchema = new Schema(
     month: { type: Number, required: true, min: 1, max: 12 },
     year: { type: Number, required: true },
     amount: { type: Number, required: true },
+    paidAmount: { type: Number, default: 0, min: 0 },
+    dueAmount: { type: Number, default: 0, min: 0 },
+    advanceAmount: { type: Number, default: 0, min: 0 },
     status: {
       type: String,
       enum: ["Paid", "Unpaid"],

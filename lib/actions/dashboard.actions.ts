@@ -43,8 +43,26 @@ export async function getDashboardData() {
       { $match: { month: currentMonth, year: currentYear } },
       {
         $group: {
-          _id: "$status",
-          totalAmount: { $sum: "$amount" },
+          _id: null,
+          collectedAmount: {
+            $sum: {
+              $cond: [
+                { $gt: [{ $ifNull: ["$paidAmount", 0] }, 0] },
+                "$paidAmount",
+                { $cond: [{ $eq: ["$status", "Paid"] }, "$amount", 0] },
+              ],
+            },
+          },
+          dueAmount: {
+            $sum: {
+              $cond: [
+                { $ne: [{ $type: "$dueAmount" }, "missing"] },
+                "$dueAmount",
+                { $cond: [{ $eq: ["$status", "Unpaid"] }, "$amount", 0] },
+              ],
+            },
+          },
+          advanceAmount: { $sum: { $ifNull: ["$advanceAmount", 0] } },
         },
       },
     ]),
@@ -68,12 +86,9 @@ export async function getDashboardData() {
     ]),
   ]);
 
-  let currentMonthCollection = 0;
-  let currentMonthDue = 0;
-  billAggregation.forEach((b) => {
-    if (b._id === "Paid") currentMonthCollection = b.totalAmount;
-    if (b._id === "Unpaid") currentMonthDue = b.totalAmount;
-  });
+  const currentMonthCollection = billAggregation[0]?.collectedAmount || 0;
+  const currentMonthDue = billAggregation[0]?.dueAmount || 0;
+  const currentMonthAdvance = billAggregation[0]?.advanceAmount || 0;
 
   const currentMonthExpenses = expenseAggregation[0]?.totalAmount || 0;
   const currentMonthManualIncome = incomeAggregation[0]?.totalAmount || 0;
@@ -87,7 +102,6 @@ export async function getDashboardData() {
     Bill.aggregate([
       {
         $match: {
-          status: "Paid",
           $or: Array.from({ length: 6 }, (_, i) => {
             const date = new Date(currentYear, currentMonth - 1 - i, 1);
             return { month: date.getMonth() + 1, year: date.getFullYear() };
@@ -97,7 +111,15 @@ export async function getDashboardData() {
       {
         $group: {
           _id: { year: "$year", month: "$month" },
-          amount: { $sum: "$amount" },
+          amount: {
+            $sum: {
+              $cond: [
+                { $gt: [{ $ifNull: ["$paidAmount", 0] }, 0] },
+                "$paidAmount",
+                { $cond: [{ $eq: ["$status", "Paid"] }, "$amount", 0] },
+              ],
+            },
+          },
         },
       },
     ]),
@@ -163,8 +185,10 @@ export async function getDashboardData() {
 
   // ── 4. Recent Activities (Optimized with .lean() & .select()) ───────────────
   const [recentPayments, recentExpenses, recentIncomes] = await Promise.all([
-    Bill.find({ status: "Paid" })
-      .select("customer invoiceNumber amount paymentDate")
+    Bill.find({
+      $or: [{ status: "Paid" }, { paidAmount: { $gt: 0 } }],
+    })
+      .select("customer invoiceNumber amount paidAmount dueAmount advanceAmount paymentDate")
       .populate("customer", "name")
       .sort({ paymentDate: -1 })
       .limit(5)
@@ -191,6 +215,7 @@ export async function getDashboardData() {
     billing: {
       currentMonthCollection,
       currentMonthDue,
+      currentMonthAdvance,
       currentMonthManualIncome,
       currentMonthTotalIncome,
       currentMonthExpenses,

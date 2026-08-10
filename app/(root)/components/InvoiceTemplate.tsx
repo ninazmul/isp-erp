@@ -22,6 +22,9 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
   });
 
   const isPaid = bill.status === "Paid";
+  const paidAmount = bill.paidAmount ?? (isPaid ? bill.amount : 0);
+  const dueAmount = bill.dueAmount ?? (isPaid ? 0 : bill.amount);
+  const advanceAmount = bill.advanceAmount ?? 0;
 
   return (
     <div
@@ -261,6 +264,26 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
               <span>Total Amount</span>
               <span>৳{bill.amount.toFixed(2)}</span>
             </div>
+            <div className="flex justify-between text-slate-600 pt-1">
+              <span>Paid Amount</span>
+              <span className="font-semibold text-emerald-700">
+                ৳{paidAmount.toFixed(2)}
+              </span>
+            </div>
+            <div className="flex justify-between text-slate-600">
+              <span>Due Amount</span>
+              <span className="font-semibold text-amber-700">
+                ৳{dueAmount.toFixed(2)}
+              </span>
+            </div>
+            {advanceAmount > 0 && (
+              <div className="flex justify-between text-slate-600">
+                <span>Advance Amount</span>
+                <span className="font-semibold text-cyan-700">
+                  ৳{advanceAmount.toFixed(2)}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

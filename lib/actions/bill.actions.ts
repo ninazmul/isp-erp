@@ -20,6 +20,9 @@ interface RawBillDoc {
   month: number;
   year: number;
   amount: number;
+  paidAmount?: number;
+  dueAmount?: number;
+  advanceAmount?: number;
   status: string;
   paymentDate?: Date;
   paymentMethod?: string;
@@ -82,6 +85,9 @@ export async function generateMonthlyBills(month: number, year: number) {
           month,
           year,
           amount: customer.monthlyFee,
+          paidAmount: 0,
+          dueAmount: customer.monthlyFee,
+          advanceAmount: 0,
           status: "Unpaid",
           invoiceNumber,
         },
@@ -94,6 +100,7 @@ export async function generateMonthlyBills(month: number, year: number) {
   }
 
   revalidatePath("/billing");
+  revalidatePath("/");
   return { generated: bulkOps.length, skipped };
 }
 
@@ -162,15 +169,33 @@ export async function markBillAsPaid(
   data: {
     paymentDate: Date;
     paymentMethod: string;
+    paidAmount: number;
     remarks?: string;
   }
 ) {
   await connectToDatabase();
 
+  const existingBill = await Bill.findById(id).select("amount").lean<RawBillDoc | null>();
+  if (!existingBill) {
+    throw new Error("Bill not found");
+  }
+
+  const paidAmount = Number(data.paidAmount);
+  if (!Number.isFinite(paidAmount) || paidAmount < 0) {
+    throw new Error("Paid amount must be a valid non-negative number");
+  }
+
+  const billAmount = Number(existingBill.amount) || 0;
+  const dueAmount = Math.max(billAmount - paidAmount, 0);
+  const advanceAmount = Math.max(paidAmount - billAmount, 0);
+
   const bill = await Bill.findByIdAndUpdate(
     id,
     {
-      status: "Paid",
+      status: dueAmount > 0 ? "Unpaid" : "Paid",
+      paidAmount,
+      dueAmount,
+      advanceAmount,
       paymentDate: data.paymentDate,
       paymentMethod: data.paymentMethod,
       remarks: data.remarks,
@@ -179,6 +204,7 @@ export async function markBillAsPaid(
   ).lean();
 
   revalidatePath("/billing");
+  revalidatePath("/");
   return JSON.parse(JSON.stringify(bill));
 }
 
@@ -290,9 +316,17 @@ export async function bulkImportBills(
       const VALID_STATUSES = ["Paid", "Unpaid"];
       const rawStatusVal = getFlexibleField(raw, "Status", "status", "Payment Status");
       const rawStatus = safeParseString(rawStatusVal, "Unpaid");
-      const status = VALID_STATUSES.map(s => s.toLowerCase()).includes(rawStatus.toLowerCase())
+      const requestedStatus = VALID_STATUSES.map(s => s.toLowerCase()).includes(rawStatus.toLowerCase())
         ? (rawStatus.toLowerCase() === "paid" ? "Paid" : "Unpaid")
         : "Unpaid";
+
+      const rawPaidAmountVal = getFlexibleField(raw, "PaidAmount", "Paid Amount", "paidAmount", "Paid");
+      const paidAmount = rawPaidAmountVal !== undefined && rawPaidAmountVal !== null && rawPaidAmountVal !== ""
+        ? safeParseNumber(rawPaidAmountVal, requestedStatus === "Paid" ? amount : 0)
+        : (requestedStatus === "Paid" ? amount : 0);
+      const dueAmount = Math.max(amount - paidAmount, 0);
+      const advanceAmount = Math.max(paidAmount - amount, 0);
+      const status = dueAmount > 0 ? "Unpaid" : "Paid";
 
       // ---- Invoice Number ----
       const rawInvoiceVal = getFlexibleField(raw, "InvoiceNumber", "Invoice Number", "invoiceNumber", "Invoice");
@@ -307,6 +341,9 @@ export async function bulkImportBills(
         month,
         year,
         amount,
+        paidAmount,
+        dueAmount,
+        advanceAmount,
         status,
         invoiceNumber,
       });
@@ -322,5 +359,6 @@ export async function bulkImportBills(
   }
 
   revalidatePath("/billing");
+  revalidatePath("/");
   return { inserted, failed };
 }

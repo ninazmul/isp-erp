@@ -133,6 +133,7 @@ export default function BillingClient({
   const handleMarkPaid = async (data: {
     paymentDate: string;
     paymentMethod: string;
+    paidAmount: number;
     remarks?: string;
   }) => {
     if (!markingBill) return;
@@ -140,9 +141,10 @@ export default function BillingClient({
       await markBillAsPaid(markingBill._id, {
         paymentDate: new Date(data.paymentDate),
         paymentMethod: data.paymentMethod,
+        paidAmount: data.paidAmount,
         remarks: data.remarks,
       });
-      toast.success("Bill marked as paid");
+      toast.success(data.paidAmount >= markingBill.amount ? "Bill marked as paid" : "Partial payment recorded");
       setIsMarkPaidOpen(false);
       setMarkingBill(null);
       loadBills();
@@ -163,6 +165,11 @@ export default function BillingClient({
   };
 
   const pageTotalAmount = bills.reduce((sum, b) => sum + b.amount, 0);
+  const getPaidAmount = (bill: Bill) =>
+    bill.paidAmount ?? (bill.status === "Paid" ? bill.amount : 0);
+  const getDueAmount = (bill: Bill) =>
+    bill.dueAmount ?? (bill.status === "Paid" ? 0 : bill.amount);
+  const getAdvanceAmount = (bill: Bill) => bill.advanceAmount ?? 0;
 
   // ── Excel Columns ─────────────────────────────────────────────────────────
   const BILLING_IMPORT_HEADERS = [
@@ -171,6 +178,7 @@ export default function BillingClient({
     "Month",
     "Year",
     "Amount",
+    "PaidAmount",
     "Status",
     "InvoiceNumber",
   ];
@@ -182,6 +190,9 @@ export default function BillingClient({
     "Month",
     "Year",
     "Amount",
+    "PaidAmount",
+    "DueAmount",
+    "AdvanceAmount",
     "Status",
     "PaymentDate",
     "PaymentMethod",
@@ -193,6 +204,7 @@ export default function BillingClient({
     Month: new Date().getMonth() + 1,
     Year: new Date().getFullYear(),
     Amount: 500,
+    PaidAmount: 0,
     Status: "Unpaid",
     InvoiceNumber: "",
   };
@@ -211,6 +223,9 @@ export default function BillingClient({
         Month: bill.month,
         Year: bill.year,
         Amount: bill.amount,
+        PaidAmount: getPaidAmount(bill),
+        DueAmount: getDueAmount(bill),
+        AdvanceAmount: getAdvanceAmount(bill),
         Status: bill.status,
         PaymentDate: bill.paymentDate ? new Date(bill.paymentDate).toISOString().split("T")[0] : "",
         PaymentMethod: bill.paymentMethod ?? "",
@@ -344,6 +359,9 @@ export default function BillingClient({
                 <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Customer</TableHead>
                 <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Period</TableHead>
                 <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Amount</TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Paid</TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Due</TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Advance</TableHead>
                 <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Status</TableHead>
                 <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Payment Date</TableHead>
                 <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider text-right">Actions</TableHead>
@@ -352,7 +370,7 @@ export default function BillingClient({
             <TableBody>
               {bills.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-slate-400 py-10 text-sm">
+                  <TableCell colSpan={10} className="text-center text-slate-400 py-10 text-sm">
                     No bills found
                   </TableCell>
                 </TableRow>
@@ -370,6 +388,15 @@ export default function BillingClient({
                     </TableCell>
                     <TableCell className="font-bold text-sm text-slate-800 whitespace-nowrap">
                       ৳{bill.amount.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="font-bold text-sm text-emerald-700 whitespace-nowrap">
+                      ৳{getPaidAmount(bill).toFixed(2)}
+                    </TableCell>
+                    <TableCell className="font-bold text-sm text-amber-700 whitespace-nowrap">
+                      ৳{getDueAmount(bill).toFixed(2)}
+                    </TableCell>
+                    <TableCell className="font-bold text-sm text-cyan-700 whitespace-nowrap">
+                      ৳{getAdvanceAmount(bill).toFixed(2)}
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
                       {getStatusBadge(bill.status)}
@@ -400,7 +427,7 @@ export default function BillingClient({
                               <DialogHeader>
                                 <DialogTitle className="text-lg font-bold text-slate-800">Mark Bill as Paid</DialogTitle>
                               </DialogHeader>
-                              <MarkPaidForm onSubmit={handleMarkPaid} />
+                              <MarkPaidForm bill={bill} onSubmit={handleMarkPaid} />
                             </DialogContent>
                           </Dialog>
                         )}
