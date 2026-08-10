@@ -15,9 +15,11 @@ import {
   LayoutDashboard,
   Users,
   TrendingUp,
+  TrendingDown,
   Receipt,
   Wallet,
   UserPlus,
+  Settings,
 } from "lucide-react";
 
 import Image from "next/image";
@@ -54,6 +56,11 @@ const sidebarSections = [
         icon: Wallet,
       },
       {
+        title: "Income",
+        url: "/income",
+        icon: TrendingDown,
+      },
+      {
         title: "Reports",
         url: "/reports",
         icon: TrendingUp,
@@ -67,6 +74,11 @@ const sidebarSections = [
         title: "Manage Admins",
         url: "/admins",
         icon: UserPlus,
+      },
+      {
+        title: "Settings",
+        url: "/settings",
+        icon: Settings,
       },
     ],
   },

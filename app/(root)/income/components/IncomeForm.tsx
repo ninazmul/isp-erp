@@ -20,57 +20,57 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { createExpense, updateExpense } from "@/lib/actions/expense.actions";
+import { createIncome, updateIncome } from "@/lib/actions/income.actions";
 import { getCategories, createCategory } from "@/lib/actions/category.actions";
 import { Plus } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 const PAYMENT_METHODS = ["Cash", "Bank Transfer", "Mobile Banking", "Cheque"];
 
-interface Expense {
+interface Income {
   _id: string;
   category: string;
   amount: number;
-  expenseDate: Date;
+  incomeDate: Date;
   paymentMethod: string;
   reference?: string;
   description?: string;
 }
 
-interface ExpenseFormProps {
-  expense?: Expense;
+interface IncomeFormProps {
+  income?: Income;
   onSuccess: () => void;
 }
 
-interface ExpenseFormData {
+interface IncomeFormData {
   category: string;
   amount: number;
-  expenseDate: string;
+  incomeDate: string;
   paymentMethod: string;
   reference: string;
   description: string;
 }
 
-export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
+export default function IncomeForm({ income, onSuccess }: IncomeFormProps) {
   const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
   const [newCatName, setNewCatName] = useState("");
   const [addingCat, setAddingCat] = useState(false);
   const [showAddCat, setShowAddCat] = useState(false);
 
-  const form = useForm<ExpenseFormData>({
-    defaultValues: expense
+  const form = useForm<IncomeFormData>({
+    defaultValues: income
       ? {
-          category: expense.category,
-          amount: expense.amount,
-          expenseDate: new Date(expense.expenseDate).toISOString().split("T")[0],
-          paymentMethod: expense.paymentMethod,
-          reference: expense.reference ?? "",
-          description: expense.description ?? "",
+          category: income.category,
+          amount: income.amount,
+          incomeDate: new Date(income.incomeDate).toISOString().split("T")[0],
+          paymentMethod: income.paymentMethod,
+          reference: income.reference ?? "",
+          description: income.description ?? "",
         }
       : {
           category: "",
           amount: 0,
-          expenseDate: new Date().toISOString().split("T")[0],
+          incomeDate: new Date().toISOString().split("T")[0],
           paymentMethod: "",
           reference: "",
           description: "",
@@ -78,15 +78,17 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
   });
 
   useEffect(() => {
-    getCategories("expense").then(setCategories);
+    getCategories("income").then(setCategories);
   }, []);
 
   const handleAddCategory = async () => {
     if (!newCatName.trim()) return;
     setAddingCat(true);
     try {
-      const created = await createCategory(newCatName.trim(), "expense");
-      setCategories((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
+      const created = await createCategory(newCatName.trim(), "income");
+      setCategories((prev) =>
+        [...prev, created].sort((a, b) => a.name.localeCompare(b.name))
+      );
       form.setValue("category", created.name);
       setNewCatName("");
       setShowAddCat(false);
@@ -98,23 +100,23 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
     }
   };
 
-  const onSubmit = async (data: ExpenseFormData) => {
+  const onSubmit = async (data: IncomeFormData) => {
     try {
       const payload = {
         ...data,
-        expenseDate: new Date(data.expenseDate),
+        incomeDate: new Date(data.incomeDate),
         reference: data.reference || undefined,
         description: data.description || undefined,
       };
-      if (expense) {
-        await updateExpense(expense._id, payload);
+      if (income) {
+        await updateIncome(income._id, payload);
       } else {
-        await createExpense(payload);
+        await createIncome(payload);
       }
       onSuccess();
     } catch (error) {
-      console.error("Error saving expense:", error);
-      toast.error("Failed to save expense");
+      console.error("Error saving income:", error);
+      toast.error("Failed to save income");
     }
   };
 
@@ -144,20 +146,26 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
                 </SelectContent>
               </Select>
               <FormMessage />
-              {/* Inline add category */}
               {showAddCat ? (
                 <div className="flex gap-2 mt-2">
                   <Input
                     placeholder="New category name"
                     value={newCatName}
                     onChange={(e) => setNewCatName(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddCategory())}
+                    onKeyDown={(e) =>
+                      e.key === "Enter" && (e.preventDefault(), handleAddCategory())
+                    }
                     className="h-8 text-sm"
                   />
                   <Button type="button" size="sm" onClick={handleAddCategory} disabled={addingCat}>
                     Add
                   </Button>
-                  <Button type="button" size="sm" variant="ghost" onClick={() => setShowAddCat(false)}>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setShowAddCat(false)}
+                  >
                     Cancel
                   </Button>
                 </div>
@@ -178,7 +186,10 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
         <FormField
           control={form.control}
           name="amount"
-          rules={{ required: "Amount is required", min: { value: 0.01, message: "Amount must be greater than 0" } }}
+          rules={{
+            required: "Amount is required",
+            min: { value: 0.01, message: "Amount must be greater than 0" },
+          }}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Amount (৳)</FormLabel>
@@ -199,7 +210,7 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
         {/* Date */}
         <FormField
           control={form.control}
-          name="expenseDate"
+          name="incomeDate"
           rules={{ required: "Date is required" }}
           render={({ field }) => (
             <FormItem>
@@ -228,7 +239,9 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
                 </FormControl>
                 <SelectContent>
                   {PAYMENT_METHODS.map((m) => (
-                    <SelectItem key={m} value={m}>{m}</SelectItem>
+                    <SelectItem key={m} value={m}>
+                      {m}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -243,9 +256,12 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
           name="reference"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Reference <span className="text-gray-400 text-xs font-normal">(optional)</span></FormLabel>
+              <FormLabel>
+                Reference{" "}
+                <span className="text-gray-400 text-xs font-normal">(optional)</span>
+              </FormLabel>
               <FormControl>
-                <Input placeholder="e.g. Invoice #1234" {...field} />
+                <Input placeholder="e.g. Receipt #5678" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -258,7 +274,10 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description <span className="text-gray-400 text-xs font-normal">(optional)</span></FormLabel>
+              <FormLabel>
+                Description{" "}
+                <span className="text-gray-400 text-xs font-normal">(optional)</span>
+              </FormLabel>
               <FormControl>
                 <Textarea placeholder="Additional notes..." {...field} />
               </FormControl>
@@ -268,7 +287,7 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
         />
 
         <Button type="submit" className="w-full">
-          {expense ? "Update Expense" : "Add Expense"}
+          {income ? "Update Income" : "Add Income"}
         </Button>
       </form>
     </Form>

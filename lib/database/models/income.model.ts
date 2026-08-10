@@ -1,10 +1,10 @@
 import { Schema, model, models } from "mongoose";
 
-const ExpenseSchema = new Schema(
+const IncomeSchema = new Schema(
   {
     category: { type: String, required: true },
     amount: { type: Number, required: true },
-    expenseDate: { type: Date, required: true },
+    incomeDate: { type: Date, required: true },
     paymentMethod: { type: String, required: true },
     reference: { type: String },
     description: { type: String },
@@ -12,6 +12,6 @@ const ExpenseSchema = new Schema(
   { timestamps: true }
 );
 
-const Expense = models.Expense || model("Expense", ExpenseSchema);
+const Income = models.Income || model("Income", IncomeSchema);
 
-export default Expense;
+export default Income;

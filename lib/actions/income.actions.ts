@@ -1,36 +1,35 @@
 "use server";
 
 import { connectToDatabase } from "@/lib/database";
-import Expense from "@/lib/database/models/expense.model";
+import Income from "@/lib/database/models/income.model";
 import { revalidatePath } from "next/cache";
 import type { FilterQuery } from "mongoose";
 
-// Define types
-interface ExpenseDoc {
+interface IncomeDoc {
   _id: string;
   category: string;
   amount: number;
-  expenseDate: Date;
+  incomeDate: Date;
   paymentMethod: string;
   reference?: string;
   description?: string;
 }
 
-export async function createExpense(data: {
+export async function createIncome(data: {
   category: string;
   amount: number;
-  expenseDate: Date;
+  incomeDate: Date;
   paymentMethod: string;
   reference?: string;
   description?: string;
 }) {
   await connectToDatabase();
-  const expense = await Expense.create(data);
-  revalidatePath("/expenses");
-  return JSON.parse(JSON.stringify(expense));
+  const income = await Income.create(data);
+  revalidatePath("/income");
+  return JSON.parse(JSON.stringify(income));
 }
 
-export async function getExpenses(params?: {
+export async function getIncomes(params?: {
   category?: string;
   month?: number;
   year?: number;
@@ -50,7 +49,7 @@ export async function getExpenses(params?: {
   } = params || {};
   const skip = (page - 1) * limit;
 
-  const query: FilterQuery<ExpenseDoc> = {};
+  const query: FilterQuery<IncomeDoc> = {};
 
   if (category) query.category = category;
 
@@ -61,7 +60,7 @@ export async function getExpenses(params?: {
       1
     );
     const endDate = new Date(year || new Date().getFullYear(), month || 12, 0);
-    query.expenseDate = { $gte: startDate, $lte: endDate };
+    query.incomeDate = { $gte: startDate, $lte: endDate };
   }
 
   if (search) {
@@ -71,32 +70,32 @@ export async function getExpenses(params?: {
     ];
   }
 
-  const expenses = await Expense.find<ExpenseDoc>(query)
+  const incomes = await Income.find<IncomeDoc>(query)
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
 
-  const total = await Expense.countDocuments(query);
+  const total = await Income.countDocuments(query);
 
   return {
-    expenses: JSON.parse(JSON.stringify(expenses)),
+    incomes: JSON.parse(JSON.stringify(incomes)),
     total,
     page,
     totalPages: Math.ceil(total / limit),
   };
 }
 
-export async function updateExpense(id: string, data: Partial<ExpenseDoc>) {
+export async function updateIncome(id: string, data: Partial<IncomeDoc>) {
   await connectToDatabase();
-  const expense = await Expense.findByIdAndUpdate<ExpenseDoc>(id, data, {
+  const income = await Income.findByIdAndUpdate<IncomeDoc>(id, data, {
     new: true,
   });
-  revalidatePath("/expenses");
-  return JSON.parse(JSON.stringify(expense));
+  revalidatePath("/income");
+  return JSON.parse(JSON.stringify(income));
 }
 
-export async function deleteExpense(id: string) {
+export async function deleteIncome(id: string) {
   await connectToDatabase();
-  await Expense.findByIdAndDelete(id);
-  revalidatePath("/expenses");
+  await Income.findByIdAndDelete(id);
+  revalidatePath("/income");
 }
