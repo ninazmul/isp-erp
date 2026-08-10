@@ -99,23 +99,24 @@ const AdminSidebar = () => {
     >
       {/* Brand Header */}
       <SidebarHeader className="p-0">
-        <div className="px-3.5 py-3.5 mb-1 flex items-center justify-between border-b border-purple-50 group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:justify-center">
-          <div className="flex items-center gap-3 group-data-[collapsible=icon]:gap-0">
-            <div className="relative p-1.5 rounded-xl bg-gradient-to-tr from-[#3e0078] to-[#6b11c9] shadow-md shadow-purple-900/10 shrink-0 group-data-[collapsible=icon]:p-1.5">
+        <div className="px-3.5 py-3.5 mb-1 flex items-center border-b border-purple-50 group-data-[collapsible=icon]:hidden">
+          <div className="flex items-center gap-3 w-full">
+            <div className="relative p-1.5 rounded-xl bg-gradient-to-tr from-[#3e0078] to-[#6b11c9] shadow-md shadow-purple-900/10 shrink-0">
               <Image
                 src="/assets/images/logo.png"
                 width={100}
                 height={50}
                 alt="ISP ERP"
-                className="brightness-0 invert object-contain h-6 w-auto group-data-[collapsible=icon]:h-5"
+                className="brightness-0 invert object-contain h-6 w-auto"
               />
             </div>
-            <div className="flex flex-col group-data-[collapsible=icon]:hidden transition-all duration-200">
+            <div className="flex flex-col transition-all duration-200">
               <span className="font-extrabold text-sm tracking-tight text-[#3e0078]">
                 ISP ERP
               </span>
               <span className="text-[10px] font-medium text-purple-600/70 tracking-widest uppercase flex items-center gap-1">
-                Enterprise <Sparkles className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                Enterprise{" "}
+                <Sparkles className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
               </span>
             </div>
           </div>
@@ -125,19 +126,22 @@ const AdminSidebar = () => {
       <SidebarContent className="py-1">
         {/* Sections */}
         {sidebarSections.map((section) => (
-          <SidebarGroup key={section.label} className="py-1.5 group-data-[collapsible=icon]:py-1">
+          <SidebarGroup
+            key={section.label}
+            className="py-1.5 group-data-[collapsible=icon]:py-1"
+          >
             <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-wider text-purple-900/50 px-4 mb-1 group-data-[collapsible=icon]:hidden">
               {section.label}
             </SidebarGroupLabel>
 
             <SidebarGroupContent>
-              <SidebarMenu className="space-y-1 px-2 group-data-[collapsible=icon]:px-1">
+              <SidebarMenu className="space-y-1 px-2 group-data-[collapsible=icon]:px-0">
                 {section.items.map((item) => {
                   const isActive =
                     item.url === "/"
                       ? currentPath === item.url
                       : currentPath === item.url ||
-                      currentPath.startsWith(`${item.url}/`);
+                        currentPath.startsWith(`${item.url}/`);
 
                   return (
                     <SidebarMenuItem key={item.title}>
@@ -146,20 +150,30 @@ const AdminSidebar = () => {
                         tooltip={item.title}
                         isActive={isActive}
                         size="lg"
-                        className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 group-data-[collapsible=icon]:!size-10 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:justify-center ${isActive
-                          ? "bg-gradient-to-r from-[#3e0078] to-[#5b0ea6] text-white shadow-md shadow-purple-900/20 font-semibold"
-                          : "text-slate-600 hover:text-[#3e0078] hover:bg-purple-50/70"
-                          }`}
+                        className={`relative rounded-xl font-medium text-sm transition-all duration-200 py-2.5 ${
+                          isActive
+                            ? "bg-gradient-to-r from-[#3e0078] to-[#5b0ea6] text-white shadow-md shadow-purple-900/20 font-semibold"
+                            : "text-slate-600 hover:text-[#3e0078] hover:bg-purple-50/70"
+                        }`}
                       >
                         <Link href={item.url}>
-                          <item.icon
-                            className={`w-4 h-4 shrink-0 transition-transform duration-200 ${isActive
-                              ? "text-white scale-110"
-                              : "text-purple-700/70"
+                          {/* Independent wrapper — Slot only merges classes onto the
+                              <Link> itself, so this inner span is never touched by
+                              the sidebar library's own collapsed-state classes and
+                              always centers reliably. */}
+                          <span className="flex items-center gap-3 w-full group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0">
+                            <item.icon
+                              className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
+                                isActive
+                                  ? "text-white scale-110"
+                                  : "text-purple-700/70"
                               }`}
-                          />
-                          <span className="group-data-[collapsible=icon]:hidden truncate">
-                            {item.title}
+                            />
+                            <span
+                              className={`group-data-[collapsible=icon]:hidden truncate ${isActive ? "text-white" : ""}`}
+                            >
+                              {item.title}
+                            </span>
                           </span>
 
                           {isActive && !isCollapsed && (
