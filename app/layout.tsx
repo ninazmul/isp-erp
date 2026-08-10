@@ -18,12 +18,12 @@ const dmSerif = DM_Serif_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "ISP ERP – Internet Service Provider Management System",
-    template: "%s | ISP ERP",
+    default: "SBN Solutions – Management System",
+    template: "%s | SBN Solutions",
   },
 
   description:
-    "ISP ERP is a comprehensive management system for Internet Service Providers, handling customers, billing, expenses, and reports.",
+    "SBN Solutions is a comprehensive management system handling customers, billing, expenses, and reports.",
 
   alternates: {
     canonical: "/",
@@ -44,31 +44,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_BD",
-    siteName: "ISP ERP",
-    title: "ISP ERP – Internet Service Provider Management System",
+    siteName: "SBN Solutions",
+    title: "SBN Solutions – Management System",
     description:
-      "Manage your ISP business with ISP ERP - customers, billing, expenses, and reports in one place.",
-    images: [
-      {
-        url: "/assets/images/logo.png",
-        width: 1200,
-        height: 630,
-        alt: "ISP ERP",
-      },
-    ],
+      "Manage your business with SBN Solutions - customers, billing, expenses, and reports in one place.",
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "ISP ERP – Internet Service Provider Management System",
+    title: "SBN Solutions – Management System",
     description:
-      "Comprehensive ISP management system for customers, billing, expenses, and reports.",
-    images: ["/assets/images/logo.png"],
-  },
-
-  icons: {
-    icon: "/assets/images/logo.png",
-    apple: "/assets/images/logo.png",
+      "Comprehensive management system for customers, billing, expenses, and reports.",
   },
 };
 

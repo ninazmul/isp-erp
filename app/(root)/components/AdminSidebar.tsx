@@ -25,7 +25,6 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -101,18 +100,12 @@ const AdminSidebar = () => {
       <SidebarHeader className="p-0">
         <div className="px-3.5 py-3.5 mb-1 flex items-center border-b border-purple-50 group-data-[collapsible=icon]:hidden">
           <div className="flex items-center gap-3 w-full">
-            <div className="relative p-1.5 rounded-xl bg-gradient-to-tr from-[#3e0078] to-[#6b11c9] shadow-md shadow-purple-900/10 shrink-0">
-              <Image
-                src="/assets/images/logo.png"
-                width={100}
-                height={50}
-                alt="ISP ERP"
-                className="brightness-0 invert object-contain h-6 w-auto"
-              />
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-[#3e0078] to-[#6b11c9] shadow-md shadow-purple-900/10 shrink-0 text-white font-black text-xs">
+              SBN
             </div>
             <div className="flex flex-col transition-all duration-200">
               <span className="font-extrabold text-sm tracking-tight text-[#3e0078]">
-                ISP ERP
+                SBN Solutions
               </span>
               <span className="text-[10px] font-medium text-purple-600/70 tracking-widest uppercase flex items-center gap-1">
                 Enterprise{" "}

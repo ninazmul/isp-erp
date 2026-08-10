@@ -133,7 +133,7 @@ export default function DashboardClient({ data }: DashboardClientProps) {
               <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> Executive Overview
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-              ISP ERP Management Dashboard
+              SBN Solutions Dashboard
             </h1>
             <p className="text-purple-200 text-xs md:text-sm mt-1">
               Real-time analytics across billing, customer subscriptions, manual income, and operational expenses.

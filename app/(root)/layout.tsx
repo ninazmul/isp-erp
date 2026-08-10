@@ -33,7 +33,7 @@ export default async function AdminLayout({
           <div className="flex items-center gap-3">
             <SidebarTrigger className="hover:bg-white/10 text-white transition-colors rounded-lg" />
             <span className="text-xs font-semibold uppercase tracking-wider text-purple-200 hidden sm:inline-block">
-              ISP Management Portal
+              SBN Solutions
             </span>
           </div>
           <SignedIn>
