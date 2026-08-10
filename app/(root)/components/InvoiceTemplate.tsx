@@ -121,10 +121,10 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                   {bill.customer.email}
                 </p>
               )}
-              {bill.customer?.address && (
+              {bill.customer?.location && (
                 <p>
-                  <span className="font-semibold text-slate-500">Address:</span>{" "}
-                  {bill.customer.address}
+                  <span className="font-semibold text-slate-500">Location:</span>{" "}
+                  {bill.customer.location}
                 </p>
               )}
             </div>

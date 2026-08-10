@@ -4,7 +4,6 @@ export interface Customer {
   name: string;
   phone: string;
   email?: string;
-  address?: string;
   location: string;
   packageName: string;
   monthlyFee: number;

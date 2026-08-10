@@ -31,7 +31,6 @@ interface Customer {
   name: string;
   phone: string;
   email?: string;
-  address?: string;
   location: string;
   packageName: string;
   monthlyFee: number;
@@ -51,7 +50,6 @@ interface CustomerFormData {
   name: string;
   phone: string;
   email: string;
-  address: string;
   location: string;
   packageName: string;
   monthlyFee: number;
@@ -93,7 +91,6 @@ export default function CustomerForm({
           name: customer.name,
           phone: customer.phone,
           email: customer.email ?? "",
-          address: customer.address ?? "",
           location: customer.location ?? "",
           packageName: customer.packageName,
           monthlyFee: customer.monthlyFee,
@@ -109,7 +106,6 @@ export default function CustomerForm({
           name: "",
           phone: "",
           email: "",
-          address: "",
           location: "",
           packageName: "",
           monthlyFee: 0,
@@ -180,7 +176,6 @@ export default function CustomerForm({
         location: data.location,
         connectionDate: new Date(data.connectionDate),
         email: data.email || undefined,
-        address: data.address || undefined,
         router: data.router || undefined,
         ipAddress: data.ipAddress || undefined,
         notes: data.notes || undefined,
@@ -498,19 +493,6 @@ export default function CustomerForm({
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Address</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Customer address" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         <FormField
           control={form.control}
