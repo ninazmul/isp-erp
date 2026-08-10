@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Edit, Trash2, ChevronLeft, ChevronRight, Wallet, Search } from "lucide-react";
 import { toast } from "react-hot-toast";
 import ExpenseForm from "./ExpenseForm";
 import { getExpenses, deleteExpense } from "@/lib/actions/expense.actions";
@@ -91,7 +91,6 @@ export default function ExpensesClient({
     loadExpenses();
   }, [loadExpenses]);
 
-  // Reset page to 1 when filters change
   const handleSearchChange = (val: string) => {
     setSearch(val);
     setPage(1);
@@ -132,24 +131,33 @@ export default function ExpensesClient({
   const pageAmountTotal = expenses.reduce((sum, e) => sum + e.amount, 0);
 
   return (
-    <div className="p-4 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Expenses</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Total Items: <span className="font-semibold text-gray-800">{total}</span> | Page Subtotal:{" "}
-            <span className="font-semibold text-red-600">৳{pageAmountTotal.toFixed(2)}</span>
-          </p>
+    <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-rose-50 text-rose-600">
+            <Wallet className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight">
+              Expense Management
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Total Records: <span className="font-bold text-slate-800">{total}</span> | Page Subtotal:{" "}
+              <span className="font-bold text-rose-600">৳{pageAmountTotal.toFixed(2)}</span>
+            </p>
+          </div>
         </div>
+
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="bg-[#3e0078] hover:bg-[#52029d] text-white shadow-md shadow-purple-900/10 rounded-xl w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" /> Add Expense
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl bg-white">
+          <DialogContent className="max-w-2xl bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Add New Expense</DialogTitle>
+              <DialogTitle className="text-lg font-bold text-slate-800">Add New Expense</DialogTitle>
             </DialogHeader>
             <ExpenseForm
               onSuccess={() => {
@@ -162,18 +170,21 @@ export default function ExpensesClient({
         </Dialog>
       </div>
 
-      {/* Filters & Lazy Loading Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap gap-4">
-          <Input
-            placeholder="Search reference or description..."
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="max-w-xs"
-          />
+      {/* Filters & Limit Controls */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              placeholder="Search reference or description..."
+              value={search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="pl-9 rounded-xl border-slate-200 text-sm"
+            />
+          </div>
           <Select value={category || "all"} onValueChange={handleCategoryChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by category" />
+            <SelectTrigger className="w-full sm:w-[160px] rounded-xl border-slate-200 text-sm">
+              <SelectValue placeholder="Filter category" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
@@ -185,7 +196,7 @@ export default function ExpensesClient({
             </SelectContent>
           </Select>
           <Select value={month} onValueChange={handleMonthChange}>
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-full sm:w-[140px] rounded-xl border-slate-200 text-sm">
               <SelectValue placeholder="Select month" />
             </SelectTrigger>
             <SelectContent>
@@ -198,7 +209,7 @@ export default function ExpensesClient({
             </SelectContent>
           </Select>
           <Select value={year} onValueChange={handleYearChange}>
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-full sm:w-[110px] rounded-xl border-slate-200 text-sm">
               <SelectValue placeholder="Select year" />
             </SelectTrigger>
             <SelectContent>
@@ -211,11 +222,10 @@ export default function ExpensesClient({
           </Select>
         </div>
 
-        {/* Rows per page selector */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">Rows per page:</span>
+        <div className="flex items-center justify-between sm:justify-end gap-2 text-xs text-slate-500">
+          <span>Rows per page:</span>
           <Select value={limit.toString()} onValueChange={handleLimitChange}>
-            <SelectTrigger className="w-[80px]">
+            <SelectTrigger className="w-[75px] rounded-xl border-slate-200 text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -228,119 +238,132 @@ export default function ExpensesClient({
         </div>
       </div>
 
-      <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Category</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Payment Method</TableHead>
-              <TableHead>Reference</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {expenses.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center text-gray-400 py-8">
-                  No expenses found
-                </TableCell>
+      {/* Mobile Responsive Overflow Table */}
+      <Card className="rounded-2xl border border-slate-100 shadow-sm bg-white overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-slate-50/70">
+              <TableRow className="hover:bg-transparent border-slate-100">
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Category</TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Amount</TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Date</TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Payment Method</TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Reference</TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Description</TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider text-right">Actions</TableHead>
               </TableRow>
-            ) : (
-              expenses.map((expense) => (
-                <TableRow key={expense._id}>
-                  <TableCell>
-                    <Badge variant="secondary">{expense.category}</Badge>
-                  </TableCell>
-                  <TableCell className="font-medium text-red-600">
-                    ৳{expense.amount.toFixed(2)}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(expense.expenseDate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>{expense.paymentMethod}</TableCell>
-                  <TableCell className="max-w-[120px] truncate text-gray-500">
-                    {expense.reference || "—"}
-                  </TableCell>
-                  <TableCell className="max-w-xs truncate text-gray-500">
-                    {expense.description || "—"}
-                  </TableCell>
-                  <TableCell className="flex gap-2">
-                    <Dialog
-                      open={isEditOpen && editingExpense?._id === expense._id}
-                      onOpenChange={(open) => {
-                        setIsEditOpen(open);
-                        if (!open) setEditingExpense(null);
-                      }}
-                    >
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => setEditingExpense(expense)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-2xl bg-white">
-                        <DialogHeader>
-                          <DialogTitle>Edit Expense</DialogTitle>
-                        </DialogHeader>
-                        <ExpenseForm
-                          expense={editingExpense ?? undefined}
-                          onSuccess={() => {
-                            setIsEditOpen(false);
-                            setEditingExpense(null);
-                            loadExpenses();
-                            toast.success("Expense updated successfully");
-                          }}
-                        />
-                      </DialogContent>
-                    </Dialog>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(expense._id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+            </TableHeader>
+            <TableBody>
+              {expenses.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center text-slate-400 py-10 text-sm">
+                    No expenses found
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                expenses.map((expense) => (
+                  <TableRow key={expense._id} className="hover:bg-slate-50/60 border-slate-100 transition-colors">
+                    <TableCell className="whitespace-nowrap">
+                      <Badge className="bg-rose-50 text-rose-700 hover:bg-rose-100 border-rose-200">
+                        {expense.category}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="font-bold text-sm text-rose-600 whitespace-nowrap">
+                      ৳{expense.amount.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="text-xs text-slate-600 whitespace-nowrap">
+                      {new Date(expense.expenseDate).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-xs text-slate-600 whitespace-nowrap">
+                      {expense.paymentMethod}
+                    </TableCell>
+                    <TableCell className="text-xs font-mono text-slate-500 max-w-[120px] truncate whitespace-nowrap">
+                      {expense.reference || "—"}
+                    </TableCell>
+                    <TableCell className="text-xs text-slate-500 max-w-xs truncate whitespace-nowrap">
+                      {expense.description || "—"}
+                    </TableCell>
+                    <TableCell className="text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Dialog
+                          open={isEditOpen && editingExpense?._id === expense._id}
+                          onOpenChange={(open) => {
+                            setIsEditOpen(open);
+                            if (!open) setEditingExpense(null);
+                          }}
+                        >
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-slate-500 hover:text-purple-700 hover:bg-purple-50 rounded-lg"
+                              onClick={() => setEditingExpense(expense)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle className="text-lg font-bold text-slate-800">Edit Expense</DialogTitle>
+                            </DialogHeader>
+                            <ExpenseForm
+                              expense={editingExpense ?? undefined}
+                              onSuccess={() => {
+                                setIsEditOpen(false);
+                                setEditingExpense(null);
+                                loadExpenses();
+                                toast.success("Expense updated successfully");
+                              }}
+                            />
+                          </DialogContent>
+                        </Dialog>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg"
+                          onClick={() => handleDelete(expense._id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
-        {/* Server-Side Pagination Bar */}
-        <div className="flex items-center justify-between p-4 border-t text-sm text-gray-600">
+        {/* Server Pagination Bar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-t border-slate-100 gap-3 text-xs text-slate-500">
           <div>
-            Showing <span className="font-medium">{expenses.length > 0 ? (page - 1) * limit + 1 : 0}</span> to{" "}
-            <span className="font-medium">{Math.min(page * limit, total)}</span> of{" "}
-            <span className="font-medium">{total}</span> entries
+            Showing <span className="font-bold text-slate-700">{expenses.length > 0 ? (page - 1) * limit + 1 : 0}</span> to{" "}
+            <span className="font-bold text-slate-700">{Math.min(page * limit, total)}</span> of{" "}
+            <span className="font-bold text-slate-700">{total}</span> entries
           </div>
 
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
+              className="h-8 rounded-xl border-slate-200 text-xs"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
             >
-              <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+              <ChevronLeft className="h-3.5 w-3.5 mr-1" /> Prev
             </Button>
-            <span className="text-xs px-2">
-              Page <span className="font-semibold">{page}</span> of{" "}
-              <span className="font-semibold">{totalPages}</span>
+            <span className="px-2 font-medium">
+              Page <span className="font-bold text-slate-800">{page}</span> of{" "}
+              <span className="font-bold text-slate-800">{totalPages}</span>
             </span>
             <Button
               variant="outline"
               size="sm"
+              className="h-8 rounded-xl border-slate-200 text-xs"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
             >
-              Next <ChevronRight className="h-4 w-4 ml-1" />
+              Next <ChevronRight className="h-3.5 w-3.5 ml-1" />
             </Button>
           </div>
         </div>

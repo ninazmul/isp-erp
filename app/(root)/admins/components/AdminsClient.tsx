@@ -27,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, UserPlus, ShieldCheck } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -108,39 +108,50 @@ export default function AdminsClient({
   };
 
   return (
-    <div className="p-4 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Manage Admins</h1>
+    <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-purple-50 text-[#3e0078]">
+            <UserPlus className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight">
+              Manage Administrators
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Authorized Accounts: <span className="font-bold text-slate-800">{admins.length}</span>
+            </p>
+          </div>
+        </div>
+
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="bg-[#3e0078] hover:bg-[#52029d] text-white shadow-md shadow-purple-900/10 rounded-xl w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" /> Add Admin
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl bg-white">
+          <DialogContent className="max-w-md bg-white rounded-2xl">
             <DialogHeader>
-              <DialogTitle>Add New Admin</DialogTitle>
+              <DialogTitle className="text-lg font-bold text-slate-800">Add New Administrator</DialogTitle>
             </DialogHeader>
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
-              >
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel className="text-xs font-semibold text-slate-700">Email Address</FormLabel>
                       <FormControl>
-                        <Input placeholder="admin@example.com" {...field} />
+                        <Input placeholder="admin@example.com" className="rounded-xl border-slate-200" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Adding..." : "Add Admin"}
+                <Button type="submit" className="w-full bg-[#3e0078] hover:bg-[#52029d] rounded-xl" disabled={isLoading}>
+                  {isLoading ? "Adding..." : "Add Administrator"}
                 </Button>
               </form>
             </Form>
@@ -148,35 +159,50 @@ export default function AdminsClient({
         </Dialog>
       </div>
 
-      <Card className="p-4">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Email</TableHead>
-              <TableHead>Added On</TableHead>
-              <TableHead className="w-[100px]">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {admins.map((admin) => (
-              <TableRow key={admin._id}>
-                <TableCell>{admin.email}</TableCell>
-                <TableCell>
-                  {new Date(admin.createdAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleRemoveAdmin(admin._id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </TableCell>
+      {/* Mobile Responsive Overflow Table */}
+      <Card className="rounded-2xl border border-slate-100 shadow-sm bg-white overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-slate-50/70">
+              <TableRow className="border-slate-100">
+                <TableHead className="font-bold text-slate-700 text-xs uppercase">Administrator Email</TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase">Authorized Date</TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {admins.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center text-slate-400 py-10 text-sm">
+                    No administrators registered
+                  </TableCell>
+                </TableRow>
+              ) : (
+                admins.map((admin) => (
+                  <TableRow key={admin._id} className="hover:bg-slate-50/60 border-slate-100">
+                    <TableCell className="font-semibold text-sm text-slate-800 flex items-center gap-2 whitespace-nowrap">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                      {admin.email}
+                    </TableCell>
+                    <TableCell className="text-xs text-slate-500 whitespace-nowrap">
+                      {new Date(admin.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-right whitespace-nowrap">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg"
+                        onClick={() => handleRemoveAdmin(admin._id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </Card>
     </div>
   );
