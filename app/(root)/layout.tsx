@@ -27,15 +27,22 @@ export default async function AdminLayout({
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <AdminSidebar />
-      <Toaster />
-      <main className="flex-1 h-screen mx-auto overflow-y-auto">
-        <div className="flex justify-between items-center p-4 w-full border-b text-white bg-[#3e0078]">
-          <SidebarTrigger />
+      <Toaster position="top-right" />
+      <main className="flex-1 h-screen mx-auto overflow-y-auto bg-slate-50/50">
+        <div className="sticky top-0 z-20 flex justify-between items-center px-4 py-3 w-full border-b border-purple-950/20 text-white bg-gradient-to-r from-[#3e0078] to-[#5b0ea6] shadow-md shadow-purple-950/10">
+          <div className="flex items-center gap-3">
+            <SidebarTrigger className="hover:bg-white/10 text-white transition-colors rounded-lg" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-purple-200 hidden sm:inline-block">
+              ISP Management Portal
+            </span>
+          </div>
           <SignedIn>
-            <UserButton afterSwitchSessionUrl="/" />
+            <div className="p-0.5 rounded-full ring-2 ring-purple-300/30">
+              <UserButton afterSwitchSessionUrl="/" />
+            </div>
           </SignedIn>
         </div>
-        <div className="p-2">{children}</div>
+        <div className="p-2 sm:p-4">{children}</div>
       </main>
     </SidebarProvider>
   );
