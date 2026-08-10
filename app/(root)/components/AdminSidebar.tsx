@@ -105,7 +105,7 @@ const AdminSidebar = () => {
             </div>
             <div className="flex flex-col transition-all duration-200">
               <span className="font-extrabold text-sm tracking-tight text-[#3e0078]">
-                SBN Solutions
+                SBN Enterprise
               </span>
               <span className="text-[10px] font-medium text-purple-600/70 tracking-widest uppercase flex items-center gap-1">
                 Enterprise{" "}

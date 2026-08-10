@@ -8,11 +8,13 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
   const formatDate = (date: Date | string | undefined) => {
     if (!date) return "—";
     const d = new Date(date);
-    return isNaN(d.getTime()) ? "—" : d.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+    return isNaN(d.getTime())
+      ? "—"
+      : d.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
   };
 
   const monthName = new Date(0, bill.month - 1).toLocaleString("default", {
@@ -53,7 +55,7 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                 SBN
               </div>
               <h1 className="text-2xl font-black text-[#3e0078] tracking-tight">
-                SBN Solutions
+                SBN Enterprise
               </h1>
             </div>
             <p className="text-xs text-slate-500 font-semibold tracking-wide uppercase">
@@ -79,7 +81,10 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
               {bill.invoiceNumber}
             </h2>
             <p className="text-xs text-slate-500 font-medium">
-              Billing Period: <span className="font-bold text-slate-700">{monthName} {bill.year}</span>
+              Billing Period:{" "}
+              <span className="font-bold text-slate-700">
+                {monthName} {bill.year}
+              </span>
             </p>
           </div>
         </div>
@@ -99,7 +104,9 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
             </h3>
             <div className="space-y-1 text-xs text-slate-600">
               <p>
-                <span className="font-semibold text-slate-500">Customer ID:</span>{" "}
+                <span className="font-semibold text-slate-500">
+                  Customer ID:
+                </span>{" "}
                 <span className="font-mono font-bold text-[#3e0078]">
                   {bill.customer?.customerCode ?? "—"}
                 </span>
@@ -124,34 +131,58 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
           </div>
 
           {/* Invoice Summary Details */}
-          <div className="p-4 rounded-xl border border-slate-100" style={{ backgroundColor: "#f8fafc" }}>
+          <div
+            className="p-4 rounded-xl border border-slate-100"
+            style={{ backgroundColor: "#f8fafc" }}
+          >
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
               Invoice Information
             </p>
             <div className="space-y-2 text-xs text-slate-600">
               <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
-                <span className="text-slate-500 font-medium">Invoice Number:</span>
-                <span className="font-mono font-bold text-slate-800">{bill.invoiceNumber}</span>
+                <span className="text-slate-500 font-medium">
+                  Invoice Number:
+                </span>
+                <span className="font-mono font-bold text-slate-800">
+                  {bill.invoiceNumber}
+                </span>
               </div>
               <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
-                <span className="text-slate-500 font-medium">Billing Cycle:</span>
-                <span className="font-bold text-slate-800">{monthName} {bill.year}</span>
+                <span className="text-slate-500 font-medium">
+                  Billing Cycle:
+                </span>
+                <span className="font-bold text-slate-800">
+                  {monthName} {bill.year}
+                </span>
               </div>
               <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
-                <span className="text-slate-500 font-medium">Payment Status:</span>
-                <span className="font-bold" style={{ color: isPaid ? "#059669" : "#dc2626" }}>
+                <span className="text-slate-500 font-medium">
+                  Payment Status:
+                </span>
+                <span
+                  className="font-bold"
+                  style={{ color: isPaid ? "#059669" : "#dc2626" }}
+                >
                   {bill.status}
                 </span>
               </div>
               {isPaid && (
                 <>
                   <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
-                    <span className="text-slate-500 font-medium">Payment Date:</span>
-                    <span className="font-bold text-slate-800">{formatDate(bill.paymentDate)}</span>
+                    <span className="text-slate-500 font-medium">
+                      Payment Date:
+                    </span>
+                    <span className="font-bold text-slate-800">
+                      {formatDate(bill.paymentDate)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500 font-medium">Payment Method:</span>
-                    <span className="font-bold text-slate-800">{bill.paymentMethod ?? "Cash"}</span>
+                    <span className="text-slate-500 font-medium">
+                      Payment Method:
+                    </span>
+                    <span className="font-bold text-slate-800">
+                      {bill.paymentMethod ?? "Cash"}
+                    </span>
                   </div>
                 </>
               )}
@@ -215,7 +246,9 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
           >
             <div className="flex justify-between text-slate-600">
               <span>Subtotal</span>
-              <span className="font-semibold text-slate-800">৳{bill.amount.toFixed(2)}</span>
+              <span className="font-semibold text-slate-800">
+                ৳{bill.amount.toFixed(2)}
+              </span>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>Tax / VAT (0%)</span>
@@ -255,17 +288,20 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
           <div className="text-center w-48">
             <div className="border-b border-slate-300 pb-1 mb-1.5" />
             <p className="font-bold text-[#3e0078]">Authorized Signature</p>
-            <p className="text-[10px] text-slate-400">SBN Solutions Accounts</p>
+            <p className="text-[10px] text-slate-400">
+              SBN Enterprise Accounts
+            </p>
           </div>
         </div>
 
         {/* Bottom Banner */}
         <div className="border-t border-slate-200 pt-3 text-center text-[10px] text-slate-400">
           <p className="font-semibold text-slate-500">
-            Thank you for choosing SBN Solutions!
+            Thank you for choosing SBN Enterprise!
           </p>
           <p className="mt-0.5">
-            This is a computer-generated invoice document. For billing support or inquiries, please contact our helpline.
+            This is a computer-generated invoice document. For billing support
+            or inquiries, please contact our helpline.
           </p>
         </div>
       </div>

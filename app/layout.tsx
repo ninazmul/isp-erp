@@ -18,12 +18,12 @@ const dmSerif = DM_Serif_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "SBN Solutions – Management System",
-    template: "%s | SBN Solutions",
+    default: "SBN Enterprise – Management System",
+    template: "%s | SBN Enterprise",
   },
 
   description:
-    "SBN Solutions is a comprehensive management system handling customers, billing, expenses, and reports.",
+    "SBN Enterprise is a comprehensive management system handling customers, billing, expenses, and reports.",
 
   alternates: {
     canonical: "/",
@@ -44,15 +44,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_BD",
-    siteName: "SBN Solutions",
-    title: "SBN Solutions – Management System",
+    siteName: "SBN Enterprise",
+    title: "SBN Enterprise – Management System",
     description:
-      "Manage your business with SBN Solutions - customers, billing, expenses, and reports in one place.",
+      "Manage your business with SBN Enterprise - customers, billing, expenses, and reports in one place.",
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "SBN Solutions – Management System",
+    title: "SBN Enterprise – Management System",
     description:
       "Comprehensive management system for customers, billing, expenses, and reports.",
   },
@@ -66,7 +66,10 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className={`${inter.variable} ${dmSerif.variable} font-sans`} suppressHydrationWarning>
+        <body
+          className={`${inter.variable} ${dmSerif.variable} font-sans`}
+          suppressHydrationWarning
+        >
           {children}
         </body>
       </html>

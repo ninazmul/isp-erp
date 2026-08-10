@@ -23,7 +23,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               Welcome Back
             </p>
             <h1 className="text-3xl font-extrabold leading-tight text-gray-900 dark:text-white tracking-tight">
-              SBN Solutions
+              SBN Enterprise
             </h1>
             <p className="max-w-md text-sm text-gray-600 dark:text-gray-300">
               Securely sign in to manage customers, billing, and expenses from
@@ -39,7 +39,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 SBN
               </div>
               <span className="font-extrabold text-lg text-slate-900 dark:text-white">
-                SBN Solutions
+                SBN Enterprise
               </span>
             </div>
 
@@ -54,7 +54,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 Welcome Back
               </p>
               <h1 className="mt-3 text-xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
-                SBN Solutions
+                SBN Enterprise
               </h1>
               <p className="mt-1.5 text-sm text-gray-600 dark:text-gray-300">
                 Securely sign in to manage customers, billing, and expenses from

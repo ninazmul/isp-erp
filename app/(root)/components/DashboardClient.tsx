@@ -103,14 +103,30 @@ const CustomChartTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white/95 backdrop-blur-md border border-slate-200/80 p-3 rounded-xl shadow-xl space-y-1 text-xs">
-        <p className="font-bold text-slate-700 mb-1 border-b border-slate-100 pb-1">{label}</p>
+        <p className="font-bold text-slate-700 mb-1 border-b border-slate-100 pb-1">
+          {label}
+        </p>
         {payload.map((entry, index) => (
-          <div key={`item-${index}`} className="flex items-center justify-between gap-4 font-medium">
-            <span className="flex items-center gap-1.5" style={{ color: entry.color }}>
-              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+          <div
+            key={`item-${index}`}
+            className="flex items-center justify-between gap-4 font-medium"
+          >
+            <span
+              className="flex items-center gap-1.5"
+              style={{ color: entry.color }}
+            >
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: entry.color }}
+              />
               {entry.name}:
             </span>
-            <span className="font-bold text-slate-800">৳{Number(entry.value).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+            <span className="font-bold text-slate-800">
+              ৳
+              {Number(entry.value).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+              })}
+            </span>
           </div>
         ))}
       </div>
@@ -130,18 +146,25 @@ export default function DashboardClient({ data }: DashboardClientProps) {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-purple-200 text-xs font-semibold uppercase tracking-widest mb-1">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /> Executive Overview
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />{" "}
+              Executive Overview
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-              SBN Solutions Dashboard
+              SBN Enterprise Dashboard
             </h1>
             <p className="text-purple-200 text-xs md:text-sm mt-1">
-              Real-time analytics across billing, customer subscriptions, manual income, and operational expenses.
+              Real-time analytics across billing, customer subscriptions, manual
+              income, and operational expenses.
             </p>
           </div>
           <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 text-xs text-purple-100 self-start md:self-auto">
             <Calendar className="w-4 h-4 text-purple-300" />
-            <span>{new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span>
+            <span>
+              {new Date().toLocaleDateString("en-US", {
+                month: "long",
+                year: "numeric",
+              })}
+            </span>
           </div>
         </div>
       </div>
@@ -156,7 +179,9 @@ export default function DashboardClient({ data }: DashboardClientProps) {
           <Card className="p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 bg-white relative overflow-hidden">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-xs font-semibold text-slate-400">Total Customers</p>
+                <p className="text-xs font-semibold text-slate-400">
+                  Total Customers
+                </p>
                 <h3 className="text-2xl font-black text-[#3e0078] mt-1">
                   {data.customers.total.toLocaleString()}
                 </h3>
@@ -166,7 +191,8 @@ export default function DashboardClient({ data }: DashboardClientProps) {
               </div>
             </div>
             <div className="mt-3 text-[11px] text-slate-500 font-medium flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-[#3e0078]" /> Registered Accounts
+              <span className="w-2 h-2 rounded-full bg-[#3e0078]" /> Registered
+              Accounts
             </div>
           </Card>
 
@@ -174,7 +200,9 @@ export default function DashboardClient({ data }: DashboardClientProps) {
           <Card className="p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 bg-white relative overflow-hidden">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-xs font-semibold text-slate-400">Active Connections</p>
+                <p className="text-xs font-semibold text-slate-400">
+                  Active Connections
+                </p>
                 <h3 className="text-2xl font-black text-emerald-600 mt-1">
                   {data.customers.active.toLocaleString()}
                 </h3>
@@ -184,7 +212,8 @@ export default function DashboardClient({ data }: DashboardClientProps) {
               </div>
             </div>
             <div className="mt-3 text-[11px] text-emerald-600 font-medium flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" /> Active Subscriptions
+              <span className="w-2 h-2 rounded-full bg-emerald-500" /> Active
+              Subscriptions
             </div>
           </Card>
 
@@ -192,7 +221,9 @@ export default function DashboardClient({ data }: DashboardClientProps) {
           <Card className="p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 bg-white relative overflow-hidden">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-xs font-semibold text-slate-400">Inactive Subscribers</p>
+                <p className="text-xs font-semibold text-slate-400">
+                  Inactive Subscribers
+                </p>
                 <h3 className="text-2xl font-black text-amber-600 mt-1">
                   {data.customers.inactive.toLocaleString()}
                 </h3>
@@ -202,7 +233,8 @@ export default function DashboardClient({ data }: DashboardClientProps) {
               </div>
             </div>
             <div className="mt-3 text-[11px] text-amber-600 font-medium flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-amber-500" /> Pending Renewal
+              <span className="w-2 h-2 rounded-full bg-amber-500" /> Pending
+              Renewal
             </div>
           </Card>
 
@@ -210,7 +242,9 @@ export default function DashboardClient({ data }: DashboardClientProps) {
           <Card className="p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 bg-white relative overflow-hidden">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-xs font-semibold text-slate-400">Disconnected</p>
+                <p className="text-xs font-semibold text-slate-400">
+                  Disconnected
+                </p>
                 <h3 className="text-2xl font-black text-rose-600 mt-1">
                   {data.customers.disconnected.toLocaleString()}
                 </h3>
@@ -220,7 +254,8 @@ export default function DashboardClient({ data }: DashboardClientProps) {
               </div>
             </div>
             <div className="mt-3 text-[11px] text-rose-600 font-medium flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-rose-500" /> Terminated Lines
+              <span className="w-2 h-2 rounded-full bg-rose-500" /> Terminated
+              Lines
             </div>
           </Card>
         </div>
@@ -235,11 +270,16 @@ export default function DashboardClient({ data }: DashboardClientProps) {
           {/* Billing Collection */}
           <Card className="p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 bg-white">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-slate-400">Billing Collection</span>
+              <span className="text-xs font-medium text-slate-400">
+                Billing Collection
+              </span>
               <Receipt className="w-4 h-4 text-emerald-500" />
             </div>
             <h3 className="text-lg font-bold text-emerald-600">
-              ৳{data.billing.currentMonthCollection.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              ৳
+              {data.billing.currentMonthCollection.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+              })}
             </h3>
             <p className="text-[10px] text-slate-400 mt-1">Paid Invoices</p>
           </Card>
@@ -247,11 +287,16 @@ export default function DashboardClient({ data }: DashboardClientProps) {
           {/* Manual Income */}
           <Card className="p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 bg-white">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-slate-400">Manual Income</span>
+              <span className="text-xs font-medium text-slate-400">
+                Manual Income
+              </span>
               <TrendingUp className="w-4 h-4 text-cyan-500" />
             </div>
             <h3 className="text-lg font-bold text-cyan-600">
-              ৳{data.billing.currentMonthManualIncome.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              ৳
+              {data.billing.currentMonthManualIncome.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+              })}
             </h3>
             <p className="text-[10px] text-slate-400 mt-1">Misc Receipts</p>
           </Card>
@@ -259,23 +304,35 @@ export default function DashboardClient({ data }: DashboardClientProps) {
           {/* Total Income */}
           <Card className="p-4 rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/40 to-white shadow-sm hover:shadow-md transition-all duration-200">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-semibold text-emerald-900">Total Revenue</span>
+              <span className="text-xs font-semibold text-emerald-900">
+                Total Revenue
+              </span>
               <DollarSign className="w-4 h-4 text-emerald-600" />
             </div>
             <h3 className="text-lg font-extrabold text-emerald-700">
-              ৳{data.billing.currentMonthTotalIncome.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              ৳
+              {data.billing.currentMonthTotalIncome.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+              })}
             </h3>
-            <p className="text-[10px] text-emerald-600/80 font-medium mt-1">Combined Inflows</p>
+            <p className="text-[10px] text-emerald-600/80 font-medium mt-1">
+              Combined Inflows
+            </p>
           </Card>
 
           {/* Expenses */}
           <Card className="p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 bg-white">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-slate-400">Expenses</span>
+              <span className="text-xs font-medium text-slate-400">
+                Expenses
+              </span>
               <Wallet className="w-4 h-4 text-rose-500" />
             </div>
             <h3 className="text-lg font-bold text-rose-600">
-              ৳{data.billing.currentMonthExpenses.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              ৳
+              {data.billing.currentMonthExpenses.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+              })}
             </h3>
             <p className="text-[10px] text-slate-400 mt-1">Operational Costs</p>
           </Card>
@@ -283,26 +340,49 @@ export default function DashboardClient({ data }: DashboardClientProps) {
           {/* Due Amount */}
           <Card className="p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 bg-white">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-slate-400">Due Receivables</span>
+              <span className="text-xs font-medium text-slate-400">
+                Due Receivables
+              </span>
               <CreditCard className="w-4 h-4 text-amber-500" />
             </div>
             <h3 className="text-lg font-bold text-amber-600">
-              ৳{data.billing.currentMonthDue.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              ৳
+              {data.billing.currentMonthDue.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+              })}
             </h3>
-            <p className="text-[10px] text-slate-400 mt-1">Pending Collections</p>
+            <p className="text-[10px] text-slate-400 mt-1">
+              Pending Collections
+            </p>
           </Card>
 
           {/* Net Profit */}
-          <Card className={`p-4 rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 ${isProfit ? "border-purple-200 bg-gradient-to-br from-purple-50/40 to-white" : "border-rose-200 bg-rose-50/20"}`}>
+          <Card
+            className={`p-4 rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 ${isProfit ? "border-purple-200 bg-gradient-to-br from-purple-50/40 to-white" : "border-rose-200 bg-rose-50/20"}`}
+          >
             <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-semibold text-slate-700">Net Margin</span>
-              {isProfit ? <ArrowUpRight className="w-4 h-4 text-[#3e0078]" /> : <ArrowDownRight className="w-4 h-4 text-rose-600" />}
+              <span className="text-xs font-semibold text-slate-700">
+                Net Margin
+              </span>
+              {isProfit ? (
+                <ArrowUpRight className="w-4 h-4 text-[#3e0078]" />
+              ) : (
+                <ArrowDownRight className="w-4 h-4 text-rose-600" />
+              )}
             </div>
-            <h3 className={`text-lg font-black ${isProfit ? "text-[#3e0078]" : "text-rose-600"}`}>
-              {isProfit ? "+" : ""}৳{data.billing.currentMonthProfit.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            <h3
+              className={`text-lg font-black ${isProfit ? "text-[#3e0078]" : "text-rose-600"}`}
+            >
+              {isProfit ? "+" : ""}৳
+              {data.billing.currentMonthProfit.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+              })}
             </h3>
             <div className="mt-1">
-              <Badge variant={isProfit ? "default" : "destructive"} className="text-[9px] py-0 px-1.5 font-bold">
+              <Badge
+                variant={isProfit ? "default" : "destructive"}
+                className="text-[9px] py-0 px-1.5 font-bold"
+              >
                 {isProfit ? "NET PROFIT" : "NET LOSS"}
               </Badge>
             </div>
@@ -316,18 +396,50 @@ export default function DashboardClient({ data }: DashboardClientProps) {
           <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
             6-Month Performance Trend
           </h2>
-          <span className="text-xs font-medium text-slate-500">Billing vs Manual Income vs Expenses</span>
+          <span className="text-xs font-medium text-slate-500">
+            Billing vs Manual Income vs Expenses
+          </span>
         </div>
         <Card className="p-5 rounded-2xl border border-slate-100 shadow-sm bg-white">
           <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={data.charts.monthly} margin={{ top: 15, right: 15, left: 0, bottom: 0 }}>
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
+            <BarChart
+              data={data.charts.monthly}
+              margin={{ top: 15, right: 15, left: 0, bottom: 0 }}
+            >
+              <XAxis
+                dataKey="month"
+                tick={{ fontSize: 11, fill: "#64748b" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 11, fill: "#64748b" }}
+                axisLine={false}
+                tickLine={false}
+              />
               <Tooltip content={<CustomChartTooltip />} />
               <Legend wrapperStyle={{ paddingTop: "12px", fontSize: "12px" }} />
-              <Bar dataKey="billingIncome" name="Billing Collection" fill="#10b981" radius={[6, 6, 0, 0]} maxBarSize={32} />
-              <Bar dataKey="manualIncome" name="Manual Income" fill="#06b6d4" radius={[6, 6, 0, 0]} maxBarSize={32} />
-              <Bar dataKey="expenses" name="Expenses" fill="#f43f5e" radius={[6, 6, 0, 0]} maxBarSize={32} />
+              <Bar
+                dataKey="billingIncome"
+                name="Billing Collection"
+                fill="#10b981"
+                radius={[6, 6, 0, 0]}
+                maxBarSize={32}
+              />
+              <Bar
+                dataKey="manualIncome"
+                name="Manual Income"
+                fill="#06b6d4"
+                radius={[6, 6, 0, 0]}
+                maxBarSize={32}
+              />
+              <Bar
+                dataKey="expenses"
+                name="Expenses"
+                fill="#f43f5e"
+                radius={[6, 6, 0, 0]}
+                maxBarSize={32}
+              />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -348,19 +460,31 @@ export default function DashboardClient({ data }: DashboardClientProps) {
                 </span>
                 Billing Payments
               </h3>
-              <Link href="/billing" className="text-[11px] font-semibold text-purple-700 hover:underline">
+              <Link
+                href="/billing"
+                className="text-[11px] font-semibold text-purple-700 hover:underline"
+              >
                 View All →
               </Link>
             </div>
             <div className="space-y-3">
               {data.recent.payments.length === 0 ? (
-                <p className="text-xs text-slate-400 py-4 text-center">No recent billing payments</p>
+                <p className="text-xs text-slate-400 py-4 text-center">
+                  No recent billing payments
+                </p>
               ) : (
                 data.recent.payments.map((payment) => (
-                  <div key={payment._id} className="flex justify-between items-center p-2 rounded-xl hover:bg-slate-50 transition-colors">
+                  <div
+                    key={payment._id}
+                    className="flex justify-between items-center p-2 rounded-xl hover:bg-slate-50 transition-colors"
+                  >
                     <div>
-                      <p className="font-semibold text-xs text-slate-800">{payment.customer?.name ?? "—"}</p>
-                      <p className="text-[10px] text-slate-400 font-mono mt-0.5">{payment.invoiceNumber}</p>
+                      <p className="font-semibold text-xs text-slate-800">
+                        {payment.customer?.name ?? "—"}
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                        {payment.invoiceNumber}
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-xs text-emerald-600">
@@ -385,16 +509,24 @@ export default function DashboardClient({ data }: DashboardClientProps) {
                 </span>
                 Manual Receipts
               </h3>
-              <Link href="/income" className="text-[11px] font-semibold text-purple-700 hover:underline">
+              <Link
+                href="/income"
+                className="text-[11px] font-semibold text-purple-700 hover:underline"
+              >
                 View All →
               </Link>
             </div>
             <div className="space-y-3">
               {data.recent.incomes.length === 0 ? (
-                <p className="text-xs text-slate-400 py-4 text-center">No recent manual income</p>
+                <p className="text-xs text-slate-400 py-4 text-center">
+                  No recent manual income
+                </p>
               ) : (
                 data.recent.incomes.map((income) => (
-                  <div key={income._id} className="flex justify-between items-center p-2 rounded-xl hover:bg-slate-50 transition-colors">
+                  <div
+                    key={income._id}
+                    className="flex justify-between items-center p-2 rounded-xl hover:bg-slate-50 transition-colors"
+                  >
                     <div>
                       <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-medium bg-cyan-50 text-cyan-700 mb-0.5">
                         {income.category}
@@ -426,16 +558,24 @@ export default function DashboardClient({ data }: DashboardClientProps) {
                 </span>
                 Expenses
               </h3>
-              <Link href="/expenses" className="text-[11px] font-semibold text-purple-700 hover:underline">
+              <Link
+                href="/expenses"
+                className="text-[11px] font-semibold text-purple-700 hover:underline"
+              >
                 View All →
               </Link>
             </div>
             <div className="space-y-3">
               {data.recent.expenses.length === 0 ? (
-                <p className="text-xs text-slate-400 py-4 text-center">No recent expenses</p>
+                <p className="text-xs text-slate-400 py-4 text-center">
+                  No recent expenses
+                </p>
               ) : (
                 data.recent.expenses.map((expense) => (
-                  <div key={expense._id} className="flex justify-between items-center p-2 rounded-xl hover:bg-slate-50 transition-colors">
+                  <div
+                    key={expense._id}
+                    className="flex justify-between items-center p-2 rounded-xl hover:bg-slate-50 transition-colors"
+                  >
                     <div>
                       <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-medium bg-rose-50 text-rose-700 mb-0.5">
                         {expense.category}
