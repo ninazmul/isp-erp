@@ -13,6 +13,12 @@ export * from "./income.actions";
 // Categories
 export * from "./category.actions";
 
+// Packages
+export * from "./package.actions";
+
+// Locations
+export * from "./location.actions";
+
 // Dashboard
 export * from "./dashboard.actions";
 

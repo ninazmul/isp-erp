@@ -5,6 +5,7 @@ export interface Customer {
   phone: string;
   email?: string;
   address?: string;
+  location?: string;
   packageName: string;
   monthlyFee: number;
   connectionDate: Date;
@@ -59,4 +60,15 @@ export interface Admin {
   _id: string;
   email: string;
   createdAt: Date;
+}
+
+export interface Package {
+  _id: string;
+  name: string;
+  monthlyFee: number;
+}
+
+export interface Location {
+  _id: string;
+  name: string;
 }

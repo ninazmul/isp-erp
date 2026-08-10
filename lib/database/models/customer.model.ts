@@ -7,6 +7,7 @@ const CustomerSchema = new Schema(
     phone: { type: String, required: true },
     email: { type: String },
     address: { type: String },
+    location: { type: String },
     packageName: { type: String, required: true },
     monthlyFee: { type: Number, required: true },
     connectionDate: { type: Date, required: true },
@@ -25,6 +26,7 @@ const CustomerSchema = new Schema(
 
 CustomerSchema.index({ isDeleted: 1, status: 1, createdAt: -1 });
 CustomerSchema.index({ name: 1, phone: 1, customerCode: 1 });
+CustomerSchema.index({ location: 1 });
 
 const Customer = models.Customer || model("Customer", CustomerSchema);
 

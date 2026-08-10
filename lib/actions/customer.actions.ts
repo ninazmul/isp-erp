@@ -12,6 +12,7 @@ interface CustomerDoc {
   phone: string;
   email?: string;
   address?: string;
+  location?: string;
   packageName: string;
   monthlyFee: number;
   connectionDate: Date;
@@ -27,6 +28,7 @@ export async function createCustomer(data: {
   phone: string;
   email?: string;
   address?: string;
+  location?: string;
   packageName: string;
   monthlyFee: number;
   connectionDate: Date;

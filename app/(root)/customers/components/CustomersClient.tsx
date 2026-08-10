@@ -27,7 +27,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Users, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Users,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { toast } from "react-hot-toast";
 import CustomerForm from "./CustomerForm";
 import { getCustomers, deleteCustomer } from "@/lib/actions/customer.actions";
@@ -102,11 +110,23 @@ export default function CustomersClient({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "Active":
-        return <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200">Active</Badge>;
+        return (
+          <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200">
+            Active
+          </Badge>
+        );
       case "Inactive":
-        return <Badge className="bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200">Inactive</Badge>;
+        return (
+          <Badge className="bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200">
+            Inactive
+          </Badge>
+        );
       case "Disconnected":
-        return <Badge className="bg-rose-50 text-rose-700 hover:bg-rose-100 border-rose-200">Disconnected</Badge>;
+        return (
+          <Badge className="bg-rose-50 text-rose-700 hover:bg-rose-100 border-rose-200">
+            Disconnected
+          </Badge>
+        );
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -125,7 +145,8 @@ export default function CustomersClient({
               Customer Management
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Total Subscribers: <span className="font-bold text-slate-800">{total}</span>
+              Total Subscribers:{" "}
+              <span className="font-bold text-slate-800">{total}</span>
             </p>
           </div>
         </div>
@@ -138,7 +159,9 @@ export default function CustomersClient({
           </DialogTrigger>
           <DialogContent className="max-w-2xl bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-slate-800">Add New Customer</DialogTitle>
+              <DialogTitle className="text-lg font-bold text-slate-800">
+                Add New Customer
+              </DialogTitle>
             </DialogHeader>
             <CustomerForm
               onSuccess={() => {
@@ -198,25 +221,48 @@ export default function CustomersClient({
           <Table>
             <TableHeader className="bg-slate-50/70">
               <TableRow className="hover:bg-transparent border-slate-100">
-                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Code</TableHead>
-                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Customer Name</TableHead>
-                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Phone</TableHead>
-                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Package</TableHead>
-                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Monthly Fee</TableHead>
-                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">Status</TableHead>
-                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider text-right">Actions</TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">
+                  Code
+                </TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">
+                  Customer Name
+                </TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">
+                  Phone
+                </TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">
+                  Location
+                </TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">
+                  Package
+                </TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">
+                  Monthly Fee
+                </TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">
+                  Status
+                </TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider text-right">
+                  Actions
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {customers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-slate-400 py-10 text-sm">
+                  <TableCell
+                    colSpan={8}
+                    className="text-center text-slate-400 py-10 text-sm"
+                  >
                     No customers found
                   </TableCell>
                 </TableRow>
               ) : (
                 customers.map((customer) => (
-                  <TableRow key={customer._id} className="hover:bg-slate-50/60 border-slate-100 transition-colors">
+                  <TableRow
+                    key={customer._id}
+                    className="hover:bg-slate-50/60 border-slate-100 transition-colors"
+                  >
                     <TableCell className="font-mono text-xs font-bold text-purple-900 whitespace-nowrap">
                       {customer.customerCode}
                     </TableCell>
@@ -225,6 +271,15 @@ export default function CustomersClient({
                     </TableCell>
                     <TableCell className="text-xs text-slate-600 font-mono whitespace-nowrap">
                       {customer.phone}
+                    </TableCell>
+                    <TableCell className="text-xs text-slate-600 whitespace-nowrap">
+                      {customer.location ? (
+                        <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-medium">
+                          {customer.location}
+                        </span>
+                      ) : (
+                        <span className="text-slate-300">—</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-xs text-slate-600 whitespace-nowrap">
                       <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-medium">
@@ -240,7 +295,9 @@ export default function CustomersClient({
                     <TableCell className="text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1.5">
                         <Dialog
-                          open={isEditOpen && editingCustomer?._id === customer._id}
+                          open={
+                            isEditOpen && editingCustomer?._id === customer._id
+                          }
                           onOpenChange={(open) => {
                             setIsEditOpen(open);
                             if (!open) setEditingCustomer(null);
@@ -258,7 +315,9 @@ export default function CustomersClient({
                           </DialogTrigger>
                           <DialogContent className="max-w-2xl bg-white rounded-2xl max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
-                              <DialogTitle className="text-lg font-bold text-slate-800">Edit Customer</DialogTitle>
+                              <DialogTitle className="text-lg font-bold text-slate-800">
+                                Edit Customer
+                              </DialogTitle>
                             </DialogHeader>
                             <CustomerForm
                               customer={editingCustomer ?? undefined}
@@ -291,9 +350,16 @@ export default function CustomersClient({
         {/* Server Pagination Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-t border-slate-100 gap-3 text-xs text-slate-500">
           <div>
-            Showing <span className="font-bold text-slate-700">{customers.length > 0 ? (page - 1) * limit + 1 : 0}</span> to{" "}
-            <span className="font-bold text-slate-700">{Math.min(page * limit, total)}</span> of{" "}
-            <span className="font-bold text-slate-700">{total}</span> subscribers
+            Showing{" "}
+            <span className="font-bold text-slate-700">
+              {customers.length > 0 ? (page - 1) * limit + 1 : 0}
+            </span>{" "}
+            to{" "}
+            <span className="font-bold text-slate-700">
+              {Math.min(page * limit, total)}
+            </span>{" "}
+            of <span className="font-bold text-slate-700">{total}</span>{" "}
+            subscribers
           </div>
 
           <div className="flex items-center gap-2">
