@@ -131,23 +131,21 @@ const AdminSidebar = () => {
                     item.url === "/"
                       ? currentPath === item.url
                       : currentPath === item.url ||
-                        currentPath.startsWith(`${item.url}/`);
+                      currentPath.startsWith(`${item.url}/`);
 
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
                         <Link
                           href={item.url}
-                          className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${
-                            isActive
+                          className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${isActive
                               ? "bg-gradient-to-r from-[#3e0078] to-[#5b0ea6] text-white shadow-md shadow-purple-900/20 font-semibold"
                               : "text-slate-600 hover:text-[#3e0078] hover:bg-purple-50/70"
-                          }`}
+                            }`}
                         >
                           <item.icon
-                            className={`w-4 h-4 transition-transform duration-200 ${
-                              isActive ? "text-white scale-110" : "text-purple-700/70"
-                            }`}
+                            className={`w-4 h-4 transition-transform duration-200 ${isActive ? "text-white scale-110" : "text-purple-700/70"
+                              }`}
                           />
                           <span>{item.title}</span>
 
