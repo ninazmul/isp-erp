@@ -20,6 +20,9 @@ const BillSchema = new Schema(
 );
 
 BillSchema.index({ customer: 1, month: 1, year: 1 }, { unique: true });
+BillSchema.index({ year: 1, month: 1, status: 1 });
+BillSchema.index({ status: 1, paymentDate: -1 });
+BillSchema.index({ createdAt: -1 });
 
 const Bill = models.Bill || model("Bill", BillSchema);
 

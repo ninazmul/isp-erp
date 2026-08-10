@@ -22,6 +22,13 @@ const DEFAULT_INCOME_CATEGORIES = [
   "Other",
 ];
 
+interface CategoryDoc {
+  _id: string;
+  name: string;
+  type: "income" | "expense";
+  isDefault: boolean;
+}
+
 async function seedDefaults(type: "income" | "expense") {
   const defaults =
     type === "expense" ? DEFAULT_EXPENSE_CATEGORIES : DEFAULT_INCOME_CATEGORIES;
@@ -36,7 +43,7 @@ async function seedDefaults(type: "income" | "expense") {
 export async function getCategories(type: "income" | "expense") {
   await connectToDatabase();
   await seedDefaults(type);
-  const categories = await Category.find({ type }).sort({ name: 1 });
+  const categories = await Category.find({ type }).sort({ name: 1 }).lean<CategoryDoc[]>();
   return JSON.parse(JSON.stringify(categories));
 }
 
@@ -45,7 +52,10 @@ export async function createCategory(name: string, type: "income" | "expense") {
   const existing = await Category.findOne({
     name: { $regex: `^${name}$`, $options: "i" },
     type,
-  });
+  })
+    .select("_id")
+    .lean<CategoryDoc | null>();
+
   if (existing) throw new Error("Category already exists");
   const category = await Category.create({ name, type, isDefault: false });
   revalidatePath("/expenses");
@@ -56,7 +66,7 @@ export async function createCategory(name: string, type: "income" | "expense") {
 
 export async function deleteCategory(id: string) {
   await connectToDatabase();
-  const category = await Category.findById(id);
+  const category = await Category.findById(id).lean<CategoryDoc | null>();
   if (!category) throw new Error("Category not found");
   if (category.isDefault) throw new Error("Cannot delete a default category");
   await Category.findByIdAndDelete(id);

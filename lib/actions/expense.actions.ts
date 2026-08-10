@@ -5,7 +5,6 @@ import Expense from "@/lib/database/models/expense.model";
 import { revalidatePath } from "next/cache";
 import type { FilterQuery } from "mongoose";
 
-// Define types
 interface ExpenseDoc {
   _id: string;
   category: string;
@@ -60,23 +59,31 @@ export async function getExpenses(params?: {
       (month || 1) - 1,
       1
     );
-    const endDate = new Date(year || new Date().getFullYear(), month || 12, 0);
+    const endDate = new Date(
+      year || new Date().getFullYear(),
+      month ? month : 12,
+      month ? 0 : 31,
+      23,
+      59,
+      59,
+      999
+    );
     query.expenseDate = { $gte: startDate, $lte: endDate };
   }
 
-  if (search) {
-    query.$or = [
-      { reference: { $regex: search, $options: "i" } },
-      { description: { $regex: search, $options: "i" } },
-    ];
+  if (search.trim()) {
+    const regex = new RegExp(search.trim(), "i");
+    query.$or = [{ reference: regex }, { description: regex }];
   }
 
-  const expenses = await Expense.find<ExpenseDoc>(query)
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
-
-  const total = await Expense.countDocuments(query);
+  const [expenses, total] = await Promise.all([
+    Expense.find<ExpenseDoc>(query)
+      .sort({ expenseDate: -1, createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Expense.countDocuments(query),
+  ]);
 
   return {
     expenses: JSON.parse(JSON.stringify(expenses)),
@@ -90,7 +97,7 @@ export async function updateExpense(id: string, data: Partial<ExpenseDoc>) {
   await connectToDatabase();
   const expense = await Expense.findByIdAndUpdate<ExpenseDoc>(id, data, {
     new: true,
-  });
+  }).lean();
   revalidatePath("/expenses");
   return JSON.parse(JSON.stringify(expense));
 }

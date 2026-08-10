@@ -23,6 +23,9 @@ const CustomerSchema = new Schema(
   { timestamps: true },
 );
 
+CustomerSchema.index({ isDeleted: 1, status: 1, createdAt: -1 });
+CustomerSchema.index({ name: 1, phone: 1, customerCode: 1 });
+
 const Customer = models.Customer || model("Customer", CustomerSchema);
 
 export default Customer;

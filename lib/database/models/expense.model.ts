@@ -12,6 +12,9 @@ const ExpenseSchema = new Schema(
   { timestamps: true }
 );
 
+ExpenseSchema.index({ expenseDate: -1, category: 1 });
+ExpenseSchema.index({ createdAt: -1 });
+
 const Expense = models.Expense || model("Expense", ExpenseSchema);
 
 export default Expense;

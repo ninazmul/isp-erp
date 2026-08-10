@@ -5,7 +5,6 @@ import Customer from "@/lib/database/models/customer.model";
 import { revalidatePath } from "next/cache";
 import type { FilterQuery } from "mongoose";
 
-// Define types
 interface CustomerDoc {
   _id: string;
   customerCode: string;
@@ -38,15 +37,18 @@ export async function createCustomer(data: {
 }) {
   await connectToDatabase();
 
-  const lastCustomer = await Customer.findOne<CustomerDoc>().sort({
-    createdAt: -1,
-  });
-  let customerCode = "CUST001";
+  const lastCustomer = await Customer.findOne<CustomerDoc>()
+    .select("customerCode")
+    .sort({ createdAt: -1 })
+    .lean();
 
-  if (lastCustomer) {
+  let customerCode = "CUST001";
+  if (lastCustomer && lastCustomer.customerCode) {
     const lastCode = lastCustomer.customerCode;
     const num = parseInt(lastCode.slice(4));
-    customerCode = `CUST${(num + 1).toString().padStart(3, "0")}`;
+    if (!isNaN(num)) {
+      customerCode = `CUST${(num + 1).toString().padStart(3, "0")}`;
+    }
   }
 
   const customer = await Customer.create({
@@ -71,12 +73,13 @@ export async function getCustomers(params?: {
 
   const query: FilterQuery<CustomerDoc> = { isDeleted: false };
 
-  if (search) {
+  if (search.trim()) {
+    const regex = new RegExp(search.trim(), "i");
     query.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { phone: { $regex: search, $options: "i" } },
-      { email: { $regex: search, $options: "i" } },
-      { customerCode: { $regex: search, $options: "i" } },
+      { name: regex },
+      { phone: regex },
+      { email: regex },
+      { customerCode: regex },
     ];
   }
 
@@ -84,12 +87,14 @@ export async function getCustomers(params?: {
     query.status = status;
   }
 
-  const customers = await Customer.find<CustomerDoc>(query)
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
-
-  const total = await Customer.countDocuments(query);
+  const [customers, total] = await Promise.all([
+    Customer.find<CustomerDoc>(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Customer.countDocuments(query),
+  ]);
 
   return {
     customers: JSON.parse(JSON.stringify(customers)),
@@ -101,7 +106,7 @@ export async function getCustomers(params?: {
 
 export async function getCustomerById(id: string) {
   await connectToDatabase();
-  const customer = await Customer.findById<CustomerDoc>(id);
+  const customer = await Customer.findById<CustomerDoc>(id).lean();
   if (!customer || customer.isDeleted) throw new Error("Customer not found");
   return JSON.parse(JSON.stringify(customer));
 }
@@ -110,7 +115,7 @@ export async function updateCustomer(id: string, data: Partial<CustomerDoc>) {
   await connectToDatabase();
   const customer = await Customer.findByIdAndUpdate<CustomerDoc>(id, data, {
     new: true,
-  });
+  }).lean();
   revalidatePath("/customers");
   return JSON.parse(JSON.stringify(customer));
 }

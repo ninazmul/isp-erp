@@ -59,23 +59,31 @@ export async function getIncomes(params?: {
       (month || 1) - 1,
       1
     );
-    const endDate = new Date(year || new Date().getFullYear(), month || 12, 0);
+    const endDate = new Date(
+      year || new Date().getFullYear(),
+      month ? month : 12,
+      month ? 0 : 31,
+      23,
+      59,
+      59,
+      999
+    );
     query.incomeDate = { $gte: startDate, $lte: endDate };
   }
 
-  if (search) {
-    query.$or = [
-      { reference: { $regex: search, $options: "i" } },
-      { description: { $regex: search, $options: "i" } },
-    ];
+  if (search.trim()) {
+    const regex = new RegExp(search.trim(), "i");
+    query.$or = [{ reference: regex }, { description: regex }];
   }
 
-  const incomes = await Income.find<IncomeDoc>(query)
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
-
-  const total = await Income.countDocuments(query);
+  const [incomes, total] = await Promise.all([
+    Income.find<IncomeDoc>(query)
+      .sort({ incomeDate: -1, createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Income.countDocuments(query),
+  ]);
 
   return {
     incomes: JSON.parse(JSON.stringify(incomes)),
@@ -89,7 +97,7 @@ export async function updateIncome(id: string, data: Partial<IncomeDoc>) {
   await connectToDatabase();
   const income = await Income.findByIdAndUpdate<IncomeDoc>(id, data, {
     new: true,
-  });
+  }).lean();
   revalidatePath("/income");
   return JSON.parse(JSON.stringify(income));
 }

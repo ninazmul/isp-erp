@@ -8,11 +8,15 @@ import type { FilterQuery } from "mongoose";
 
 const INVOICE_PREFIX = "INV";
 
-// Define types for mongoose docs
-interface BillDoc {
+interface RawCustomerDoc {
+  _id: { toString(): string } | string;
+  monthlyFee: number;
+}
+
+interface RawBillDoc {
   _id: string;
   invoiceNumber: string;
-  customer: CustomerDoc;
+  customer: { _id?: string; toString(): string } | string;
   month: number;
   year: number;
   amount: number;
@@ -22,62 +26,75 @@ interface BillDoc {
   remarks?: string;
 }
 
-interface CustomerDoc {
-  _id: string;
-  customerCode: string;
-  name: string;
-  monthlyFee: number;
-  status: string;
-  isDeleted: boolean;
-}
-
 export async function generateMonthlyBills(month: number, year: number) {
   await connectToDatabase();
 
-  const activeCustomers = await Customer.find<CustomerDoc>({
+  // 1. Fetch active non-deleted customers (.lean())
+  const activeCustomers = await Customer.find({
     status: "Active",
     isDeleted: false,
-  });
+  })
+    .select("_id monthlyFee")
+    .lean<RawCustomerDoc[]>();
 
-  let generated = 0;
+  if (activeCustomers.length === 0) {
+    return { generated: 0, skipped: 0 };
+  }
+
+  // 2. Fetch all existing bills for this month/year in ONE query & build O(1) Set lookup
+  const existingBills = await Bill.find({ month, year })
+    .select("customer")
+    .lean<RawBillDoc[]>();
+  const existingCustomerSet = new Set(
+    existingBills.map((b) => b.customer.toString())
+  );
+
+  // 3. Find latest invoice sequence number
+  const lastBill = await Bill.findOne()
+    .select("invoiceNumber")
+    .sort({ createdAt: -1 })
+    .lean<RawBillDoc | null>();
+
+  let invoiceSeq = 1;
+  if (lastBill && lastBill.invoiceNumber) {
+    const parsed = parseInt(lastBill.invoiceNumber.slice(INVOICE_PREFIX.length));
+    if (!isNaN(parsed)) invoiceSeq = parsed + 1;
+  }
+
+  // 4. Batch prepare bulk ops
+  const bulkOps = [];
   let skipped = 0;
 
   for (const customer of activeCustomers) {
-    const existingBill = await Bill.findOne<BillDoc>({
-      customer: customer._id,
-      month,
-      year,
-    });
-
-    if (existingBill) {
+    const custIdStr = customer._id.toString();
+    if (existingCustomerSet.has(custIdStr)) {
       skipped++;
       continue;
     }
 
-    const lastBill = await Bill.findOne<BillDoc>().sort({ createdAt: -1 });
-    let invoiceNum = 1;
+    const invoiceNumber = `${INVOICE_PREFIX}${invoiceSeq.toString().padStart(6, "0")}`;
+    invoiceSeq++;
 
-    if (lastBill) {
-      const lastInv = lastBill.invoiceNumber;
-      invoiceNum = parseInt(lastInv.slice(INVOICE_PREFIX.length)) + 1;
-    }
-
-    const invoiceNumber = `${INVOICE_PREFIX}${invoiceNum.toString().padStart(6, "0")}`;
-
-    await Bill.create({
-      customer: customer._id,
-      month,
-      year,
-      amount: customer.monthlyFee,
-      status: "Unpaid",
-      invoiceNumber,
+    bulkOps.push({
+      insertOne: {
+        document: {
+          customer: customer._id,
+          month,
+          year,
+          amount: customer.monthlyFee,
+          status: "Unpaid",
+          invoiceNumber,
+        },
+      },
     });
+  }
 
-    generated++;
+  if (bulkOps.length > 0) {
+    await Bill.bulkWrite(bulkOps);
   }
 
   revalidatePath("/billing");
-  return { generated, skipped };
+  return { generated: bulkOps.length, skipped };
 }
 
 export async function getBills(params?: {
@@ -100,32 +117,37 @@ export async function getBills(params?: {
   } = params || {};
   const skip = (page - 1) * limit;
 
-  const query: FilterQuery<BillDoc> = {};
+  const query: FilterQuery<unknown> = {};
 
   if (month) query.month = month;
   if (year) query.year = year;
   if (status) query.status = status;
 
-  const billsQuery = Bill.find<BillDoc>(query)
-    .populate("customer")
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
+  // Search by customer name/code or invoice number
+  if (search.trim()) {
+    const regex = new RegExp(search.trim(), "i");
+    const matchingCustomers = await Customer.find({
+      $or: [{ name: regex }, { customerCode: regex }],
+    })
+      .select("_id")
+      .lean<{ _id: string }[]>();
+    const customerIds = matchingCustomers.map((c) => c._id);
 
-  const total = await Bill.countDocuments(query);
-
-  let bills = await billsQuery;
-
-  if (search) {
-    bills = bills.filter(
-      (bill: BillDoc) =>
-        bill.customer.name.toLowerCase().includes(search.toLowerCase()) ||
-        bill.customer.customerCode
-          .toLowerCase()
-          .includes(search.toLowerCase()) ||
-        bill.invoiceNumber.toLowerCase().includes(search.toLowerCase()),
-    );
+    query.$or = [
+      { invoiceNumber: regex },
+      { customer: { $in: customerIds } },
+    ];
   }
+
+  const [bills, total] = await Promise.all([
+    Bill.find(query)
+      .populate("customer", "name customerCode phone monthlyFee status")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Bill.countDocuments(query),
+  ]);
 
   return {
     bills: JSON.parse(JSON.stringify(bills)),
@@ -141,11 +163,11 @@ export async function markBillAsPaid(
     paymentDate: Date;
     paymentMethod: string;
     remarks?: string;
-  },
+  }
 ) {
   await connectToDatabase();
 
-  const bill = await Bill.findByIdAndUpdate<BillDoc>(
+  const bill = await Bill.findByIdAndUpdate(
     id,
     {
       status: "Paid",
@@ -153,8 +175,8 @@ export async function markBillAsPaid(
       paymentMethod: data.paymentMethod,
       remarks: data.remarks,
     },
-    { new: true },
-  );
+    { new: true }
+  ).lean();
 
   revalidatePath("/billing");
   return JSON.parse(JSON.stringify(bill));
@@ -162,6 +184,6 @@ export async function markBillAsPaid(
 
 export async function getBillById(id: string) {
   await connectToDatabase();
-  const bill = await Bill.findById<BillDoc>(id).populate("customer");
+  const bill = await Bill.findById(id).populate("customer").lean();
   return JSON.parse(JSON.stringify(bill));
 }
