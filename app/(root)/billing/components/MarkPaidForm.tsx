@@ -39,11 +39,26 @@ type MarkPaidFormValues = {
 };
 
 export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
+  const previousDueAmount = bill.previousDueAmount ?? 0;
+  const previousAdvanceAmount = bill.previousAdvanceAmount ?? 0;
+  const paidSoFar = bill.paidAmount ?? (bill.status === "Paid" ? bill.amount : 0);
+  const currentDueAmount =
+    paidSoFar > 0
+      ? bill.dueAmount ?? Math.max(bill.amount - paidSoFar, 0)
+      : 0;
+  const currentAdvanceAmount = bill.advanceAmount ?? 0;
+  const balanceDueAmount = previousDueAmount + currentDueAmount;
+  const balanceAdvanceAmount = previousAdvanceAmount + currentAdvanceAmount;
+  const suggestedPaidAmount = Math.max(
+    bill.amount + balanceDueAmount - balanceAdvanceAmount,
+    0
+  );
+
   const form = useForm<MarkPaidFormValues>({
     defaultValues: {
       paymentDate: new Date().toISOString().split("T")[0],
       paymentMethod: "",
-      paidAmount: bill.amount,
+      paidAmount: suggestedPaidAmount,
       remarks: "",
     },
   });
@@ -51,9 +66,7 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
   const paidAmount = Number(form.watch("paidAmount")) || 0;
   const dueAmount = Math.max(bill.amount - paidAmount, 0);
   const advanceAmount = Math.max(paidAmount - bill.amount, 0);
-  const previousDueAmount = bill.previousDueAmount ?? 0;
-  const previousAdvanceAmount = bill.previousAdvanceAmount ?? 0;
-  const hasPreviousBalance = previousDueAmount > 0 || previousAdvanceAmount > 0;
+  const hasExistingBalance = balanceDueAmount > 0 || balanceAdvanceAmount > 0;
 
   return (
     <Form {...form}>
@@ -83,26 +96,32 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
               </p>
             </div>
           </div>
-          {hasPreviousBalance && (
+          {hasExistingBalance && (
             <div className="grid grid-cols-2 gap-3 border-t border-slate-200 pt-3">
               <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">
                 <p className="text-[11px] font-bold uppercase text-rose-700">
-                  Previous Due
+                  Existing Due
                 </p>
                 <p className="text-base font-black text-rose-800">
-                  ৳{previousDueAmount.toFixed(2)}
+                  ৳{balanceDueAmount.toFixed(2)}
                 </p>
               </div>
               <div className="rounded-lg border border-sky-200 bg-sky-50 p-3">
                 <p className="text-[11px] font-bold uppercase text-sky-700">
-                  Previous Advance
+                  Existing Advance
                 </p>
                 <p className="text-base font-black text-sky-800">
-                  ৳{previousAdvanceAmount.toFixed(2)}
+                  ৳{balanceAdvanceAmount.toFixed(2)}
                 </p>
               </div>
             </div>
           )}
+          <div className="flex items-center justify-between border-t border-slate-200 pt-3 text-sm">
+            <span className="font-medium text-slate-500">Suggested Payment</span>
+            <span className="font-extrabold text-slate-900">
+              ৳{suggestedPaidAmount.toFixed(2)}
+            </span>
+          </div>
         </div>
 
         <FormField
