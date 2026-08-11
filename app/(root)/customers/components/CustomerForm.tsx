@@ -28,6 +28,7 @@ import { toast } from "react-hot-toast";
 
 interface Customer {
   _id: string;
+  username?: string;
   name: string;
   phone: string;
   email?: string;
@@ -47,6 +48,7 @@ interface CustomerFormProps {
 }
 
 interface CustomerFormData {
+  username: string;
   name: string;
   phone: string;
   email: string;
@@ -88,6 +90,7 @@ export default function CustomerForm({
   const form = useForm<CustomerFormData>({
     defaultValues: customer
       ? {
+          username: customer.username ?? "",
           name: customer.name,
           phone: customer.phone,
           email: customer.email ?? "",
@@ -103,6 +106,7 @@ export default function CustomerForm({
           notes: customer.notes ?? "",
         }
       : {
+          username: "",
           name: "",
           phone: "",
           email: "",
@@ -173,6 +177,7 @@ export default function CustomerForm({
     try {
       const payload = {
         ...data,
+        username: data.username || undefined,
         location: data.location,
         connectionDate: new Date(data.connectionDate),
         email: data.email || undefined,
@@ -212,6 +217,20 @@ export default function CustomerForm({
                 <FormLabel>Name</FormLabel>
                 <FormControl>
                   <Input placeholder="Customer name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input placeholder="Customer username" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

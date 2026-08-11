@@ -143,6 +143,7 @@ export default function CustomersClient({
   // ── Excel Columns & Actions ─────────────────────────────────────────────
   const CUSTOMER_HEADERS = [
     "Name",
+    "Username",
     "Phone",
     "Location",
     "Package",
@@ -157,6 +158,7 @@ export default function CustomersClient({
 
   const CUSTOMER_SAMPLE = {
     Name: "John Doe",
+    Username: "john.doe",
     Phone: "01700000000",
     Location: "Gulshan",
     Package: "Standard 10Mbps",
@@ -186,6 +188,7 @@ export default function CustomersClient({
       });
       const rows = res.customers.map((cust: Customer) => ({
         Name: cust.name,
+        Username: cust.username ?? "",
         Phone: cust.phone,
         Location: cust.location,
         Package: cust.packageName,
@@ -274,7 +277,7 @@ export default function CustomersClient({
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
-              placeholder="Search by code, name, phone..."
+              placeholder="Search by code, name, username..."
               value={search}
               onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-9 rounded-xl border-slate-200 text-sm"
@@ -322,6 +325,9 @@ export default function CustomersClient({
                   Customer Name
                 </TableHead>
                 <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">
+                  Username
+                </TableHead>
+                <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">
                   Phone
                 </TableHead>
                 <TableHead className="font-bold text-slate-700 text-xs uppercase tracking-wider">
@@ -345,7 +351,7 @@ export default function CustomersClient({
               {customers.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={8}
+                    colSpan={9}
                     className="text-center text-slate-400 py-10 text-sm"
                   >
                     No customers found
@@ -362,6 +368,11 @@ export default function CustomersClient({
                     </TableCell>
                     <TableCell className="font-semibold text-sm text-slate-800 whitespace-nowrap">
                       {customer.name}
+                    </TableCell>
+                    <TableCell className="text-xs text-slate-600 font-mono whitespace-nowrap">
+                      {customer.username || (
+                        <span className="text-slate-300">—</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-xs text-slate-600 font-mono whitespace-nowrap">
                       {customer.phone}

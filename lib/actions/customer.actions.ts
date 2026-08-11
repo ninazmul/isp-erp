@@ -8,6 +8,7 @@ import type { FilterQuery } from "mongoose";
 interface CustomerDoc {
   _id: string;
   customerCode: string;
+  username?: string;
   name: string;
   phone: string;
   email?: string;
@@ -23,6 +24,7 @@ interface CustomerDoc {
 }
 
 export async function createCustomer(data: {
+  username?: string;
   name: string;
   phone: string;
   email?: string;
@@ -80,6 +82,7 @@ export async function getCustomers(params?: {
       { phone: regex },
       { email: regex },
       { customerCode: regex },
+      { username: regex },
     ];
   }
 
@@ -172,6 +175,9 @@ export async function bulkCreateCustomers(
       const rawName = getFlexibleField(raw, "Name", "name", "Customer Name", "CustomerName");
       const name = safeParseString(rawName, `Customer ${customerCode}`);
 
+      const rawUsername = getFlexibleField(raw, "Username", "username", "User Name", "Login Username");
+      const username = safeParseString(rawUsername, "") || undefined;
+
       const rawPhone = getFlexibleField(raw, "Phone", "phone", "Phone Number", "Mobile", "Contact");
       const phone = safeParseString(rawPhone, "N/A");
 
@@ -205,6 +211,7 @@ export async function bulkCreateCustomers(
 
       await Customer.create({
         customerCode,
+        username,
         name,
         phone,
         location,
@@ -232,4 +239,3 @@ export async function bulkCreateCustomers(
   revalidatePath("/customers");
   return { inserted, failed };
 }
-
