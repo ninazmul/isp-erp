@@ -1,127 +1,144 @@
 # ISP ERP
 
-ISP ERP is a Next.js application for managing an internet service provider business. It includes authenticated admin access, customer records, monthly billing, expenses, reports, settings, and invoice export.
+ISP ERP is a full-featured, modern Next.js 15 application designed for managing Internet Service Provider (ISP) business operations. It provides protected administrative access, customer record management with bulk Excel import/export, automated monthly bill generation, payment tracking with partial/advance calculations, expense management, real-time analytics, company settings, and custom invoice exports (PDF/Print).
 
-For full app documentation, see [docs/APP_DOCUMENTATION.md](docs/APP_DOCUMENTATION.md).
+For comprehensive technical documentation, refer to [docs/APP_DOCUMENTATION.md](docs/APP_DOCUMENTATION.md).
 
-## Features
+---
 
-- Clerk authentication for protected dashboard routes
-- Dashboard summaries for customers, collections, dues, expenses, and profit
-- Customer management with package, monthly fee, connection, router, and IP details
-- Monthly bill generation for active customers
-- Payment marking and invoice download support
-- Expense tracking by category, month, and year
-- Income, expense, profit, and due reports with CSV export
-- Company and invoice settings stored in MongoDB
+## 🚀 Features
 
-## Tech Stack
+- **Authentication & Authorization**: Integrated Clerk authentication with MongoDB email role verification to protect administrative routes.
+- **Dashboard & Analytics**: Real-time metrics for total/active/inactive/disconnected customers, monthly collections, dues, expenses, net profit, and interactive income/expense charts.
+- **Customer Management**:
+  - Full CRUD operations with soft-delete capabilities.
+  - Search, filter by status, and track connection date, package name, monthly fee, router details, and IP address.
+  - **Bulk Data Operations**: Download sample Excel template, bulk import customer records, and export customer data to `.xlsx`.
+- **Billing & Invoice System**:
+  - One-click monthly bill generation for active customers.
+  - Granular payment tracking supporting bill amount, paid amount, due amount, and advance amounts.
+  - Automatic invoice number generation based on customizable prefix settings.
+  - Single-click invoice PDF download (`jsPDF`/`html2canvas`) and browser print support.
+- **Expense Tracking**: Categorized expense management (Bandwidth, Electricity, Salary, Maintenance, Equipment, Rent, Transport, Misc) with month/year filtering.
+- **Financial Reports**: Multi-tab financial reporting (Income, Expense, Profit, Dues) with CSV data export.
+- **Settings & Identity**: Global settings store for company details, logo, contact information, currency, and invoice numbering.
+- **Admin Management**: Multi-admin access control with email-based authorization.
 
-- Next.js 15
-- React 19
-- TypeScript
-- Tailwind CSS
-- Clerk
-- MongoDB with Mongoose
-- Radix UI components
-- Recharts
-- jsPDF and html2canvas
+---
 
-## Getting Started
+## 🛠️ Tech Stack
 
-Install dependencies:
+- **Framework**: Next.js 15 (App Router) & React 19
+- **Language**: TypeScript
+- **Styling & UI**: Tailwind CSS, Radix UI Primitives, Lucide Icons, `tailwindcss-animate`
+- **Authentication**: Clerk (`@clerk/nextjs`)
+- **Database & ORM**: MongoDB with Mongoose
+- **Charts & Data Visualization**: Recharts
+- **Excel & Document Generation**: `xlsx` (SheetJS), `html2canvas`, `jspdf`
+- **Form Management**: React Hook Form & Zod
+- **Notifications**: `react-hot-toast`
 
-```bash
-npm install
-```
+---
 
-Create a `.env.local` file in the project root:
+## 💻 Getting Started
 
-```env
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
-MONGODB_URI=
-```
+### Prerequisites
 
-Start the development server:
+- Node.js 18+ installed
+- MongoDB instance (local or MongoDB Atlas cluster)
+- Clerk account for authentication keys
 
-```bash
-npm run dev
-```
+### Installation
 
-Open [http://localhost:3000](http://localhost:3000).
+1. Clone the repository and install dependencies:
 
-## Scripts
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-```
+2. Create a `.env.local` file in the root directory:
 
-Runs the app in development mode with Turbopack.
+   ```env
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+   CLERK_SECRET_KEY=your_clerk_secret_key
+   NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+   NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+   NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
+   NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+   MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/isp-erp
+   ```
 
-```bash
-npm run build
-```
+3. Start the development server:
 
-Creates a production build and runs Next.js type and lint checks.
+   ```bash
+   npm run dev
+   ```
 
-```bash
-npm run start
-```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-Starts the production server after a successful build.
+---
 
-```bash
-npm run lint
-```
+## 📜 Available Scripts
 
-Runs the configured Next.js lint command.
+- `npm run dev` - Starts the development server with Turbopack enabled.
+- `npm run build` - Creates an optimized production build (runs Next.js type and lint checks).
+- `npm run start` - Starts the production server after a successful build.
+- `npm run lint` - Runs the configured Next.js ESLint rules.
+- `npx tsc --noEmit` - Performs static type checking across the codebase.
 
-## Project Structure
+---
+
+## 📁 Project Structure
 
 ```text
 app/
-  (auth)/              Clerk sign-in and sign-up pages
-  (root)/              Protected ERP pages and dashboard
-components/ui/         Shared UI primitives
-hooks/                 Client hooks
-lib/actions/           Server actions for app data
-lib/database/          MongoDB connection and Mongoose models
-types/                 Shared TypeScript interfaces
+  (auth)/              # Public authentication routes (Sign-in / Sign-up)
+  (root)/              # Protected ERP dashboard and module routes
+    admins/            # Admin user management
+    billing/           # Monthly billing & payment tracking
+    components/        # Page-specific client components & invoice helpers
+    customers/         # Customer database & bulk import/export
+    expenses/          # Expense tracking & categorization
+    reports/           # Financial reports & CSV export
+    settings/          # Company identity & invoice prefix configuration
+  access-denied/       # Access denied fallback page
+components/
+  shared/              # Reusable layout structures (Sidebar, Header, Cards)
+  ui/                  # Radix UI primitives and styled UI components
+hooks/                 # Custom React hooks
+lib/
+  actions/             # Next.js Server Actions for database CRUD
+  database/            # Mongoose models & database connection handler
+types/                 # Shared TypeScript interfaces & types
 ```
 
-## Main Routes
+---
 
-- `/` - Dashboard
-- `/customers` - Customer records
-- `/billing` - Bill generation and payment management
-- `/expenses` - Expense records
-- `/reports` - Financial reports and CSV export
-- `/settings` - Company and invoice settings
-- `/admins` - Admin management
+## 🌐 Main Routes
 
-## Database
+- `/` - **Dashboard Overview** (Key financial metrics, customer stats, recent activity & charts)
+- `/customers` - **Customer Directory** (Manage customers, import Excel, download template, export `.xlsx`)
+- `/billing` - **Billing Management** (Generate monthly bills, record payments with paid/due/advance breakdown, print/download invoices)
+- `/expenses` - **Expense Management** (Record and monitor operational expenses by category)
+- `/reports` - **Financial Reporting** (Income, Expense, Net Profit, and Due reports with CSV export)
+- `/settings` - **Settings** (Customize company details, contact info, logo, currency, and invoice prefix)
+- `/admins` - **Admin Control** (Grant or revoke admin access)
 
-The app uses MongoDB through Mongoose. Set `MONGODB_URI` in `.env.local`. The database connection uses the `isp-erp` database name.
+---
 
-Core models:
+## 🗄️ Database Models
 
-- `Customer`
-- `Bill`
-- `Expense`
-- `Setting`
-- `Admin`
+The app uses MongoDB via Mongoose. Core models defined under `lib/database/models/`:
 
-## Build Notes
+- **Customer**: Stores customer profile, connection dates, package, monthly fee, router info, IP address, and soft-delete status (`isDeleted`).
+- **Bill**: Stores monthly bill records tied to a customer with unique `(customer, month, year)` indexing, tracking `amount`, `paidAmount`, `dueAmount`, `advanceAmount`, payment status, payment date, method, remarks, and `invoiceNumber`.
+- **Expense**: Tracks operational expenses with category, date, and description.
+- **Setting**: Holds global business metadata, logo URL, contact info, currency, and invoice prefix configuration.
+- **Admin**: Contains authorized emails for ERP access control.
 
-Run the TypeScript compiler directly when checking types:
+---
 
-```bash
-npx tsc --noEmit
-```
+## 📄 License
 
-`npm run build` may attempt to connect to MongoDB while generating pages. Make sure `MONGODB_URI` is reachable from the build environment.
+This project is licensed under the MIT License.
+

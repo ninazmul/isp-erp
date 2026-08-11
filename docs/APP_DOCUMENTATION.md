@@ -366,6 +366,9 @@ Fields:
 - `month`
 - `year`
 - `amount`
+- `paidAmount`
+- `dueAmount`
+- `advanceAmount`
 - `status`
 - `paymentDate`
 - `paymentMethod`
@@ -596,6 +599,5 @@ User feedback is shown with `react-hot-toast` for success and error states.
 - Add stronger form schemas for all create and update operations.
 - Add role levels beyond basic admin access.
 - Add audit logs for billing, payment, and admin changes.
-- Add import/export for customer data.
 - Add automated tests for server actions.
 - Add metadata `metadataBase` in `app/layout.tsx` for production social images.
