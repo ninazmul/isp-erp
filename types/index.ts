@@ -26,6 +26,8 @@ export interface Bill {
   paidAmount?: number;
   dueAmount?: number;
   advanceAmount?: number;
+  previousDueAmount?: number;
+  previousAdvanceAmount?: number;
   status: string;
   paymentDate?: Date;
   paymentMethod?: string;

@@ -51,6 +51,9 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
   const paidAmount = Number(form.watch("paidAmount")) || 0;
   const dueAmount = Math.max(bill.amount - paidAmount, 0);
   const advanceAmount = Math.max(paidAmount - bill.amount, 0);
+  const previousDueAmount = bill.previousDueAmount ?? 0;
+  const previousAdvanceAmount = bill.previousAdvanceAmount ?? 0;
+  const hasPreviousBalance = previousDueAmount > 0 || previousAdvanceAmount > 0;
 
   return (
     <Form {...form}>
@@ -80,6 +83,26 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
               </p>
             </div>
           </div>
+          {hasPreviousBalance && (
+            <div className="grid grid-cols-2 gap-3 border-t border-slate-200 pt-3">
+              <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">
+                <p className="text-[11px] font-bold uppercase text-rose-700">
+                  Previous Due
+                </p>
+                <p className="text-base font-black text-rose-800">
+                  ৳{previousDueAmount.toFixed(2)}
+                </p>
+              </div>
+              <div className="rounded-lg border border-sky-200 bg-sky-50 p-3">
+                <p className="text-[11px] font-bold uppercase text-sky-700">
+                  Previous Advance
+                </p>
+                <p className="text-base font-black text-sky-800">
+                  ৳{previousAdvanceAmount.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         <FormField

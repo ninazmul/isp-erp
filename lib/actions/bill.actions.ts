@@ -29,6 +29,19 @@ interface RawBillDoc {
   remarks?: string;
 }
 
+function getBillCustomerId(bill: Pick<RawBillDoc, "customer">): string {
+  if (typeof bill.customer === "string") return bill.customer;
+  return (bill.customer._id ?? bill.customer).toString();
+}
+
+function getBillPeriodIndex(bill: Pick<RawBillDoc, "month" | "year">): number {
+  return bill.year * 12 + bill.month;
+}
+
+function getBillDueAmount(bill: Pick<RawBillDoc, "amount" | "dueAmount" | "status">): number {
+  return bill.dueAmount ?? (bill.status === "Paid" ? 0 : bill.amount);
+}
+
 export async function generateMonthlyBills(month: number, year: number) {
   await connectToDatabase();
 
@@ -156,8 +169,74 @@ export async function getBills(params?: {
     Bill.countDocuments(query),
   ]);
 
+  const customerIds = Array.from(
+    new Set(bills.map((bill) => getBillCustomerId(bill as unknown as RawBillDoc)))
+  );
+  const maxPeriodIndex = bills.reduce(
+    (max, bill) => Math.max(max, getBillPeriodIndex(bill as unknown as RawBillDoc)),
+    0
+  );
+  const maxYear = Math.floor((maxPeriodIndex - 1) / 12);
+  const maxMonth = maxPeriodIndex - maxYear * 12;
+
+  const previousBalanceByBill = new Map<
+    string,
+    { previousDueAmount: number; previousAdvanceAmount: number }
+  >();
+
+  if (customerIds.length > 0 && maxPeriodIndex > 0) {
+    const balanceDocs = await Bill.find({
+      customer: { $in: customerIds },
+      $or: [{ year: { $lt: maxYear } }, { year: maxYear, month: { $lte: maxMonth } }],
+    })
+      .select("customer month year amount dueAmount advanceAmount status")
+      .sort({ customer: 1, year: 1, month: 1 })
+      .lean<RawBillDoc[]>();
+
+    const runningBalances = new Map<
+      string,
+      { periodIndex: number; due: number; advance: number }
+    >();
+
+    for (const balanceDoc of balanceDocs) {
+      const customerId = getBillCustomerId(balanceDoc);
+      const periodIndex = getBillPeriodIndex(balanceDoc);
+      const current = runningBalances.get(customerId) ?? {
+        periodIndex,
+        due: 0,
+        advance: 0,
+      };
+
+      if (current.periodIndex !== periodIndex) {
+        current.periodIndex = periodIndex;
+      }
+
+      previousBalanceByBill.set(`${customerId}:${periodIndex}`, {
+        previousDueAmount: current.due,
+        previousAdvanceAmount: current.advance,
+      });
+
+      current.due += getBillDueAmount(balanceDoc);
+      current.advance += balanceDoc.advanceAmount ?? 0;
+      runningBalances.set(customerId, current);
+    }
+  }
+
+  const billsWithPreviousBalances = bills.map((bill) => {
+    const rawBill = bill as unknown as RawBillDoc;
+    const balance = previousBalanceByBill.get(
+      `${getBillCustomerId(rawBill)}:${getBillPeriodIndex(rawBill)}`
+    );
+
+    return {
+      ...bill,
+      previousDueAmount: balance?.previousDueAmount ?? 0,
+      previousAdvanceAmount: balance?.previousAdvanceAmount ?? 0,
+    };
+  });
+
   return {
-    bills: JSON.parse(JSON.stringify(bills)),
+    bills: JSON.parse(JSON.stringify(billsWithPreviousBalances)),
     total,
     page,
     totalPages: Math.ceil(total / limit),
