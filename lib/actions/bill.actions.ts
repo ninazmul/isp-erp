@@ -185,7 +185,7 @@ export async function getBills(params?: {
       customer: { $in: customerIds },
       $or: [{ year: { $lt: maxYear } }, { year: maxYear, month: { $lte: maxMonth } }],
     })
-      .select("customer month year amount dueAmount advanceAmount status")
+      .select("customer month year amount paidAmount dueAmount advanceAmount status")
       .sort({ customer: 1, year: 1, month: 1 })
       .lean<RawBillDoc[]>();
 
@@ -251,18 +251,21 @@ export async function markBillAsPaid(
   await connectToDatabase();
 
   const existingBill = await Bill.findById(id)
-    .select("amount customer month year")
+    .select("amount paidAmount customer month year status")
     .lean<RawBillDoc | null>();
   if (!existingBill) {
     throw new Error("Bill not found");
   }
 
-  const paidAmount = Number(data.paidAmount);
-  if (!Number.isFinite(paidAmount) || paidAmount < 0) {
+  const newPayment = Number(data.paidAmount);
+  if (!Number.isFinite(newPayment) || newPayment < 0) {
     throw new Error("Paid amount must be a valid non-negative number");
   }
 
   const billAmount = Number(existingBill.amount) || 0;
+  const existingPaidSoFar =
+    existingBill.paidAmount ?? (existingBill.status === "Paid" ? billAmount : 0);
+  const totalPaidForBill = existingPaidSoFar + newPayment;
   const customerId = getBillCustomerId(existingBill);
 
   const previousBills = await Bill.find({
@@ -285,19 +288,20 @@ export async function markBillAsPaid(
   const previousDueAmount = Math.max(previousNetBalance, 0);
   const previousAdvanceAmount = Math.max(-previousNetBalance, 0);
 
+  const currentBillRemaining = Math.max(billAmount - existingPaidSoFar, 0);
   const totalCoverNeeded = Math.max(
-    billAmount + previousDueAmount - previousAdvanceAmount,
+    currentBillRemaining + previousDueAmount - previousAdvanceAmount,
     0
   );
 
-  const dueAmount = Math.max(billAmount - paidAmount, 0);
-  const advanceAmount = Math.max(paidAmount - totalCoverNeeded, 0);
+  const dueAmount = Math.max(billAmount - totalPaidForBill, 0);
+  const advanceAmount = Math.max(newPayment - totalCoverNeeded, 0);
 
   const bill = await Bill.findByIdAndUpdate(
     id,
     {
       status: dueAmount > 0 ? "Unpaid" : "Paid",
-      paidAmount,
+      paidAmount: totalPaidForBill,
       dueAmount,
       advanceAmount,
       paymentDate: data.paymentDate,

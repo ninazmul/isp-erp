@@ -42,6 +42,9 @@ import type { Bill } from "@/types";
 import ExcelImportExport, { type ImportResult } from "@/components/shared/ExcelImportExport";
 import { exportToExcel, downloadTemplate } from "@/lib/excel";
 
+const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTHS_LONG = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
 export default function BillingClient({
   initialBills,
   initialTotal = 0,
@@ -144,12 +147,14 @@ export default function BillingClient({
         paidAmount: data.paidAmount,
         remarks: data.remarks,
       });
-      toast.success(data.paidAmount >= markingBill.amount ? "Bill marked as paid" : "Partial payment recorded");
+      const existingPaid = markingBill.paidAmount ?? (markingBill.status === "Paid" ? markingBill.amount : 0);
+      const totalPaid = existingPaid + data.paidAmount;
+      toast.success(totalPaid >= markingBill.amount ? "Bill marked as paid" : "Partial payment recorded");
       setIsMarkPaidOpen(false);
       setMarkingBill(null);
       loadBills();
     } catch {
-      toast.error("Failed to mark bill as paid");
+      toast.error("Failed to record payment");
     }
   };
 
@@ -304,7 +309,7 @@ export default function BillingClient({
               <SelectItem value="all">All Months</SelectItem>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                 <SelectItem key={m} value={m.toString()}>
-                  {new Date(0, m - 1).toLocaleString("default", { month: "long" })}
+                  {MONTHS_LONG[m - 1]}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -384,7 +389,7 @@ export default function BillingClient({
                       {bill.customer?.name ?? "—"}
                     </TableCell>
                     <TableCell className="text-xs text-slate-600 whitespace-nowrap">
-                      {new Date(0, bill.month - 1).toLocaleString("default", { month: "short" })} {bill.year}
+                      {MONTHS_SHORT[bill.month - 1]} {bill.year}
                     </TableCell>
                     <TableCell className="font-bold text-sm text-slate-800 whitespace-nowrap">
                       ৳{bill.amount.toFixed(2)}

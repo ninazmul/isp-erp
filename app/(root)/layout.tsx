@@ -6,7 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { checkIsAdmin } from "@/lib/actions/admin.actions";
-import { Calendar } from "lucide-react";
+import CurrentMonthBadge from "./components/CurrentMonthBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -39,15 +39,7 @@ export default async function AdminLayout({
           </div>
           <SignedIn>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-xs font-bold text-white shadow-sm self-start md:self-auto">
-                <Calendar className="w-4 h-4 text-purple-300" />
-                <span>
-                  {new Date().toLocaleDateString("en-US", {
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </span>
-              </div>
+              <CurrentMonthBadge />
               <UserButton afterSwitchSessionUrl="/" />
             </div>
           </SignedIn>

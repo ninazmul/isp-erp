@@ -43,15 +43,10 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
   const previousDueAmount = bill.previousDueAmount ?? 0;
   const previousAdvanceAmount = bill.previousAdvanceAmount ?? 0;
   const paidSoFar = bill.paidAmount ?? (bill.status === "Paid" ? bill.amount : 0);
-  const currentDueAmount =
-    paidSoFar > 0
-      ? bill.dueAmount ?? Math.max(bill.amount - paidSoFar, 0)
-      : 0;
-  const currentAdvanceAmount = bill.advanceAmount ?? 0;
-  const balanceDueAmount = previousDueAmount + currentDueAmount;
-  const balanceAdvanceAmount = previousAdvanceAmount + currentAdvanceAmount;
+  const currentBillRemaining = Math.max(bill.amount - paidSoFar, 0);
+
   const suggestedPaidAmount = Math.max(
-    bill.amount + balanceDueAmount - balanceAdvanceAmount,
+    currentBillRemaining + previousDueAmount - previousAdvanceAmount,
     0
   );
 
@@ -64,10 +59,11 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
     },
   });
 
-  const paidAmount = Number(form.watch("paidAmount")) || 0;
-  const dueAmount = Math.max(bill.amount - paidAmount, 0);
-  const advanceAmount = Math.max(paidAmount - suggestedPaidAmount, 0);
-  const hasExistingBalance = balanceDueAmount > 0 || balanceAdvanceAmount > 0;
+  const newPayment = Number(form.watch("paidAmount")) || 0;
+  const totalPaidForBill = paidSoFar + newPayment;
+  const dueAmount = Math.max(bill.amount - totalPaidForBill, 0);
+  const advanceAmount = Math.max(newPayment - suggestedPaidAmount, 0);
+  const hasExistingBalance = previousDueAmount > 0 || previousAdvanceAmount > 0;
 
   return (
     <Form {...form}>
@@ -78,6 +74,11 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
               <span className="font-medium text-slate-500">Bill Amount</span>
               <span className="font-extrabold text-slate-900">
                 ৳{bill.amount.toFixed(2)}
+                {paidSoFar > 0 && (
+                  <span className="text-xs font-normal text-emerald-600 ml-1.5">
+                    (৳{paidSoFar.toFixed(2)} paid)
+                  </span>
+                )}
               </span>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -105,7 +106,7 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
                     Existing Due
                   </p>
                   <p className="text-base font-black text-rose-800">
-                    ৳{balanceDueAmount.toFixed(2)}
+                    ৳{previousDueAmount.toFixed(2)}
                   </p>
                 </div>
                 <div className="rounded-lg border border-sky-200 bg-sky-50 p-3">
@@ -113,7 +114,7 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
                     Existing Advance
                   </p>
                   <p className="text-base font-black text-sky-800">
-                    ৳{balanceAdvanceAmount.toFixed(2)}
+                    ৳{previousAdvanceAmount.toFixed(2)}
                   </p>
                 </div>
               </div>
