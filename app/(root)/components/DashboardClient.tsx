@@ -23,7 +23,7 @@ import {
   DollarSign,
   ArrowUpRight,
   ArrowDownRight,
-  Receipt
+  Receipt,
 } from "lucide-react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
@@ -150,88 +150,72 @@ export default function DashboardClient({ data }: DashboardClientProps) {
         <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">
           Subscriber Metrics
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-fr">
           {/* Total Customers */}
-          <Card className="p-4 rounded-2xl border border-slate-100 border-t-4 border-t-purple-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-purple-50/40 via-white to-white relative overflow-hidden">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-xs font-bold text-slate-500">
+          <Card className="p-4 rounded-2xl border border-slate-100 border-t-4 border-t-purple-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-purple-50/40 via-white to-white relative overflow-hidden h-full min-h-[120px]">
+            <div className="flex items-center gap-4 h-full">
+              <div className="flex-shrink-0 p-3.5 rounded-xl bg-purple-100/80 text-[#3e0078] shadow-2xs">
+                <Users className="w-7 h-7" />
+              </div>
+              <div className="flex flex-col justify-center min-w-0 flex-1">
+                <p className="text-xs font-bold text-slate-500 leading-none">
                   Total Customers
                 </p>
-                <h3 className="text-2xl font-black text-[#3e0078] mt-1">
+                <h3 className="text-2xl sm:text-3xl font-black text-[#3e0078] mt-1.5 leading-tight break-words min-w-0 truncate">
                   {data.customers.total.toLocaleString()}
                 </h3>
               </div>
-              <div className="p-2.5 rounded-xl bg-purple-100/80 text-[#3e0078] shadow-2xs">
-                <Users className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="mt-3 text-[11px] text-purple-900 font-bold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#3e0078]" /> Registered
-              Accounts
             </div>
           </Card>
 
           {/* Active */}
-          <Card className="p-4 rounded-2xl border border-slate-100 border-t-4 border-t-emerald-500 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-emerald-50/40 via-white to-white relative overflow-hidden">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-xs font-bold text-slate-500">
+          <Card className="p-4 rounded-2xl border border-slate-100 border-t-4 border-t-emerald-500 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-emerald-50/40 via-white to-white relative overflow-hidden h-full min-h-[120px]">
+            <div className="flex items-center gap-4 h-full">
+              <div className="flex-shrink-0 p-3.5 rounded-xl bg-emerald-100/80 text-emerald-700 shadow-2xs">
+                <UserCheck className="w-7 h-7" />
+              </div>
+              <div className="flex flex-col justify-center min-w-0 flex-1">
+                <p className="text-xs font-bold text-slate-500 leading-none">
                   Active Connections
                 </p>
-                <h3 className="text-2xl font-black text-emerald-600 mt-1">
+                <h3 className="text-2xl sm:text-3xl font-black text-emerald-600 mt-1.5 leading-tight break-words min-w-0 truncate">
                   {data.customers.active.toLocaleString()}
                 </h3>
               </div>
-              <div className="p-2.5 rounded-xl bg-emerald-100/80 text-emerald-700 shadow-2xs">
-                <UserCheck className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="mt-3 text-[11px] text-emerald-700 font-bold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" /> Active
-              Subscriptions
             </div>
           </Card>
 
           {/* Inactive */}
-          <Card className="p-4 rounded-2xl border border-slate-100 border-t-4 border-t-amber-500 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-amber-50/40 via-white to-white relative overflow-hidden">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-xs font-bold text-slate-500">
+          <Card className="p-4 rounded-2xl border border-slate-100 border-t-4 border-t-amber-500 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-amber-50/40 via-white to-white relative overflow-hidden h-full min-h-[120px]">
+            <div className="flex items-center gap-4 h-full">
+              <div className="flex-shrink-0 p-3.5 rounded-xl bg-amber-100/80 text-amber-700 shadow-2xs">
+                <UserMinus className="w-7 h-7" />
+              </div>
+              <div className="flex flex-col justify-center min-w-0 flex-1">
+                <p className="text-xs font-bold text-slate-500 leading-none">
                   Inactive Subscribers
                 </p>
-                <h3 className="text-2xl font-black text-amber-600 mt-1">
+                <h3 className="text-2xl sm:text-3xl font-black text-amber-600 mt-1.5 leading-tight break-words min-w-0 truncate">
                   {data.customers.inactive.toLocaleString()}
                 </h3>
               </div>
-              <div className="p-2.5 rounded-xl bg-amber-100/80 text-amber-700 shadow-2xs">
-                <UserMinus className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="mt-3 text-[11px] text-amber-700 font-bold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-500" /> Pending
-              Renewal
             </div>
           </Card>
 
           {/* Disconnected */}
-          <Card className="p-4 rounded-2xl border border-slate-100 border-t-4 border-t-rose-500 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-rose-50/40 via-white to-white relative overflow-hidden">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-xs font-bold text-slate-500">
+          <Card className="p-4 rounded-2xl border border-slate-100 border-t-4 border-t-rose-500 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-rose-50/40 via-white to-white relative overflow-hidden h-full min-h-[120px]">
+            <div className="flex items-center gap-4 h-full">
+              <div className="flex-shrink-0 p-3.5 rounded-xl bg-rose-100/80 text-rose-700 shadow-2xs">
+                <UserX className="w-7 h-7" />
+              </div>
+              <div className="flex flex-col justify-center min-w-0 flex-1">
+                <p className="text-xs font-bold text-slate-500 leading-none">
                   Disconnected
                 </p>
-                <h3 className="text-2xl font-black text-rose-600 mt-1">
+                <h3 className="text-2xl sm:text-3xl font-black text-rose-600 mt-1.5 leading-tight break-words min-w-0 truncate">
                   {data.customers.disconnected.toLocaleString()}
                 </h3>
               </div>
-              <div className="p-2.5 rounded-xl bg-rose-100/80 text-rose-700 shadow-2xs">
-                <UserX className="w-5 h-5" />
-              </div>
-            </div>
-            <div className="mt-3 text-[11px] text-rose-700 font-bold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-rose-500" /> Terminated
-              Lines
             </div>
           </Card>
         </div>
@@ -242,151 +226,182 @@ export default function DashboardClient({ data }: DashboardClientProps) {
         <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">
           Current Month Financial Breakdown
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-fr">
           {/* Billing Collection */}
-          <Card className="p-4 rounded-2xl border border-emerald-200/70 border-t-4 border-t-emerald-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-emerald-50/50 via-white to-white">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-bold text-emerald-900">
-                Billing Collection
-              </span>
-              <Receipt className="w-4 h-4 text-emerald-600" />
+          <Card className="p-4 rounded-2xl border border-emerald-200/70 border-t-4 border-t-emerald-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-emerald-50/50 via-white to-white h-full min-h-[130px]">
+            <div className="flex items-center gap-4 h-full">
+              <div className="flex-shrink-0 p-3 rounded-xl bg-emerald-100/80 text-emerald-700 shadow-2xs">
+                <Receipt className="w-6 h-6" />
+              </div>
+              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
+                <span className="text-xs font-bold text-emerald-900 leading-none">
+                  Billing Collection
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-emerald-700 leading-tight break-words min-w-0 truncate">
+                  ৳
+                  {data.billing.currentMonthCollection.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                  })}
+                </h3>
+              </div>
             </div>
-            <h3 className="text-lg font-black text-emerald-700">
-              ৳
-              {data.billing.currentMonthCollection.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-              })}
-            </h3>
-            <p className="text-[10px] text-emerald-700/80 font-bold mt-1">Paid Invoices</p>
           </Card>
 
           {/* Manual Income */}
-          <Card className="p-4 rounded-2xl border border-cyan-200/70 border-t-4 border-t-cyan-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-cyan-50/50 via-white to-white">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-bold text-cyan-900">
-                Manual Income
-              </span>
-              <TrendingUp className="w-4 h-4 text-cyan-600" />
+          <Card className="p-4 rounded-2xl border border-cyan-200/70 border-t-4 border-t-cyan-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-cyan-50/50 via-white to-white h-full min-h-[130px]">
+            <div className="flex items-center gap-4 h-full">
+              <div className="flex-shrink-0 p-3 rounded-xl bg-cyan-100/80 text-cyan-700 shadow-2xs">
+                <TrendingUp className="w-6 h-6" />
+              </div>
+              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
+                <span className="text-xs font-bold text-cyan-900 leading-none">
+                  Manual Income
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-cyan-700 leading-tight break-words min-w-0 truncate">
+                  ৳
+                  {data.billing.currentMonthManualIncome.toLocaleString(
+                    "en-US",
+                    {
+                      minimumFractionDigits: 2,
+                    },
+                  )}
+                </h3>
+              </div>
             </div>
-            <h3 className="text-lg font-black text-cyan-700">
-              ৳
-              {data.billing.currentMonthManualIncome.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-              })}
-            </h3>
-            <p className="text-[10px] text-cyan-700/80 font-bold mt-1">Misc Receipts</p>
           </Card>
 
           {/* Total Income */}
-          <Card className="p-4 rounded-2xl border border-emerald-300 border-t-4 border-t-emerald-700 bg-gradient-to-br from-emerald-100/60 via-emerald-50/30 to-white shadow-md hover:shadow-lg transition-all duration-200">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-black text-emerald-950">
-                Total Revenue
-              </span>
-              <DollarSign className="w-4 h-4 text-emerald-700" />
+          <Card className="p-4 rounded-2xl border border-emerald-300 border-t-4 border-t-emerald-700 bg-gradient-to-br from-emerald-100/60 via-emerald-50/30 to-white shadow-md hover:shadow-lg transition-all duration-200 h-full min-h-[130px]">
+            <div className="flex items-center gap-4 h-full">
+              <div className="flex-shrink-0 p-3 rounded-xl bg-emerald-200/80 text-emerald-800 shadow-sm">
+                <DollarSign className="w-6 h-6" />
+              </div>
+              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
+                <span className="text-xs font-black text-emerald-950 leading-none">
+                  Total Revenue
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-emerald-800 leading-tight break-words min-w-0 truncate">
+                  ৳
+                  {data.billing.currentMonthTotalIncome.toLocaleString(
+                    "en-US",
+                    {
+                      minimumFractionDigits: 2,
+                    },
+                  )}
+                </h3>
+              </div>
             </div>
-            <h3 className="text-lg font-black text-emerald-800">
-              ৳
-              {data.billing.currentMonthTotalIncome.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-              })}
-            </h3>
-            <p className="text-[10px] text-emerald-800/90 font-extrabold mt-1">
-              Combined Inflows
-            </p>
           </Card>
 
           {/* Expenses */}
-          <Card className="p-4 rounded-2xl border border-rose-200/70 border-t-4 border-t-rose-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-rose-50/50 via-white to-white">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-bold text-rose-900">
-                Expenses
-              </span>
-              <Wallet className="w-4 h-4 text-rose-600" />
+          <Card className="p-4 rounded-2xl border border-rose-200/70 border-t-4 border-t-rose-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-rose-50/50 via-white to-white h-full min-h-[130px]">
+            <div className="flex items-center gap-4 h-full">
+              <div className="flex-shrink-0 p-3 rounded-xl bg-rose-100/80 text-rose-700 shadow-2xs">
+                <Wallet className="w-6 h-6" />
+              </div>
+              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
+                <span className="text-xs font-bold text-rose-900 leading-none">
+                  Expenses
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-rose-700 leading-tight break-words min-w-0 truncate">
+                  ৳
+                  {data.billing.currentMonthExpenses.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                  })}
+                </h3>
+              </div>
             </div>
-            <h3 className="text-lg font-black text-rose-700">
-              ৳
-              {data.billing.currentMonthExpenses.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-              })}
-            </h3>
-            <p className="text-[10px] text-rose-700/80 font-bold mt-1">Operational Costs</p>
           </Card>
 
           {/* Due Amount */}
-          <Card className="p-4 rounded-2xl border border-amber-200/70 border-t-4 border-t-amber-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-amber-50/50 via-white to-white">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-bold text-amber-900">
-                Due Receivables
-              </span>
-              <CreditCard className="w-4 h-4 text-amber-600" />
+          <Card className="p-4 rounded-2xl border border-amber-200/70 border-t-4 border-t-amber-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-amber-50/50 via-white to-white h-full min-h-[130px]">
+            <div className="flex items-center gap-4 h-full">
+              <div className="flex-shrink-0 p-3 rounded-xl bg-amber-100/80 text-amber-700 shadow-2xs">
+                <CreditCard className="w-6 h-6" />
+              </div>
+              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
+                <span className="text-xs font-bold text-amber-900 leading-none">
+                  Due Receivables
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-amber-700 leading-tight break-words min-w-0 truncate">
+                  ৳
+                  {data.billing.currentMonthDue.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                  })}
+                </h3>
+              </div>
             </div>
-            <h3 className="text-lg font-black text-amber-700">
-              ৳
-              {data.billing.currentMonthDue.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-              })}
-            </h3>
-            <p className="text-[10px] text-amber-700/80 font-bold mt-1">
-              Pending Collections
-            </p>
           </Card>
 
           {/* Advance Amount */}
-          <Card className="p-4 rounded-2xl border border-cyan-200/70 border-t-4 border-t-cyan-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-cyan-50/50 via-white to-white">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-bold text-cyan-900">
-                Advance
-              </span>
-              <CreditCard className="w-4 h-4 text-cyan-600" />
+          <Card className="p-4 rounded-2xl border border-cyan-200/70 border-t-4 border-t-cyan-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-cyan-50/50 via-white to-white h-full min-h-[130px]">
+            <div className="flex items-center gap-4 h-full">
+              <div className="flex-shrink-0 p-3 rounded-xl bg-cyan-100/80 text-cyan-700 shadow-2xs">
+                <CreditCard className="w-6 h-6" />
+              </div>
+              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
+                <span className="text-xs font-bold text-cyan-900 leading-none">
+                  Advance
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black text-cyan-700 leading-tight break-words min-w-0 truncate">
+                  ৳
+                  {data.billing.currentMonthAdvance.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                  })}
+                </h3>
+              </div>
             </div>
-            <h3 className="text-lg font-black text-cyan-700">
-              ৳
-              {data.billing.currentMonthAdvance.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-              })}
-            </h3>
-            <p className="text-[10px] text-cyan-700/80 font-bold mt-1">
-              Extra Collections
-            </p>
           </Card>
 
           {/* Net Profit */}
           <Card
-            className={`p-4 rounded-2xl border border-t-4 shadow-md hover:shadow-lg transition-all duration-200 ${isProfit
+            className={`p-4 rounded-2xl border border-t-4 shadow-md hover:shadow-lg transition-all duration-200 h-full min-h-[130px] ${
+              isProfit
                 ? "border-purple-300 border-t-purple-700 bg-gradient-to-br from-purple-100/60 via-purple-50/30 to-white"
                 : "border-rose-300 border-t-rose-700 bg-gradient-to-br from-rose-100/60 via-rose-50/30 to-white"
-              }`}
+            }`}
           >
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-black text-slate-900">
-                Net Margin
-              </span>
-              {isProfit ? (
-                <ArrowUpRight className="w-4 h-4 text-[#3e0078]" />
-              ) : (
-                <ArrowDownRight className="w-4 h-4 text-rose-600" />
-              )}
-            </div>
-            <h3
-              className={`text-lg font-black ${isProfit ? "text-[#3e0078]" : "text-rose-700"}`}
-            >
-              {isProfit ? "+" : ""}৳
-              {data.billing.currentMonthProfit.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-              })}
-            </h3>
-            <div className="mt-1">
-              <Badge
-                variant={isProfit ? "default" : "destructive"}
-                className={
+            <div className="flex items-center gap-4 h-full">
+              <div
+                className={`flex-shrink-0 p-3 rounded-xl shadow-2xs ${
                   isProfit
-                    ? "text-[9px] py-0.5 px-2 font-extrabold bg-[#3e0078] text-white shadow-2xs"
-                    : "text-[9px] py-0.5 px-2 font-extrabold bg-rose-600 text-white shadow-2xs"
-                }
+                    ? "bg-purple-100/80 text-[#3e0078]"
+                    : "bg-rose-100/80 text-rose-700"
+                }`}
               >
-                {isProfit ? "NET PROFIT" : "NET LOSS"}
-              </Badge>
+                {isProfit ? (
+                  <ArrowUpRight className="w-6 h-6" />
+                ) : (
+                  <ArrowDownRight className="w-6 h-6" />
+                )}
+              </div>
+              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
+                <span className="text-xs font-black text-slate-900 leading-none">
+                  Net Margin
+                </span>
+                <div>
+                  <h3
+                    className={`text-xl sm:text-2xl font-black leading-tight break-words min-w-0 truncate ${isProfit ? "text-[#3e0078]" : "text-rose-700"}`}
+                  >
+                    {isProfit ? "+" : ""}৳
+                    {data.billing.currentMonthProfit.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                    })}
+                  </h3>
+                  <div className="mt-1">
+                    <Badge
+                      variant={isProfit ? "default" : "destructive"}
+                      className={
+                        isProfit
+                          ? "text-[9px] py-0.5 px-2 font-extrabold bg-[#3e0078] text-white shadow-2xs"
+                          : "text-[9px] py-0.5 px-2 font-extrabold bg-rose-600 text-white shadow-2xs"
+                      }
+                    >
+                      {isProfit ? "NET PROFIT" : "NET LOSS"}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
             </div>
           </Card>
         </div>
