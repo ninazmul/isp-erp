@@ -23,9 +23,7 @@ import {
   DollarSign,
   ArrowUpRight,
   ArrowDownRight,
-  Receipt,
-  Calendar,
-  Sparkles,
+  Receipt
 } from "lucide-react";
 import Link from "next/link";
 
@@ -146,35 +144,6 @@ export default function DashboardClient({ data }: DashboardClientProps) {
 
   return (
     <div className="py-4 flex flex-col gap-6 px-3 lg:px-6">
-      {/* ── Banner Header ────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#3e0078] via-[#560aab] to-[#7c1ed4] p-6 text-white shadow-xl shadow-purple-900/10">
-        <div className="absolute right-0 top-0 -mr-12 -mt-12 w-64 h-64 rounded-full bg-white/5 blur-2xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-purple-200 text-xs font-semibold uppercase tracking-widest mb-1">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />{" "}
-              Executive Overview
-            </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-              SBN Enterprise Dashboard
-            </h1>
-            <p className="text-purple-200 text-xs md:text-sm mt-1">
-              Real-time analytics across billing, customer subscriptions, manual
-              income, and operational expenses.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/20 text-xs font-bold text-white shadow-sm self-start md:self-auto">
-            <Calendar className="w-4 h-4 text-purple-300" />
-            <span>
-              {new Date().toLocaleDateString("en-US", {
-                month: "long",
-                year: "numeric",
-              })}
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* ── Customer Stats ───────────────────────────────────── */}
       <section>
         <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">
@@ -383,11 +352,10 @@ export default function DashboardClient({ data }: DashboardClientProps) {
 
           {/* Net Profit */}
           <Card
-            className={`p-4 rounded-2xl border border-t-4 shadow-md hover:shadow-lg transition-all duration-200 ${
-              isProfit
+            className={`p-4 rounded-2xl border border-t-4 shadow-md hover:shadow-lg transition-all duration-200 ${isProfit
                 ? "border-purple-300 border-t-purple-700 bg-gradient-to-br from-purple-100/60 via-purple-50/30 to-white"
                 : "border-rose-300 border-t-rose-700 bg-gradient-to-br from-rose-100/60 via-rose-50/30 to-white"
-            }`}
+              }`}
           >
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs font-black text-slate-900">
