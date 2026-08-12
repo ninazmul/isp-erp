@@ -137,22 +137,26 @@ export default function AdminsClient({
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs font-semibold text-slate-700">Email Address</FormLabel>
-                      <FormControl>
-                        <Input placeholder="admin@example.com" className="rounded-xl border-slate-200" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full bg-[#3e0078] hover:bg-[#52029d] rounded-xl" disabled={isLoading}>
-                  {isLoading ? "Adding..." : "Add Administrator"}
-                </Button>
+                <div className="max-h-[50vh] md:max-h-[60vh] overflow-y-auto space-y-4 pr-3 pb-4">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs font-semibold text-slate-700">Email Address</FormLabel>
+                        <FormControl>
+                          <Input placeholder="admin@example.com" className="rounded-xl border-slate-200" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="pt-2 border-t">
+                  <Button type="submit" className="w-full bg-[#3e0078] hover:bg-[#52029d] rounded-xl" disabled={isLoading}>
+                    {isLoading ? "Adding..." : "Add Administrator"}
+                  </Button>
+                </div>
               </form>
             </Form>
           </DialogContent>

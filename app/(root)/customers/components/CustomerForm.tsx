@@ -207,329 +207,332 @@ export default function CustomerForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            rules={{ required: "Name is required" }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Customer name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder="Customer username" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="phone"
-            rules={{ required: "Phone is required" }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input placeholder="Phone number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="Email address" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Package dropdown */}
-          <FormField
-            control={form.control}
-            name="packageName"
-            rules={{ required: "Package is required" }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Package</FormLabel>
-                <Select
-                  onValueChange={handlePackageChange}
-                  value={field.value || undefined}
-                >
+        <div className="max-h-[50vh] md:max-h-[60vh] overflow-y-auto space-y-4 pr-3 pb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="name"
+              rules={{ required: "Name is required" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a package" />
-                    </SelectTrigger>
+                    <Input placeholder="Customer name" {...field} />
                   </FormControl>
-                  <SelectContent>
-                    {packages.map((pkg) => (
-                      <SelectItem key={pkg._id} value={pkg.name}>
-                        {pkg.name} (৳{pkg.monthlyFee})
-                      </SelectItem>
-                    ))}
-                    {packages.length === 0 && (
-                      <div className="px-2 py-3 text-xs text-slate-400">
-                        No packages yet — add one below
-                      </div>
-                    )}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-                {showAddPackage ? (
-                  <div className="flex flex-col sm:flex-row gap-2 mt-2">
-                    <Input
-                      placeholder="Package name"
-                      value={newPkgName}
-                      onChange={(e) => setNewPkgName(e.target.value)}
-                      className="h-8 text-sm flex-1"
-                    />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Customer username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phone"
+              rules={{ required: "Phone is required" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Phone number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Email address" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Package dropdown */}
+            <FormField
+              control={form.control}
+              name="packageName"
+              rules={{ required: "Package is required" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Package</FormLabel>
+                  <Select
+                    onValueChange={handlePackageChange}
+                    value={field.value || undefined}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a package" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {packages.map((pkg) => (
+                        <SelectItem key={pkg._id} value={pkg.name}>
+                          {pkg.name} (৳{pkg.monthlyFee})
+                        </SelectItem>
+                      ))}
+                      {packages.length === 0 && (
+                        <div className="px-2 py-3 text-xs text-slate-400">
+                          No packages yet — add one below
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                  {showAddPackage ? (
+                    <div className="flex flex-col sm:flex-row gap-2 mt-2">
+                      <Input
+                        placeholder="Package name"
+                        value={newPkgName}
+                        onChange={(e) => setNewPkgName(e.target.value)}
+                        className="h-8 text-sm flex-1"
+                      />
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="Monthly fee (৳)"
+                        value={newPkgFee}
+                        onChange={(e) => setNewPkgFee(e.target.value)}
+                        className="h-8 text-sm sm:w-[150px]"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={handleAddPackage}
+                        disabled={addingPkg}
+                      >
+                        Add
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setShowAddPackage(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowAddPackage(true)}
+                      className="flex items-center gap-1 text-xs text-[#3e0078] hover:underline mt-1"
+                    >
+                      <Plus className="w-3 h-3" /> Add new package
+                    </button>
+                  )}
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="monthlyFee"
+              rules={{ required: "Monthly fee is required" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Monthly Fee (৳)</FormLabel>
+                  <FormControl>
                     <Input
                       type="number"
                       step="0.01"
-                      min="0"
-                      placeholder="Monthly fee (৳)"
-                      value={newPkgFee}
-                      onChange={(e) => setNewPkgFee(e.target.value)}
-                      className="h-8 text-sm sm:w-[150px]"
-                    />
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={handleAddPackage}
-                      disabled={addingPkg}
-                    >
-                      Add
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setShowAddPackage(false)}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowAddPackage(true)}
-                    className="flex items-center gap-1 text-xs text-[#3e0078] hover:underline mt-1"
-                  >
-                    <Plus className="w-3 h-3" /> Add new package
-                  </button>
-                )}
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="monthlyFee"
-            rules={{ required: "Monthly fee is required" }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Monthly Fee (৳)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    {...field}
-                    onChange={(e) =>
-                      field.onChange(parseFloat(e.target.value) || 0)
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="connectionDate"
-            rules={{ required: "Connection date is required" }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Connection Date</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Location dropdown */}
-          <FormField
-            control={form.control}
-            name="location"
-            rules={{ required: "Location is required" }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Location</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value || undefined}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select location" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {locations.map((loc) => (
-                      <SelectItem key={loc._id} value={loc.name}>
-                        {loc.name}
-                      </SelectItem>
-                    ))}
-                    {locations.length === 0 && (
-                      <div className="px-2 py-3 text-xs text-slate-400">
-                        No locations yet — add one below
-                      </div>
-                    )}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-                {showAddLocation ? (
-                  <div className="flex flex-col sm:flex-row gap-2 mt-2">
-                    <Input
-                      placeholder="Location name"
-                      value={newLocName}
-                      onChange={(e) => setNewLocName(e.target.value)}
-                      onKeyDown={(e) =>
-                        e.key === "Enter" &&
-                        (e.preventDefault(), handleAddLocation())
+                      placeholder="0.00"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(parseFloat(e.target.value) || 0)
                       }
-                      className="h-8 text-sm flex-1"
                     />
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={handleAddLocation}
-                      disabled={addingLoc}
-                    >
-                      Add
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setShowAddLocation(false)}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowAddLocation(true)}
-                    className="flex items-center gap-1 text-xs text-[#3e0078] hover:underline mt-1"
-                  >
-                    <Plus className="w-3 h-3" /> Add new location
-                  </button>
-                )}
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="router"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Router</FormLabel>
-                <FormControl>
-                  <Input placeholder="Router model" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="ipAddress"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>IP Address</FormLabel>
-                <FormControl>
-                  <Input placeholder="IP address" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="status"
-            rules={{ required: "Status is required" }}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  value={field.value || undefined}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Inactive">Inactive</SelectItem>
-                    <SelectItem value="Disconnected">Disconnected</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="connectionDate"
+              rules={{ required: "Connection date is required" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Connection Date</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Location dropdown */}
+            <FormField
+              control={form.control}
+              name="location"
+              rules={{ required: "Location is required" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Location</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value || undefined}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select location" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {locations.map((loc) => (
+                        <SelectItem key={loc._id} value={loc.name}>
+                          {loc.name}
+                        </SelectItem>
+                      ))}
+                      {locations.length === 0 && (
+                        <div className="px-2 py-3 text-xs text-slate-400">
+                          No locations yet — add one below
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                  {showAddLocation ? (
+                    <div className="flex flex-col sm:flex-row gap-2 mt-2">
+                      <Input
+                        placeholder="Location name"
+                        value={newLocName}
+                        onChange={(e) => setNewLocName(e.target.value)}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" &&
+                          (e.preventDefault(), handleAddLocation())
+                        }
+                        className="h-8 text-sm flex-1"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={handleAddLocation}
+                        disabled={addingLoc}
+                      >
+                        Add
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setShowAddLocation(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowAddLocation(true)}
+                      className="flex items-center gap-1 text-xs text-[#3e0078] hover:underline mt-1"
+                    >
+                      <Plus className="w-3 h-3" /> Add new location
+                    </button>
+                  )}
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="router"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Router</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Router model" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="ipAddress"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>IP Address</FormLabel>
+                  <FormControl>
+                    <Input placeholder="IP address" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              rules={{ required: "Status is required" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    value={field.value || undefined}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Active">Active</SelectItem>
+                      <SelectItem value="Inactive">Inactive</SelectItem>
+                      <SelectItem value="Disconnected">Disconnected</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Notes</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="Additional notes" {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
 
-
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Notes</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Additional notes" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button type="submit" className="w-full">
-          {customer ? "Update Customer" : "Add Customer"}
-        </Button>
+        <div className="pt-2 border-t">
+          <Button type="submit" className="w-full">
+            {customer ? "Update Customer" : "Add Customer"}
+          </Button>
+        </div>
       </form>
     </Form>
   );
