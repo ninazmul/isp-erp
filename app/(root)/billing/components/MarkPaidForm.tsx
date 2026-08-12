@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import type { Bill } from "@/types";
+import { PAYMENT_METHODS } from "@/lib/constants";
 
 interface MarkPaidFormProps {
   bill: Bill;
@@ -178,11 +179,11 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Cash">Cash</SelectItem>
-                    <SelectItem value="Bkash">Bkash</SelectItem>
-                    <SelectItem value="Rocket">Rocket</SelectItem>
-                    <SelectItem value="Nagad">Nagad</SelectItem>
-                    <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                    {PAYMENT_METHODS.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {m}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage />

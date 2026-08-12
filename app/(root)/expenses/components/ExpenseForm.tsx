@@ -24,8 +24,7 @@ import { createExpense, updateExpense } from "@/lib/actions/expense.actions";
 import { getCategories, createCategory } from "@/lib/actions/category.actions";
 import { Plus } from "lucide-react";
 import { toast } from "react-hot-toast";
-
-const PAYMENT_METHODS = ["Cash", "Bank Transfer", "Mobile Banking", "Cheque"];
+import { PAYMENT_METHODS } from "@/lib/constants";
 
 interface Expense {
   _id: string;
