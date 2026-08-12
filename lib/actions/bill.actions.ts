@@ -38,10 +38,6 @@ function getBillPeriodIndex(bill: Pick<RawBillDoc, "month" | "year">): number {
   return bill.year * 12 + bill.month;
 }
 
-function getBillDueAmount(bill: Pick<RawBillDoc, "amount" | "dueAmount" | "status">): number {
-  return bill.dueAmount ?? (bill.status === "Paid" ? 0 : bill.amount);
-}
-
 export async function generateMonthlyBills(month: number, year: number) {
   await connectToDatabase();
 
@@ -195,7 +191,7 @@ export async function getBills(params?: {
 
     const runningBalances = new Map<
       string,
-      { periodIndex: number; due: number; advance: number }
+      { periodIndex: number; netBalance: number }
     >();
 
     for (const balanceDoc of balanceDocs) {
@@ -203,8 +199,7 @@ export async function getBills(params?: {
       const periodIndex = getBillPeriodIndex(balanceDoc);
       const current = runningBalances.get(customerId) ?? {
         periodIndex,
-        due: 0,
-        advance: 0,
+        netBalance: 0,
       };
 
       if (current.periodIndex !== periodIndex) {
@@ -212,12 +207,13 @@ export async function getBills(params?: {
       }
 
       previousBalanceByBill.set(`${customerId}:${periodIndex}`, {
-        previousDueAmount: current.due,
-        previousAdvanceAmount: current.advance,
+        previousDueAmount: Math.max(current.netBalance, 0),
+        previousAdvanceAmount: Math.max(-current.netBalance, 0),
       });
 
-      current.due += getBillDueAmount(balanceDoc);
-      current.advance += balanceDoc.advanceAmount ?? 0;
+      const effectivePaid =
+        balanceDoc.paidAmount ?? (balanceDoc.status === "Paid" ? balanceDoc.amount : 0);
+      current.netBalance += balanceDoc.amount - effectivePaid;
       runningBalances.set(customerId, current);
     }
   }
@@ -254,7 +250,9 @@ export async function markBillAsPaid(
 ) {
   await connectToDatabase();
 
-  const existingBill = await Bill.findById(id).select("amount").lean<RawBillDoc | null>();
+  const existingBill = await Bill.findById(id)
+    .select("amount customer month year")
+    .lean<RawBillDoc | null>();
   if (!existingBill) {
     throw new Error("Bill not found");
   }
@@ -265,8 +263,35 @@ export async function markBillAsPaid(
   }
 
   const billAmount = Number(existingBill.amount) || 0;
+  const customerId = getBillCustomerId(existingBill);
+
+  const previousBills = await Bill.find({
+    customer: customerId,
+    $or: [
+      { year: { $lt: existingBill.year } },
+      { year: existingBill.year, month: { $lt: existingBill.month } },
+    ],
+  })
+    .select("amount paidAmount status")
+    .lean<RawBillDoc[]>();
+
+  let previousNetBalance = 0;
+  for (const prevBill of previousBills) {
+    const effectivePaid =
+      prevBill.paidAmount ?? (prevBill.status === "Paid" ? prevBill.amount : 0);
+    previousNetBalance += prevBill.amount - effectivePaid;
+  }
+
+  const previousDueAmount = Math.max(previousNetBalance, 0);
+  const previousAdvanceAmount = Math.max(-previousNetBalance, 0);
+
+  const totalCoverNeeded = Math.max(
+    billAmount + previousDueAmount - previousAdvanceAmount,
+    0
+  );
+
   const dueAmount = Math.max(billAmount - paidAmount, 0);
-  const advanceAmount = Math.max(paidAmount - billAmount, 0);
+  const advanceAmount = Math.max(paidAmount - totalCoverNeeded, 0);
 
   const bill = await Bill.findByIdAndUpdate(
     id,

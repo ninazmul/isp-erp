@@ -65,7 +65,7 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
 
   const paidAmount = Number(form.watch("paidAmount")) || 0;
   const dueAmount = Math.max(bill.amount - paidAmount, 0);
-  const advanceAmount = Math.max(paidAmount - bill.amount, 0);
+  const advanceAmount = Math.max(paidAmount - suggestedPaidAmount, 0);
   const hasExistingBalance = balanceDueAmount > 0 || balanceAdvanceAmount > 0;
 
   return (
