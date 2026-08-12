@@ -22,6 +22,7 @@ import {
 import { getBills, getExpenses, getIncomes } from "@/lib/actions";
 import { Download, FileText, TrendingUp, TrendingDown, DollarSign, Wallet, FileSpreadsheet } from "lucide-react";
 import { exportToExcel, exportMultiSheetExcel } from "@/lib/excel";
+import { formatDate } from "@/lib/utils";
 
 interface Bill {
   _id: string;
@@ -115,14 +116,14 @@ export default function ReportsPage() {
         "Invoice #": b.invoiceNumber,
         Customer: b.customer?.name ?? "—",
         Amount: b.amount,
-        "Payment Date": b.paymentDate ? new Date(b.paymentDate).toLocaleDateString() : "—",
+        "Payment Date": b.paymentDate ? formatDate(b.paymentDate) : "—",
       }));
 
   const getManualIncomeRows = () =>
     incomes.map((inc) => ({
       Category: inc.category,
       Amount: inc.amount,
-      Date: new Date(inc.incomeDate).toLocaleDateString(),
+      Date: formatDate(inc.incomeDate),
       "Payment Method": inc.paymentMethod,
       Reference: inc.reference ?? "—",
     }));
@@ -131,7 +132,7 @@ export default function ReportsPage() {
     expenses.map((exp) => ({
       Category: exp.category,
       Amount: exp.amount,
-      Date: new Date(exp.expenseDate).toLocaleDateString(),
+      Date: formatDate(exp.expenseDate),
       "Payment Method": exp.paymentMethod,
       Reference: exp.reference ?? "—",
     }));
@@ -324,7 +325,7 @@ export default function ReportsPage() {
                           <TableCell className="font-medium text-sm text-slate-800">{bill.customer?.name ?? "—"}</TableCell>
                           <TableCell className="font-bold text-emerald-600">৳{bill.amount.toFixed(2)}</TableCell>
                           <TableCell className="text-xs text-slate-500">
-                            {bill.paymentDate ? new Date(bill.paymentDate).toLocaleDateString() : "—"}
+                            {bill.paymentDate ? formatDate(bill.paymentDate) : "—"}
                           </TableCell>
                         </TableRow>
                       ))
@@ -375,7 +376,7 @@ export default function ReportsPage() {
                         <TableCell className="font-semibold text-slate-800">{inc.category}</TableCell>
                         <TableCell className="font-bold text-cyan-600">৳{inc.amount.toFixed(2)}</TableCell>
                         <TableCell className="text-xs text-slate-500">
-                          {new Date(inc.incomeDate).toLocaleDateString()}
+                          {formatDate(inc.incomeDate)}
                         </TableCell>
                         <TableCell className="text-xs text-slate-600">{inc.paymentMethod}</TableCell>
                         <TableCell className="text-xs font-mono text-slate-400">{inc.reference || "—"}</TableCell>
@@ -428,7 +429,7 @@ export default function ReportsPage() {
                         <TableCell className="font-semibold text-slate-800">{expense.category}</TableCell>
                         <TableCell className="font-bold text-rose-600">৳{expense.amount.toFixed(2)}</TableCell>
                         <TableCell className="text-xs text-slate-500">
-                          {new Date(expense.expenseDate).toLocaleDateString()}
+                          {formatDate(expense.expenseDate)}
                         </TableCell>
                         <TableCell className="text-xs text-slate-600">{expense.paymentMethod}</TableCell>
                         <TableCell className="text-xs font-mono text-slate-400">{expense.reference || "—"}</TableCell>

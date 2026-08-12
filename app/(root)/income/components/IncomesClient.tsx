@@ -34,6 +34,7 @@ import { getIncomes, deleteIncome, bulkCreateIncomes } from "@/lib/actions/incom
 import { getCategories } from "@/lib/actions/category.actions";
 import ExcelImportExport, { type ImportResult } from "@/components/shared/ExcelImportExport";
 import { exportToExcel, downloadTemplate } from "@/lib/excel";
+import { formatDate } from "@/lib/utils";
 
 interface Income {
   _id: string;
@@ -332,7 +333,7 @@ export default function IncomesClient({
                       ৳{income.amount.toFixed(2)}
                     </TableCell>
                     <TableCell className="text-xs text-slate-600 whitespace-nowrap">
-                      {new Date(income.incomeDate).toLocaleDateString()}
+                      {formatDate(income.incomeDate)}
                     </TableCell>
                     <TableCell className="text-xs text-slate-600 whitespace-nowrap">
                       {income.paymentMethod}

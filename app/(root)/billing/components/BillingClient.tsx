@@ -41,6 +41,7 @@ import InvoiceDownloader from "../../components/InvoiceDownloader";
 import type { Bill } from "@/types";
 import ExcelImportExport, { type ImportResult } from "@/components/shared/ExcelImportExport";
 import { exportToExcel, downloadTemplate } from "@/lib/excel";
+import { formatDate } from "@/lib/utils";
 
 const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const MONTHS_LONG = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -407,7 +408,7 @@ export default function BillingClient({
                       {getStatusBadge(bill.status)}
                     </TableCell>
                     <TableCell className="text-xs text-slate-500 whitespace-nowrap">
-                      {bill.paymentDate ? new Date(bill.paymentDate).toLocaleDateString() : "—"}
+                      {bill.paymentDate ? formatDate(bill.paymentDate) : "—"}
                     </TableCell>
                     <TableCell className="text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-2">

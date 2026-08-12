@@ -1,22 +1,11 @@
 import type { Bill } from "@/types";
+import { formatDate } from "@/lib/utils";
 
 type InvoiceTemplateProps = {
   bill: Bill;
 };
 
 export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
-  const formatDate = (date: Date | string | undefined) => {
-    if (!date) return "—";
-    const d = new Date(date);
-    return isNaN(d.getTime())
-      ? "—"
-      : d.toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        });
-  };
-
   const monthName = new Date(0, bill.month - 1).toLocaleString("default", {
     month: "long",
   });

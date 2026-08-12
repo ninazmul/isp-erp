@@ -34,6 +34,7 @@ import { getExpenses, deleteExpense, bulkCreateExpenses } from "@/lib/actions/ex
 import { getCategories } from "@/lib/actions/category.actions";
 import ExcelImportExport, { type ImportResult } from "@/components/shared/ExcelImportExport";
 import { exportToExcel, downloadTemplate } from "@/lib/excel";
+import { formatDate } from "@/lib/utils";
 
 interface Expense {
   _id: string;
@@ -332,7 +333,7 @@ export default function ExpensesClient({
                       ৳{expense.amount.toFixed(2)}
                     </TableCell>
                     <TableCell className="text-xs text-slate-600 whitespace-nowrap">
-                      {new Date(expense.expenseDate).toLocaleDateString()}
+                      {formatDate(expense.expenseDate)}
                     </TableCell>
                     <TableCell className="text-xs text-slate-600 whitespace-nowrap">
                       {expense.paymentMethod}

@@ -37,6 +37,7 @@ import {
   removeAdmin,
   getAllAdmins,
 } from "@/lib/actions/admin.actions";
+import { formatDate } from "@/lib/utils";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -189,7 +190,7 @@ export default function AdminsClient({
                       {admin.email}
                     </TableCell>
                     <TableCell className="text-xs text-slate-500 whitespace-nowrap">
-                      {new Date(admin.createdAt).toLocaleDateString()}
+                      {formatDate(admin.createdAt)}
                     </TableCell>
                     <TableCell className="text-right whitespace-nowrap">
                       <Button

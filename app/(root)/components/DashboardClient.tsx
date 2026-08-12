@@ -26,6 +26,7 @@ import {
   Receipt
 } from "lucide-react";
 import Link from "next/link";
+import { formatDate } from "@/lib/utils";
 
 interface Payment {
   _id: string;
@@ -492,7 +493,7 @@ export default function DashboardClient({ data }: DashboardClientProps) {
                         +৳{getPaymentAmount(payment).toFixed(2)}
                       </p>
                       <p className="text-[10px] text-slate-400 font-medium">
-                        {new Date(payment.paymentDate).toLocaleDateString()}
+                        {formatDate(payment.paymentDate)}
                       </p>
                     </div>
                   </div>
@@ -541,7 +542,7 @@ export default function DashboardClient({ data }: DashboardClientProps) {
                         +৳{income.amount.toFixed(2)}
                       </p>
                       <p className="text-[10px] text-slate-400 font-medium">
-                        {new Date(income.incomeDate).toLocaleDateString()}
+                        {formatDate(income.incomeDate)}
                       </p>
                     </div>
                   </div>
@@ -590,7 +591,7 @@ export default function DashboardClient({ data }: DashboardClientProps) {
                         -৳{expense.amount.toFixed(2)}
                       </p>
                       <p className="text-[10px] text-slate-400 font-medium">
-                        {new Date(expense.expenseDate).toLocaleDateString()}
+                        {formatDate(expense.expenseDate)}
                       </p>
                     </div>
                   </div>
