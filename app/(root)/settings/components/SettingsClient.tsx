@@ -69,12 +69,16 @@ function CategoryTab({ type }: { type: "income" | "expense" }) {
     if (!newName.trim()) return;
     setLoading(true);
     try {
-      await createCategory(newName.trim(), type);
+      const result = await createCategory(newName.trim(), type);
+      if (!result.success) {
+        toast.error(result.error ?? "Failed to add category");
+        return;
+      }
       setNewName("");
       toast.success("Category added");
       load();
     } catch {
-      toast.error("Category already exists");
+      toast.error("Failed to add category");
     } finally {
       setLoading(false);
     }
@@ -94,13 +98,17 @@ function CategoryTab({ type }: { type: "income" | "expense" }) {
     if (!editName.trim()) return;
     setEditLoading(true);
     try {
-      await updateCategory(id, editName.trim());
+      const result = await updateCategory(id, editName.trim());
+      if (!result.success) {
+        toast.error(result.error ?? "Failed to update category");
+        return;
+      }
       toast.success("Category updated successfully");
       setEditingId(null);
       setEditName("");
       load();
-    } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Failed to update category");
+    } catch {
+      toast.error("Failed to update category");
     } finally {
       setEditLoading(false);
     }

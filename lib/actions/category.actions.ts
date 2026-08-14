@@ -37,22 +37,22 @@ export async function createCategory(name: string, type: "income" | "expense") {
     .select("_id")
     .lean<CategoryDoc | null>();
 
-  if (existing) throw new Error("Category already exists");
+  if (existing) return { success: false, error: "Category already exists" };
   const category = await Category.create({ name: trimmedName, type, isDefault: false });
   revalidatePath("/");
   revalidatePath("/expenses");
   revalidatePath("/income");
   revalidatePath("/settings");
-  return JSON.parse(JSON.stringify(category));
+  return { success: true, data: JSON.parse(JSON.stringify(category)) };
 }
 
 export async function updateCategory(id: string, newName: string) {
   await connectToDatabase();
   const trimmedName = newName.trim();
-  if (!trimmedName) throw new Error("Category name cannot be empty");
+  if (!trimmedName) return { success: false, error: "Category name cannot be empty" };
 
   const category = await Category.findById(id).lean<CategoryDoc | null>();
-  if (!category) throw new Error("Category not found");
+  if (!category) return { success: false, error: "Category not found" };
 
   const oldName = category.name;
 
@@ -65,7 +65,7 @@ export async function updateCategory(id: string, newName: string) {
       .select("_id")
       .lean<CategoryDoc | null>();
 
-    if (existing) throw new Error(`Category "${trimmedName}" already exists`);
+    if (existing) return { success: false, error: `"${trimmedName}" already exists` };
   }
 
   const updatedCategory = await Category.findByIdAndUpdate(
@@ -88,7 +88,7 @@ export async function updateCategory(id: string, newName: string) {
   revalidatePath("/income");
   revalidatePath("/settings");
 
-  return JSON.parse(JSON.stringify(updatedCategory));
+  return { success: true };
 }
 
 export async function deleteCategory(id: string) {
