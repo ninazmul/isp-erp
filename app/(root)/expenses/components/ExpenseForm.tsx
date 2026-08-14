@@ -84,14 +84,18 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
     if (!newCatName.trim()) return;
     setAddingCat(true);
     try {
-      const created = await createCategory(newCatName.trim(), "expense");
-      setCategories((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
-      form.setValue("category", created.name);
+      const result = await createCategory(newCatName.trim(), "expense");
+      if (!result.success || !result.data) {
+        toast.error(result.error ?? "Failed to add category");
+        return;
+      }
+      setCategories((prev) => [...prev, result.data].sort((a, b) => a.name.localeCompare(b.name)));
+      form.setValue("category", result.data.name);
       setNewCatName("");
       setShowAddCat(false);
       toast.success("Category added");
     } catch {
-      toast.error("Category already exists");
+      toast.error("Failed to add category");
     } finally {
       setAddingCat(false);
     }
