@@ -68,7 +68,7 @@ export async function updateCategory(id: string, newName: string) {
     if (existing) return { success: false, error: `"${trimmedName}" already exists` };
   }
 
-  const updatedCategory = await Category.findByIdAndUpdate(
+  await Category.findByIdAndUpdate(
     id,
     { name: trimmedName },
     { new: true }
