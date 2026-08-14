@@ -170,7 +170,7 @@ export default function DashboardClient({
   return (
     <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto font-sans">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Total Income */}
         <Card className="relative overflow-hidden p-5 rounded-2xl border border-emerald-200/70 border-t-4 border-t-emerald-600 bg-gradient-to-br from-emerald-50/50 via-white to-white shadow-sm hover:shadow-md transition-all">
           <div className="flex items-center justify-between mb-3">
