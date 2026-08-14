@@ -16,8 +16,14 @@ const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
   if (!userId) redirect("/sign-in");
 
   const resolvedParams = await searchParams;
-  const month = resolvedParams.month ? parseInt(resolvedParams.month, 10) : undefined;
-  const year = resolvedParams.year ? parseInt(resolvedParams.year, 10) : undefined;
+  const month =
+    resolvedParams.month !== undefined && resolvedParams.month !== ""
+      ? parseInt(resolvedParams.month, 10)
+      : undefined;
+  const year =
+    resolvedParams.year !== undefined && resolvedParams.year !== ""
+      ? parseInt(resolvedParams.year, 10)
+      : undefined;
 
   const dashboardData = await getDashboardData(month, year);
 

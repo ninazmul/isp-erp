@@ -10,48 +10,64 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
   await connectToDatabase();
 
   const now = new Date();
+  const isAllTime = selectedMonth === 0;
+
   const currentMonth =
-    selectedMonth && selectedMonth >= 1 && selectedMonth <= 12
+    !isAllTime && selectedMonth && selectedMonth >= 1 && selectedMonth <= 12
       ? selectedMonth
       : now.getMonth() + 1;
+
   const currentYear =
-    selectedYear && selectedYear >= 2000 && selectedYear <= 2100
+    !isAllTime && selectedYear && selectedYear >= 2000 && selectedYear <= 2100
       ? selectedYear
       : now.getFullYear();
 
   const startOfMonth = new Date(currentYear, currentMonth - 1, 1, 0, 0, 0, 0);
   const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
+  const sixMonthsAgoStart = new Date(currentYear, currentMonth - 6, 1, 0, 0, 0, 0);
 
-  // ── 1. Customer stats (Single aggregation facet) ──────────────────────────
-  const customerStatsFacet = await Customer.aggregate([
-    { $match: { isDeleted: false } },
-    {
-      $group: {
-        _id: null,
-        total: { $sum: 1 },
-        active: { $sum: { $cond: [{ $eq: ["$status", "Active"] }, 1, 0] } },
-        inactive: { $sum: { $cond: [{ $eq: ["$status", "Inactive"] }, 1, 0] } },
-        disconnected: { $sum: { $cond: [{ $eq: ["$status", "Disconnected"] }, 1, 0] } },
-      },
-    },
-  ]);
+  // Match objects based on date filter mode
+  const billMatch = isAllTime ? {} : { month: currentMonth, year: currentYear };
+  const expenseMatch = isAllTime
+    ? {}
+    : { expenseDate: { $gte: startOfMonth, $lte: endOfMonth } };
+  const incomeMatch = isAllTime
+    ? {}
+    : { incomeDate: { $gte: startOfMonth, $lte: endOfMonth } };
 
-  const customerStats = customerStatsFacet[0] || {
-    total: 0,
-    active: 0,
-    inactive: 0,
-    disconnected: 0,
-  };
-
-  // ── 2. Billing & Financial aggregation for current month ───────────
+  // ── Execute ALL aggregations and queries in 1 parallel Promise.all ──────────
   const [
+    customerStatsFacet,
     billAggregation,
     expenseAggregation,
     incomeAggregation,
     expenseCategoryAggregation,
+    sixMonthBills,
+    sixMonthIncomes,
+    sixMonthExpenses,
+    recentPayments,
+    recentExpenses,
+    recentIncomes,
   ] = await Promise.all([
+    // 1. Customer stats
+    Customer.aggregate([
+      { $match: { isDeleted: false } },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+          active: { $sum: { $cond: [{ $eq: ["$status", "Active"] }, 1, 0] } },
+          inactive: { $sum: { $cond: [{ $eq: ["$status", "Inactive"] }, 1, 0] } },
+          disconnected: {
+            $sum: { $cond: [{ $eq: ["$status", "Disconnected"] }, 1, 0] },
+          },
+        },
+      },
+    ]),
+
+    // 2. Billing & collection breakdown
     Bill.aggregate([
-      { $match: { month: currentMonth, year: currentYear } },
+      { $match: billMatch },
       {
         $group: {
           _id: null,
@@ -77,8 +93,10 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
         },
       },
     ]),
+
+    // 3. Expenses total
     Expense.aggregate([
-      { $match: { expenseDate: { $gte: startOfMonth, $lte: endOfMonth } } },
+      { $match: expenseMatch },
       {
         $group: {
           _id: null,
@@ -86,8 +104,10 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
         },
       },
     ]),
+
+    // 4. Income total
     Income.aggregate([
-      { $match: { incomeDate: { $gte: startOfMonth, $lte: endOfMonth } } },
+      { $match: incomeMatch },
       {
         $group: {
           _id: null,
@@ -95,8 +115,10 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
         },
       },
     ]),
+
+    // 5. Expense Category breakdown
     Expense.aggregate([
-      { $match: { expenseDate: { $gte: startOfMonth, $lte: endOfMonth } } },
+      { $match: expenseMatch },
       {
         $group: {
           _id: "$category",
@@ -105,21 +127,8 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
       },
       { $sort: { total: -1 } },
     ]),
-  ]);
 
-  const currentMonthCollection = billAggregation[0]?.collectedAmount || 0;
-  const currentMonthDue = billAggregation[0]?.dueAmount || 0;
-  const currentMonthAdvance = billAggregation[0]?.advanceAmount || 0;
-
-  const currentMonthExpenses = expenseAggregation[0]?.totalAmount || 0;
-  const currentMonthManualIncome = incomeAggregation[0]?.totalAmount || 0;
-  const currentMonthTotalIncome = currentMonthCollection + currentMonthManualIncome;
-  const currentMonthProfit = currentMonthTotalIncome - currentMonthExpenses;
-
-  // ── 3. 6-Month Combined Trend Aggregation (Single Aggregation per Model) ──
-  const sixMonthsAgoStart = new Date(currentYear, currentMonth - 6, 1);
-
-  const [sixMonthBills, sixMonthIncomes, sixMonthExpenses] = await Promise.all([
+    // 6. 6-Month Bills
     Bill.aggregate([
       {
         $match: {
@@ -144,6 +153,8 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
         },
       },
     ]),
+
+    // 7. 6-Month Incomes
     Income.aggregate([
       { $match: { incomeDate: { $gte: sixMonthsAgoStart, $lte: endOfMonth } } },
       {
@@ -156,6 +167,8 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
         },
       },
     ]),
+
+    // 8. 6-Month Expenses
     Expense.aggregate([
       { $match: { expenseDate: { $gte: sixMonthsAgoStart, $lte: endOfMonth } } },
       {
@@ -168,7 +181,53 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
         },
       },
     ]),
+
+    // 9. Recent Payments stream
+    Bill.find(
+      isAllTime
+        ? { $or: [{ status: "Paid" }, { paidAmount: { $gt: 0 } }] }
+        : {
+            month: currentMonth,
+            year: currentYear,
+            $or: [{ status: "Paid" }, { paidAmount: { $gt: 0 } }],
+          }
+    )
+      .select("customer invoiceNumber amount paidAmount dueAmount advanceAmount paymentDate")
+      .populate("customer", "name")
+      .sort({ paymentDate: -1, createdAt: -1 })
+      .limit(5)
+      .lean(),
+
+    // 10. Recent Expenses stream
+    Expense.find(isAllTime ? {} : { expenseDate: { $gte: startOfMonth, $lte: endOfMonth } })
+      .select("category amount expenseDate paymentMethod reference")
+      .sort({ expenseDate: -1, createdAt: -1 })
+      .limit(5)
+      .lean(),
+
+    // 11. Recent Incomes stream
+    Income.find(isAllTime ? {} : { incomeDate: { $gte: startOfMonth, $lte: endOfMonth } })
+      .select("category amount incomeDate paymentMethod reference")
+      .sort({ incomeDate: -1, createdAt: -1 })
+      .limit(5)
+      .lean(),
   ]);
+
+  // Extract customer stats
+  const customerStats = customerStatsFacet[0] || {
+    total: 0,
+    active: 0,
+    inactive: 0,
+    disconnected: 0,
+  };
+
+  const currentMonthCollection = billAggregation[0]?.collectedAmount || 0;
+  const currentMonthDue = billAggregation[0]?.dueAmount || 0;
+  const currentMonthAdvance = billAggregation[0]?.advanceAmount || 0;
+  const currentMonthExpenses = expenseAggregation[0]?.totalAmount || 0;
+  const currentMonthManualIncome = incomeAggregation[0]?.totalAmount || 0;
+  const currentMonthTotalIncome = currentMonthCollection + currentMonthManualIncome;
+  const currentMonthProfit = currentMonthTotalIncome - currentMonthExpenses;
 
   // Build O(1) map for quick 6-month chart aggregation lookup
   const billMap = new Map<string, number>();
@@ -204,28 +263,6 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
     });
   }
 
-  // ── 4. Recent Activities (Optimized with .lean() & .select()) ───────────────
-  const [recentPayments, recentExpenses, recentIncomes] = await Promise.all([
-    Bill.find({
-      $or: [{ status: "Paid" }, { paidAmount: { $gt: 0 } }],
-    })
-      .select("customer invoiceNumber amount paidAmount dueAmount advanceAmount paymentDate")
-      .populate("customer", "name")
-      .sort({ paymentDate: -1 })
-      .limit(5)
-      .lean(),
-    Expense.find()
-      .select("category amount expenseDate paymentMethod reference")
-      .sort({ expenseDate: -1 })
-      .limit(5)
-      .lean(),
-    Income.find()
-      .select("category amount incomeDate paymentMethod reference")
-      .sort({ incomeDate: -1 })
-      .limit(5)
-      .lean(),
-  ]);
-
   return {
     customers: {
       total: customerStats.total,
@@ -254,5 +291,6 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
       expenses: JSON.parse(JSON.stringify(recentExpenses)),
       incomes: JSON.parse(JSON.stringify(recentIncomes)),
     },
+    isAllTime,
   };
 }

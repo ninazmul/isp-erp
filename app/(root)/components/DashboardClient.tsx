@@ -205,17 +205,19 @@ export default function DashboardClient({
     payment.paidAmount ?? payment.amount;
 
   const now = new Date();
-  const displayMonthName = selectedMonth
-    ? MONTH_NAMES[selectedMonth - 1]
-    : MONTH_NAMES[now.getMonth()];
-  const displayYear = selectedYear || now.getFullYear();
+  const isAllTime = selectedMonth === 0;
+  const displayHeaderLabel = isAllTime
+    ? "All Time"
+    : `${selectedMonth ? MONTH_NAMES[selectedMonth - 1] : MONTH_NAMES[now.getMonth()]} ${
+        selectedYear || now.getFullYear()
+      }`;
 
   return (
     <div className="py-4 flex flex-col gap-6 px-3 lg:px-6">
       {/* ── Financial Summary ────────────────────────────────── */}
       <section>
         <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">
-          {displayMonthName} {displayYear} Financial Summary
+          {displayHeaderLabel} Financial Summary
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 auto-rows-fr">
           {/* 1. Total Income */}
