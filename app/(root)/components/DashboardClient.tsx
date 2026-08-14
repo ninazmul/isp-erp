@@ -10,9 +10,11 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 import {
-  CreditCard,
   Wallet,
   TrendingUp,
   TrendingDown,
@@ -20,6 +22,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Receipt,
+  PieChart as PieChartIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
@@ -77,6 +80,10 @@ type DashboardClientProps = {
         manualIncome: number;
         expenses: number;
       }[];
+      expenseCategories: {
+        name: string;
+        value: number;
+      }[];
     };
     recent: {
       payments: Payment[];
@@ -115,6 +122,19 @@ const MONTH_NAMES = [
   "December",
 ];
 
+const CATEGORY_COLORS = [
+  "#f43f5e", // Rose
+  "#8b5cf6", // Purple
+  "#06b6d4", // Cyan
+  "#f59e0b", // Amber
+  "#10b981", // Emerald
+  "#3b82f6", // Blue
+  "#ec4899", // Pink
+  "#6366f1", // Indigo
+  "#14b8a6", // Teal
+  "#a855f7", // Purple Light
+];
+
 const CustomChartTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
@@ -145,6 +165,30 @@ const CustomChartTooltip = ({ active, payload, label }: CustomTooltipProps) => {
             </span>
           </div>
         ))}
+      </div>
+    );
+  }
+  return null;
+};
+
+const CustomExpenseTooltip = ({ active, payload }: CustomTooltipProps) => {
+  if (active && payload && payload.length) {
+    const item = payload[0];
+    return (
+      <div className="bg-white/95 backdrop-blur-md border border-slate-200/80 p-2.5 rounded-xl shadow-xl text-xs space-y-1">
+        <p className="font-bold text-slate-800 flex items-center gap-1.5">
+          <span
+            className="w-2.5 h-2.5 rounded-full"
+            style={{ backgroundColor: item.color }}
+          />
+          {item.name}
+        </p>
+        <p className="font-extrabold text-rose-700 text-sm">
+          ৳
+          {Number(item.value).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+          })}
+        </p>
       </div>
     );
   }
@@ -222,19 +266,17 @@ export default function DashboardClient({
 
           {/* 3. Balance / Profit */}
           <Card
-            className={`p-5 rounded-2xl border border-t-4 shadow-md hover:shadow-lg transition-all duration-200 h-full min-h-[130px] ${
-              isProfit
+            className={`p-5 rounded-2xl border border-t-4 shadow-md hover:shadow-lg transition-all duration-200 h-full min-h-[130px] ${isProfit
                 ? "border-purple-300 border-t-purple-700 bg-gradient-to-br from-purple-100/60 via-purple-50/30 to-white"
                 : "border-rose-300 border-t-rose-700 bg-gradient-to-br from-rose-100/60 via-rose-50/30 to-white"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-4 h-full">
               <div
-                className={`flex-shrink-0 p-3.5 rounded-xl shadow-2xs ${
-                  isProfit
+                className={`flex-shrink-0 p-3.5 rounded-xl shadow-2xs ${isProfit
                     ? "bg-purple-100/80 text-[#3e0078]"
                     : "bg-rose-100/80 text-rose-700"
-                }`}
+                  }`}
               >
                 {isProfit ? (
                   <ArrowUpRight className="w-7 h-7" />
@@ -259,9 +301,8 @@ export default function DashboardClient({
                   </Badge>
                 </div>
                 <h3
-                  className={`text-2xl sm:text-3xl font-black leading-tight break-words min-w-0 truncate ${
-                    isProfit ? "text-[#3e0078]" : "text-rose-700"
-                  }`}
+                  className={`text-2xl sm:text-3xl font-black leading-tight break-words min-w-0 truncate ${isProfit ? "text-[#3e0078]" : "text-rose-700"
+                    }`}
                 >
                   {isProfit ? "+" : ""}৳
                   {data.billing.currentMonthProfit.toLocaleString("en-US", {
@@ -277,59 +318,159 @@ export default function DashboardClient({
         </div>
       </section>
 
-      {/* ── 6-Month Comparison Chart ─────────────────────────── */}
-      <section>
-        <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            6-Month Performance Trend
-          </h2>
-          <span className="text-xs font-medium text-slate-500">
-            Billing vs Manual Income vs Expenses
-          </span>
+      {/* ── Charts Grid: 6-Month Trend & Expense Breakdown ────── */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* 6-Month Performance Trend Bar Chart (7 Cols) */}
+        <div className="lg:col-span-7 flex flex-col">
+          <div className="flex items-center justify-between mb-3 px-1">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              6-Month Performance Trend
+            </h2>
+            <span className="text-xs font-medium text-slate-500">
+              Billing vs Manual Income vs Expenses
+            </span>
+          </div>
+          <Card className="p-5 rounded-2xl border border-slate-100 border-t-4 border-t-purple-600 shadow-sm bg-white flex-1 min-h-[350px]">
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart
+                data={data.charts.monthly}
+                margin={{ top: 15, right: 15, left: 0, bottom: 0 }}
+              >
+                <XAxis
+                  dataKey="month"
+                  tick={{ fontSize: 11, fill: "#64748b" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 11, fill: "#64748b" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomChartTooltip />} />
+                <Legend wrapperStyle={{ paddingTop: "12px", fontSize: "12px" }} />
+                <Bar
+                  dataKey="billingIncome"
+                  name="Billing Collection"
+                  fill="#10b981"
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={32}
+                />
+                <Bar
+                  dataKey="manualIncome"
+                  name="Manual Income"
+                  fill="#06b6d4"
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={32}
+                />
+                <Bar
+                  dataKey="expenses"
+                  name="Expenses"
+                  fill="#f43f5e"
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={32}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
         </div>
-        <Card className="p-5 rounded-2xl border border-slate-100 border-t-4 border-t-purple-600 shadow-sm bg-white">
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart
-              data={data.charts.monthly}
-              margin={{ top: 15, right: 15, left: 0, bottom: 0 }}
+
+        {/* Expense Category Breakdown Pie / Donut Chart (5 Cols) */}
+        <div className="lg:col-span-5 flex flex-col">
+          <div className="flex items-center justify-between mb-3 px-1">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              Expense Breakdown
+            </h2>
+            <Link
+              href="/expenses"
+              className="text-xs font-bold text-[#3e0078] hover:underline"
             >
-              <XAxis
-                dataKey="month"
-                tick={{ fontSize: 11, fill: "#64748b" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 11, fill: "#64748b" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip content={<CustomChartTooltip />} />
-              <Legend wrapperStyle={{ paddingTop: "12px", fontSize: "12px" }} />
-              <Bar
-                dataKey="billingIncome"
-                name="Billing Collection"
-                fill="#10b981"
-                radius={[6, 6, 0, 0]}
-                maxBarSize={32}
-              />
-              <Bar
-                dataKey="manualIncome"
-                name="Manual Income"
-                fill="#06b6d4"
-                radius={[6, 6, 0, 0]}
-                maxBarSize={32}
-              />
-              <Bar
-                dataKey="expenses"
-                name="Expenses"
-                fill="#f43f5e"
-                radius={[6, 6, 0, 0]}
-                maxBarSize={32}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
+              View Expenses →
+            </Link>
+          </div>
+          <Card className="p-5 rounded-2xl border border-slate-100 border-t-4 border-t-rose-600 shadow-sm bg-white flex-1 min-h-[350px] flex flex-col justify-between">
+            {data.charts.expenseCategories && data.charts.expenseCategories.length > 0 ? (
+              <div className="flex flex-col h-full justify-between gap-4">
+                <div className="relative w-full h-[200px] flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Tooltip content={<CustomExpenseTooltip />} />
+                      <Pie
+                        data={data.charts.expenseCategories}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={85}
+                        paddingAngle={4}
+                        dataKey="value"
+                      >
+                        {data.charts.expenseCategories.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                  {/* Donut Center Total display */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span className="text-[10px] font-bold uppercase text-slate-400">Total</span>
+                    <span className="text-sm font-black text-slate-800">
+                      ৳{data.billing.currentMonthExpenses.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Category List Details */}
+                <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1">
+                  {data.charts.expenseCategories.map((cat, index) => {
+                    const pct = data.billing.currentMonthExpenses > 0
+                      ? ((cat.value / data.billing.currentMonthExpenses) * 100).toFixed(1)
+                      : "0";
+                    return (
+                      <div
+                        key={cat.name}
+                        className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-50 border border-slate-100"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                            style={{
+                              backgroundColor:
+                                CATEGORY_COLORS[index % CATEGORY_COLORS.length],
+                            }}
+                          />
+                          <span className="font-bold text-slate-700 truncate">
+                            {cat.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className="font-extrabold text-slate-900">
+                            ৳{cat.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                          </span>
+                          <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-rose-100 text-rose-700">
+                            {pct}%
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center py-10">
+                <div className="p-3 rounded-full bg-rose-50 text-rose-400 mb-2">
+                  <PieChartIcon className="w-8 h-8" />
+                </div>
+                <p className="text-xs font-bold text-slate-600">No Expenses Recorded</p>
+                <p className="text-[11px] text-slate-400 mt-1 max-w-[200px]">
+                  No category expenses have been logged for this month yet.
+                </p>
+              </div>
+            )}
+          </Card>
+        </div>
       </section>
 
       {/* ── Recent Activity Feeds ─────────────────────────────── */}

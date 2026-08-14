@@ -44,7 +44,12 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
   };
 
   // ── 2. Billing & Financial aggregation for current month ───────────
-  const [billAggregation, expenseAggregation, incomeAggregation] = await Promise.all([
+  const [
+    billAggregation,
+    expenseAggregation,
+    incomeAggregation,
+    expenseCategoryAggregation,
+  ] = await Promise.all([
     Bill.aggregate([
       { $match: { month: currentMonth, year: currentYear } },
       {
@@ -89,6 +94,16 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
           totalAmount: { $sum: "$amount" },
         },
       },
+    ]),
+    Expense.aggregate([
+      { $match: { expenseDate: { $gte: startOfMonth, $lte: endOfMonth } } },
+      {
+        $group: {
+          _id: "$category",
+          total: { $sum: "$amount" },
+        },
+      },
+      { $sort: { total: -1 } },
     ]),
   ]);
 
@@ -229,6 +244,10 @@ export async function getDashboardData(selectedMonth?: number, selectedYear?: nu
     },
     charts: {
       monthly: monthlyChart,
+      expenseCategories: expenseCategoryAggregation.map((item) => ({
+        name: item._id || "Uncategorized",
+        value: item.total || 0,
+      })),
     },
     recent: {
       payments: JSON.parse(JSON.stringify(recentPayments)),
