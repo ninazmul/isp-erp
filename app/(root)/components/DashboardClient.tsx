@@ -172,10 +172,10 @@ export default function DashboardClient({
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Total Income */}
-        <Card className="relative overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/20 to-teal-50/30 p-5 shadow-xs hover:shadow-md transition-all">
+        <Card className="relative overflow-hidden p-5 rounded-2xl border border-emerald-200/70 border-t-4 border-t-emerald-600 bg-gradient-to-br from-emerald-50/50 via-white to-white shadow-sm hover:shadow-md transition-all">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700/80">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-900">
                 Total Income
               </span>
               <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md border border-emerald-200/60">
@@ -187,7 +187,7 @@ export default function DashboardClient({
             </div>
           </div>
           <div className="space-y-1">
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-mono">
+            <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight font-mono">
               ৳{totalIncome.toLocaleString()}
             </h3>
             <p className="text-xs font-medium text-emerald-600 flex items-center gap-1">
@@ -197,10 +197,10 @@ export default function DashboardClient({
         </Card>
 
         {/* Total Expenses */}
-        <Card className="relative overflow-hidden rounded-2xl border border-rose-100 bg-gradient-to-br from-white via-rose-50/20 to-pink-50/30 p-5 shadow-xs hover:shadow-md transition-all">
+        <Card className="relative overflow-hidden p-5 rounded-2xl border border-rose-200/70 border-t-4 border-t-rose-600 bg-gradient-to-br from-rose-50/50 via-white to-white shadow-sm hover:shadow-md transition-all">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-rose-700/80">
+              <span className="text-xs font-bold uppercase tracking-wider text-rose-900">
                 Total Expenses
               </span>
               <span className="text-[10px] font-extrabold text-rose-800 bg-rose-100/80 px-2 py-0.5 rounded-md border border-rose-200/60">
@@ -212,7 +212,7 @@ export default function DashboardClient({
             </div>
           </div>
           <div className="space-y-1">
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-mono">
+            <h3 className="text-2xl sm:text-3xl font-black text-rose-700 tracking-tight font-mono">
               ৳{totalExpenses.toLocaleString()}
             </h3>
             <p className="text-xs font-medium text-rose-600 flex items-center gap-1">
@@ -223,17 +223,17 @@ export default function DashboardClient({
 
         {/* Net Profit / Loss */}
         <Card
-          className={`relative overflow-hidden rounded-2xl border p-5 shadow-xs hover:shadow-md transition-all ${
+          className={`relative overflow-hidden p-5 rounded-2xl border border-t-4 shadow-sm hover:shadow-md transition-all ${
             isProfitable
-              ? "border-emerald-200 bg-gradient-to-br from-white via-emerald-50/40 to-emerald-100/30"
-              : "border-rose-200 bg-gradient-to-br from-white via-rose-50/40 to-rose-100/30"
+              ? "border-purple-300 border-t-purple-700 bg-gradient-to-br from-purple-100/60 via-purple-50/30 to-white"
+              : "border-rose-300 border-t-rose-700 bg-gradient-to-br from-rose-100/60 via-rose-50/30 to-white"
           }`}
         >
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span
                 className={`text-xs font-bold uppercase tracking-wider ${
-                  isProfitable ? "text-emerald-800" : "text-rose-800"
+                  isProfitable ? "text-purple-900" : "text-rose-900"
                 }`}
               >
                 Net {isProfitable ? "Profit" : "Loss"}
@@ -241,7 +241,7 @@ export default function DashboardClient({
               <span
                 className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${
                   isProfitable
-                    ? "text-emerald-800 bg-emerald-100/80 border-emerald-200/60"
+                    ? "text-purple-800 bg-purple-100/80 border-purple-200/60"
                     : "text-rose-800 bg-rose-100/80 border-rose-200/60"
                 }`}
               >
@@ -251,7 +251,7 @@ export default function DashboardClient({
             <div
               className={`p-2.5 rounded-xl ${
                 isProfitable
-                  ? "bg-emerald-500/10 text-emerald-600"
+                  ? "bg-purple-500/10 text-[#3e0078]"
                   : "bg-rose-500/10 text-rose-600"
               }`}
             >
@@ -259,14 +259,18 @@ export default function DashboardClient({
             </div>
           </div>
           <div className="space-y-1">
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-mono">
-              ৳{Math.abs(netProfit).toLocaleString()}
+            <h3
+              className={`text-2xl sm:text-3xl font-black tracking-tight font-mono ${
+                isProfitable ? "text-[#3e0078]" : "text-rose-700"
+              }`}
+            >
+              {netProfit >= 0 ? "+" : "-"}৳{Math.abs(netProfit).toLocaleString()}
             </h3>
             <div className="flex items-center gap-2">
               <Badge
                 className={
                   isProfitable
-                    ? "bg-emerald-600 text-white font-bold text-[10px]"
+                    ? "bg-[#3e0078] text-white font-bold text-[10px]"
                     : "bg-rose-600 text-white font-bold text-[10px]"
                 }
               >
@@ -283,7 +287,7 @@ export default function DashboardClient({
       {/* Main Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 6-Month Income vs Expense Bar Chart */}
-        <Card className="lg:col-span-2 rounded-2xl border border-slate-100 bg-white p-5 shadow-xs space-y-4">
+        <Card className="lg:col-span-2 rounded-2xl border border-slate-200/80 border-t-4 border-t-purple-600 bg-white p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h2 className="text-base font-extrabold text-slate-900 tracking-tight">
@@ -340,7 +344,7 @@ export default function DashboardClient({
         </Card>
 
         {/* Expense Category Pie Chart */}
-        <Card className="rounded-2xl border border-slate-100 bg-white p-5 shadow-xs space-y-4 flex flex-col justify-between">
+        <Card className="rounded-2xl border border-slate-200/80 border-t-4 border-t-indigo-600 bg-white p-5 shadow-sm space-y-4 flex flex-col justify-between">
           <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
             <div>
               <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
@@ -408,7 +412,7 @@ export default function DashboardClient({
       {/* Recent Streams Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Income */}
-        <Card className="rounded-2xl border border-slate-100 bg-white p-5 shadow-xs space-y-4">
+        <Card className="rounded-2xl border border-slate-200/80 border-t-4 border-t-emerald-600 bg-white p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-emerald-600" /> Recent Income Receipts
@@ -457,7 +461,7 @@ export default function DashboardClient({
         </Card>
 
         {/* Recent Expenses */}
-        <Card className="rounded-2xl border border-slate-100 bg-white p-5 shadow-xs space-y-4">
+        <Card className="rounded-2xl border border-slate-200/80 border-t-4 border-t-rose-600 bg-white p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
               <Wallet className="w-4 h-4 text-rose-600" /> Recent Expenses
