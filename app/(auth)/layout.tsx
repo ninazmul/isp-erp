@@ -26,7 +26,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               SBN Enterprise
             </h1>
             <p className="max-w-md text-sm text-gray-600 dark:text-gray-300">
-              Securely sign in to manage customers, billing, and expenses from
+              Securely sign in to manage income, expenses, and reports from
               one modern dashboard.
             </p>
           </div>

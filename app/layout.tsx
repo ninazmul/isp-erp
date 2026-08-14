@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
 
   description:
-    "SBN Enterprise is a comprehensive management system handling customers, billing, expenses, and reports.",
+    "SBN Enterprise is a comprehensive management system handling income, expenses, and reports.",
 
   alternates: {
     canonical: "/",
@@ -47,14 +47,14 @@ export const metadata: Metadata = {
     siteName: "SBN Enterprise",
     title: "SBN Enterprise – Management System",
     description:
-      "Manage your business with SBN Enterprise - customers, billing, expenses, and reports in one place.",
+      "Manage your business with SBN Enterprise - income, expenses, and reports in one place.",
   },
 
   twitter: {
     card: "summary_large_image",
     title: "SBN Enterprise – Management System",
     description:
-      "Comprehensive management system for customers, billing, expenses, and reports.",
+      "Comprehensive management system for income, expenses, and reports.",
   },
 };
 

@@ -197,7 +197,7 @@ export default function IncomesClient({
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-slate-800 tracking-tight">
-              Manual Income Management
+              Income Management
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
               Total Receipts: <span className="font-bold text-slate-800">{total}</span> | Page Subtotal:{" "}

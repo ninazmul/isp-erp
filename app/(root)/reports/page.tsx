@@ -19,19 +19,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getBills, getExpenses, getIncomes } from "@/lib/actions";
-import { Download, FileText, TrendingUp, TrendingDown, DollarSign, Wallet, FileSpreadsheet } from "lucide-react";
+import { getExpenses, getIncomes } from "@/lib/actions";
+import { Download, FileText, TrendingUp, DollarSign, Wallet, FileSpreadsheet, Percent } from "lucide-react";
 import { exportToExcel, exportMultiSheetExcel } from "@/lib/excel";
 import { formatDate } from "@/lib/utils";
-
-interface Bill {
-  _id: string;
-  invoiceNumber: string;
-  customer: { name: string };
-  amount: number;
-  status: string;
-  paymentDate?: Date;
-}
 
 interface Expense {
   _id: string;
@@ -40,6 +31,7 @@ interface Expense {
   expenseDate: Date;
   paymentMethod: string;
   reference?: string;
+  description?: string;
 }
 
 interface Income {
@@ -49,13 +41,13 @@ interface Income {
   incomeDate: Date;
   paymentMethod: string;
   reference?: string;
+  description?: string;
 }
 
 export default function ReportsPage() {
   const [mounted, setMounted] = useState(false);
   const [month, setMonth] = useState((new Date().getMonth() + 1).toString());
   const [year, setYear] = useState(new Date().getFullYear().toString());
-  const [bills, setBills] = useState<Bill[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [incomes, setIncomes] = useState<Income[]>([]);
 
@@ -64,14 +56,12 @@ export default function ReportsPage() {
   }, []);
 
   const loadData = useCallback(async () => {
-    const m = parseInt(month);
-    const y = parseInt(year);
-    const [billsRes, expensesRes, incomesRes] = await Promise.all([
-      getBills({ month: m, year: y, limit: 1000 }),
+    const m = month === "all" ? undefined : parseInt(month, 10);
+    const y = parseInt(year, 10);
+    const [expensesRes, incomesRes] = await Promise.all([
       getExpenses({ month: m, year: y, limit: 1000 }),
       getIncomes({ month: m, year: y, limit: 1000 }),
     ]);
-    setBills(billsRes.bills);
     setExpenses(expensesRes.expenses);
     setIncomes(incomesRes.incomes);
   }, [month, year]);
@@ -90,42 +80,23 @@ export default function ReportsPage() {
     );
   }
 
-  const billingIncome = bills
-    .filter((b) => b.status === "Paid")
-    .reduce((sum, b) => sum + b.amount, 0);
-
-  const manualIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
-  const totalRevenue = billingIncome + manualIncome;
-
+  const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const netProfit = totalRevenue - totalExpenses;
-  const totalDue = bills
-    .filter((b) => b.status === "Unpaid")
-    .reduce((sum, b) => sum + b.amount, 0);
+  const netProfit = totalIncome - totalExpenses;
+  const profitMargin = totalIncome > 0 ? ((netProfit / totalIncome) * 100).toFixed(1) : "0.0";
 
   // ── Excel export helpers ────────────────────────────────────────────────
-  const BILLING_INCOME_HEADERS = ["Invoice #", "Customer", "Amount", "Payment Date"];
-  const MANUAL_INCOME_HEADERS = ["Category", "Amount", "Date", "Payment Method", "Reference"];
-  const EXPENSE_HEADERS = ["Category", "Amount", "Date", "Payment Method", "Reference"];
-  const DUE_HEADERS = ["Invoice #", "Customer", "Amount Due"];
+  const INCOME_HEADERS = ["Category", "Amount", "Date", "Payment Method", "Reference", "Description"];
+  const EXPENSE_HEADERS = ["Category", "Amount", "Date", "Payment Method", "Reference", "Description"];
 
-  const getBillingIncomeRows = () =>
-    bills
-      .filter((b) => b.status === "Paid")
-      .map((b) => ({
-        "Invoice #": b.invoiceNumber,
-        Customer: b.customer?.name ?? "—",
-        Amount: b.amount,
-        "Payment Date": b.paymentDate ? formatDate(b.paymentDate) : "—",
-      }));
-
-  const getManualIncomeRows = () =>
+  const getIncomeRows = () =>
     incomes.map((inc) => ({
       Category: inc.category,
       Amount: inc.amount,
       Date: formatDate(inc.incomeDate),
       "Payment Method": inc.paymentMethod,
       Reference: inc.reference ?? "—",
+      Description: inc.description ?? "—",
     }));
 
   const getExpenseRows = () =>
@@ -135,42 +106,33 @@ export default function ReportsPage() {
       Date: formatDate(exp.expenseDate),
       "Payment Method": exp.paymentMethod,
       Reference: exp.reference ?? "—",
+      Description: exp.description ?? "—",
     }));
 
-  const getDueRows = () =>
-    bills
-      .filter((b) => b.status === "Unpaid")
-      .map((b) => ({
-        "Invoice #": b.invoiceNumber,
-        Customer: b.customer?.name ?? "—",
-        "Amount Due": b.amount,
-      }));
-
-  const handleExportBillingIncome = () =>
-    exportToExcel(getBillingIncomeRows(), BILLING_INCOME_HEADERS, "Billing Income", `billing-income-${month}-${year}.xlsx`);
-
-  const handleExportManualIncome = () =>
-    exportToExcel(getManualIncomeRows(), MANUAL_INCOME_HEADERS, "Manual Income", `manual-income-${month}-${year}.xlsx`);
+  const handleExportIncome = () =>
+    exportToExcel(getIncomeRows(), INCOME_HEADERS, "Income", `income-report-${month}-${year}.xlsx`);
 
   const handleExportExpenses = () =>
-    exportToExcel(getExpenseRows(), EXPENSE_HEADERS, "Expenses", `expenses-${month}-${year}.xlsx`);
+    exportToExcel(getExpenseRows(), EXPENSE_HEADERS, "Expenses", `expense-report-${month}-${year}.xlsx`);
 
-  const handleExportDues = () =>
-    exportToExcel(getDueRows(), DUE_HEADERS, "Unpaid Dues", `dues-${month}-${year}.xlsx`);
+  const monthLabel = month === "all" ? "All Months" : new Date(0, parseInt(month) - 1).toLocaleString("default", { month: "long" });
 
   const handleExportFullReport = () => {
+    const summaryRows = [
+      { Metric: "Total Income", Value: totalIncome },
+      { Metric: "Total Expenses", Value: totalExpenses },
+      { Metric: "Net Profit / Loss", Value: netProfit },
+      { Metric: "Profit Margin (%)", Value: `${profitMargin}%` },
+    ];
     exportMultiSheetExcel(
       [
-        { name: "Billing Income", data: getBillingIncomeRows(), headers: BILLING_INCOME_HEADERS },
-        { name: "Manual Income", data: getManualIncomeRows(), headers: MANUAL_INCOME_HEADERS },
-        { name: "Expenses", data: getExpenseRows(), headers: EXPENSE_HEADERS },
-        { name: "Unpaid Dues", data: getDueRows(), headers: DUE_HEADERS },
+        { name: "Executive Summary", data: summaryRows, headers: ["Metric", "Value"] },
+        { name: "Income Receipts", data: getIncomeRows(), headers: INCOME_HEADERS },
+        { name: "Expense Outflows", data: getExpenseRows(), headers: EXPENSE_HEADERS },
       ],
       `full-financial-report-${monthLabel}-${year}.xlsx`
     );
   };
-
-  const monthLabel = month === "all" ? "All Months" : new Date(0, parseInt(month) - 1).toLocaleString("default", { month: "long" });
 
   return (
     <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto">
@@ -185,7 +147,7 @@ export default function ReportsPage() {
               Financial Reports & Audits
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Comprehensive financial statement for {monthLabel} {year}
+              Comprehensive income & expense statement for {monthLabel} {year}
             </p>
           </div>
         </div>
@@ -234,8 +196,8 @@ export default function ReportsPage() {
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-900">Total Income</span>
             <TrendingUp className="w-4 h-4 text-emerald-600" />
           </div>
-          <p className="text-xl sm:text-2xl font-black text-emerald-700">৳{totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
-          <p className="text-[10px] text-slate-500 mt-1 font-medium">Billing (৳{billingIncome.toLocaleString()}) + Manual (৳{manualIncome.toLocaleString()})</p>
+          <p className="text-xl sm:text-2xl font-black text-emerald-700">৳{totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+          <p className="text-[10px] text-slate-500 mt-1 font-medium">All revenue inflows</p>
         </Card>
 
         {/* 2. Total Expense */}
@@ -245,33 +207,33 @@ export default function ReportsPage() {
             <Wallet className="w-4 h-4 text-rose-600" />
           </div>
           <p className="text-xl sm:text-2xl font-black text-rose-700">৳{totalExpenses.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
-          <p className="text-[10px] text-slate-500 mt-1 font-medium">Operational Outflows</p>
+          <p className="text-[10px] text-slate-500 mt-1 font-medium">Operational outflows</p>
         </Card>
 
-        {/* 3. Balance / Profit */}
+        {/* 3. Net Profit / Loss */}
         <Card className={`p-4 rounded-2xl border border-t-4 shadow-sm ${
           netProfit >= 0
             ? "border-purple-300 border-t-purple-700 bg-gradient-to-br from-purple-100/60 via-purple-50/30 to-white"
             : "border-rose-300 border-t-rose-700 bg-gradient-to-br from-rose-100/60 via-rose-50/30 to-white"
         }`}>
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-900">Balance / Profit</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-900">Net Profit / Loss</span>
             <DollarSign className={`w-4 h-4 ${netProfit >= 0 ? "text-[#3e0078]" : "text-rose-600"}`} />
           </div>
           <p className={`text-xl sm:text-2xl font-black ${netProfit >= 0 ? "text-[#3e0078]" : "text-rose-700"}`}>
             {netProfit >= 0 ? "+" : ""}৳{netProfit.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
-          <p className="text-[10px] text-slate-500 font-medium mt-1">Net Margin (Income - Expense)</p>
+          <p className="text-[10px] text-slate-500 font-medium mt-1">Income − Expense</p>
         </Card>
 
-        {/* 4. Due Receivables */}
-        <Card className="p-4 rounded-2xl border border-amber-200/70 border-t-4 border-t-amber-600 bg-gradient-to-br from-amber-50/50 via-white to-white shadow-sm">
+        {/* 4. Profit Margin */}
+        <Card className="p-4 rounded-2xl border border-indigo-200/70 border-t-4 border-t-indigo-600 bg-gradient-to-br from-indigo-50/50 via-white to-white shadow-sm">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-900">Pending Receivables</span>
-            <TrendingDown className="w-4 h-4 text-amber-600" />
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-900">Profit Margin</span>
+            <Percent className="w-4 h-4 text-indigo-600" />
           </div>
-          <p className="text-xl sm:text-2xl font-black text-amber-700">৳{totalDue.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
-          <p className="text-[10px] text-slate-500 mt-1 font-medium">Unpaid Billing Invoices</p>
+          <p className="text-xl sm:text-2xl font-black text-indigo-700">{profitMargin}%</p>
+          <p className="text-[10px] text-slate-500 mt-1 font-medium">Net Profit / Total Income</p>
         </Card>
       </div>
 
@@ -279,84 +241,25 @@ export default function ReportsPage() {
       <Tabs defaultValue="income" className="w-full">
         <TabsList className="bg-slate-100 p-1 rounded-xl mb-4 flex flex-wrap h-auto gap-1">
           <TabsTrigger value="income" className="rounded-lg text-xs font-semibold">
-            Billing Income ({bills.filter((b) => b.status === "Paid").length})
-          </TabsTrigger>
-          <TabsTrigger value="manual-income" className="rounded-lg text-xs font-semibold">
-            Manual Income ({incomes.length})
+            Income Receipts ({incomes.length})
           </TabsTrigger>
           <TabsTrigger value="expenses" className="rounded-lg text-xs font-semibold">
-            Expenses ({expenses.length})
-          </TabsTrigger>
-          <TabsTrigger value="due" className="rounded-lg text-xs font-semibold">
-            Unpaid Dues ({bills.filter((b) => b.status === "Unpaid").length})
+            Expenses Outflows ({expenses.length})
           </TabsTrigger>
         </TabsList>
 
-        {/* Tab 1: Billing Income */}
+        {/* Tab 1: Income */}
         <TabsContent value="income">
           <Card className="rounded-2xl border border-slate-100 bg-white overflow-hidden shadow-sm">
             <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100">
               <h3 className="text-base font-bold text-slate-800">
-                Billing Collection Report — {monthLabel} {year}
+                Income Statement — {monthLabel} {year}
               </h3>
               <Button
                 variant="outline"
                 size="sm"
                 className="rounded-xl border-emerald-200 text-emerald-700 text-xs hover:bg-emerald-50 self-start sm:self-auto gap-1.5"
-                onClick={handleExportBillingIncome}
-              >
-                <Download className="h-3.5 w-3.5" /> Export Excel
-              </Button>
-            </div>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader className="bg-slate-50/70">
-                  <TableRow>
-                    <TableHead className="font-bold text-slate-700 text-xs">Invoice #</TableHead>
-                    <TableHead className="font-bold text-slate-700 text-xs">Customer Name</TableHead>
-                    <TableHead className="font-bold text-slate-700 text-xs">Amount</TableHead>
-                    <TableHead className="font-bold text-slate-700 text-xs">Payment Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {bills.filter((b) => b.status === "Paid").length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center py-8 text-xs text-slate-400">
-                        No billing payments in this period
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    bills
-                      .filter((b) => b.status === "Paid")
-                      .map((bill) => (
-                        <TableRow key={bill._id}>
-                          <TableCell className="font-mono text-xs font-bold text-purple-900">{bill.invoiceNumber}</TableCell>
-                          <TableCell className="font-medium text-sm text-slate-800">{bill.customer?.name ?? "—"}</TableCell>
-                          <TableCell className="font-bold text-emerald-600">৳{bill.amount.toFixed(2)}</TableCell>
-                          <TableCell className="text-xs text-slate-500">
-                            {bill.paymentDate ? formatDate(bill.paymentDate) : "—"}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </Card>
-        </TabsContent>
-
-        {/* Tab 2: Manual Income */}
-        <TabsContent value="manual-income">
-          <Card className="rounded-2xl border border-slate-100 bg-white overflow-hidden shadow-sm">
-            <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100">
-              <h3 className="text-base font-bold text-slate-800">
-                Manual Income Receipts — {monthLabel} {year}
-              </h3>
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-xl border-cyan-200 text-cyan-700 text-xs hover:bg-cyan-50 self-start sm:self-auto gap-1.5"
-                onClick={handleExportManualIncome}
+                onClick={handleExportIncome}
               >
                 <Download className="h-3.5 w-3.5" /> Export Excel
               </Button>
@@ -370,25 +273,27 @@ export default function ReportsPage() {
                     <TableHead className="font-bold text-slate-700 text-xs">Date</TableHead>
                     <TableHead className="font-bold text-slate-700 text-xs">Payment Method</TableHead>
                     <TableHead className="font-bold text-slate-700 text-xs">Reference</TableHead>
+                    <TableHead className="font-bold text-slate-700 text-xs">Description</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {incomes.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-xs text-slate-400">
-                        No manual income receipts in this period
+                      <TableCell colSpan={6} className="text-center py-8 text-xs text-slate-400">
+                        No income receipts in this period
                       </TableCell>
                     </TableRow>
                   ) : (
                     incomes.map((inc) => (
                       <TableRow key={inc._id}>
                         <TableCell className="font-semibold text-slate-800">{inc.category}</TableCell>
-                        <TableCell className="font-bold text-cyan-600">৳{inc.amount.toFixed(2)}</TableCell>
+                        <TableCell className="font-bold text-emerald-600">৳{inc.amount.toFixed(2)}</TableCell>
                         <TableCell className="text-xs text-slate-500">
                           {formatDate(inc.incomeDate)}
                         </TableCell>
                         <TableCell className="text-xs text-slate-600">{inc.paymentMethod}</TableCell>
                         <TableCell className="text-xs font-mono text-slate-400">{inc.reference || "—"}</TableCell>
+                        <TableCell className="text-xs text-slate-500">{inc.description || "—"}</TableCell>
                       </TableRow>
                     ))
                   )}
@@ -398,7 +303,7 @@ export default function ReportsPage() {
           </Card>
         </TabsContent>
 
-        {/* Tab 3: Expenses */}
+        {/* Tab 2: Expenses */}
         <TabsContent value="expenses">
           <Card className="rounded-2xl border border-slate-100 bg-white overflow-hidden shadow-sm">
             <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100">
@@ -423,12 +328,13 @@ export default function ReportsPage() {
                     <TableHead className="font-bold text-slate-700 text-xs">Date</TableHead>
                     <TableHead className="font-bold text-slate-700 text-xs">Payment Method</TableHead>
                     <TableHead className="font-bold text-slate-700 text-xs">Reference</TableHead>
+                    <TableHead className="font-bold text-slate-700 text-xs">Description</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {expenses.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-xs text-slate-400">
+                      <TableCell colSpan={6} className="text-center py-8 text-xs text-slate-400">
                         No expenses logged in this period
                       </TableCell>
                     </TableRow>
@@ -442,57 +348,9 @@ export default function ReportsPage() {
                         </TableCell>
                         <TableCell className="text-xs text-slate-600">{expense.paymentMethod}</TableCell>
                         <TableCell className="text-xs font-mono text-slate-400">{expense.reference || "—"}</TableCell>
+                        <TableCell className="text-xs text-slate-500">{expense.description || "—"}</TableCell>
                       </TableRow>
                     ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </Card>
-        </TabsContent>
-
-        {/* Tab 4: Due Report */}
-        <TabsContent value="due">
-          <Card className="rounded-2xl border border-slate-100 bg-white overflow-hidden shadow-sm">
-            <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100">
-              <h3 className="text-base font-bold text-slate-800">
-                Pending Due Report — {monthLabel} {year}
-              </h3>
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-xl border-amber-200 text-amber-700 text-xs hover:bg-amber-50 self-start sm:self-auto gap-1.5"
-                onClick={handleExportDues}
-              >
-                <Download className="h-3.5 w-3.5" /> Export Excel
-              </Button>
-            </div>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader className="bg-slate-50/70">
-                  <TableRow>
-                    <TableHead className="font-bold text-slate-700 text-xs">Invoice #</TableHead>
-                    <TableHead className="font-bold text-slate-700 text-xs">Customer Name</TableHead>
-                    <TableHead className="font-bold text-slate-700 text-xs">Amount Due</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {bills.filter((b) => b.status === "Unpaid").length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={3} className="text-center py-8 text-xs text-slate-400">
-                        No unpaid dues in this period
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    bills
-                      .filter((b) => b.status === "Unpaid")
-                      .map((bill) => (
-                        <TableRow key={bill._id}>
-                          <TableCell className="font-mono text-xs font-bold text-purple-900">{bill.invoiceNumber}</TableCell>
-                          <TableCell className="font-medium text-sm text-slate-800">{bill.customer?.name ?? "—"}</TableCell>
-                          <TableCell className="font-bold text-amber-600">৳{bill.amount.toFixed(2)}</TableCell>
-                        </TableRow>
-                      ))
                   )}
                 </TableBody>
               </Table>

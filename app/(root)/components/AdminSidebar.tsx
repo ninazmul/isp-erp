@@ -15,10 +15,8 @@ import {
 
 import {
   LayoutDashboard,
-  Users,
   TrendingUp,
   TrendingDown,
-  Receipt,
   Wallet,
   UserPlus,
   Settings,
@@ -42,16 +40,6 @@ const sidebarSections = [
   {
     label: "Management",
     items: [
-      {
-        title: "Customers",
-        url: "/customers",
-        icon: Users,
-      },
-      {
-        title: "Billing",
-        url: "/billing",
-        icon: Receipt,
-      },
       {
         title: "Income",
         url: "/income",
