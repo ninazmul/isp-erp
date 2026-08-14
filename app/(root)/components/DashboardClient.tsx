@@ -161,7 +161,7 @@ export default function DashboardClient({
   const currentYearDisplay = selectedYear || new Date().getFullYear();
 
   const periodLabel = isAllTime
-    ? "All Time Overview"
+    ? "All Time"
     : `${currentMonthName} ${currentYearDisplay}`;
 
   const { totalIncome, totalExpenses, netProfit } = data.summary;
@@ -174,9 +174,14 @@ export default function DashboardClient({
         {/* Total Income */}
         <Card className="relative overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-br from-white via-emerald-50/20 to-teal-50/30 p-5 shadow-xs hover:shadow-md transition-all">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700/80">
-              Total Income
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700/80">
+                Total Income
+              </span>
+              <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md border border-emerald-200/60">
+                {periodLabel}
+              </span>
+            </div>
             <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600">
               <TrendingUp className="w-5 h-5" />
             </div>
@@ -186,7 +191,7 @@ export default function DashboardClient({
               ৳{totalIncome.toLocaleString()}
             </h3>
             <p className="text-xs font-medium text-emerald-600 flex items-center gap-1">
-              <ArrowUpRight className="w-3.5 h-3.5" /> Total cash inflows in period
+              <ArrowUpRight className="w-3.5 h-3.5" /> Total cash inflows in {periodLabel}
             </p>
           </div>
         </Card>
@@ -194,9 +199,14 @@ export default function DashboardClient({
         {/* Total Expenses */}
         <Card className="relative overflow-hidden rounded-2xl border border-rose-100 bg-gradient-to-br from-white via-rose-50/20 to-pink-50/30 p-5 shadow-xs hover:shadow-md transition-all">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-rose-700/80">
-              Total Expenses
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-rose-700/80">
+                Total Expenses
+              </span>
+              <span className="text-[10px] font-extrabold text-rose-800 bg-rose-100/80 px-2 py-0.5 rounded-md border border-rose-200/60">
+                {periodLabel}
+              </span>
+            </div>
             <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-600">
               <Wallet className="w-5 h-5" />
             </div>
@@ -206,30 +216,44 @@ export default function DashboardClient({
               ৳{totalExpenses.toLocaleString()}
             </h3>
             <p className="text-xs font-medium text-rose-600 flex items-center gap-1">
-              <ArrowDownRight className="w-3.5 h-3.5" /> Total cash outflows in period
+              <ArrowDownRight className="w-3.5 h-3.5" /> Total cash outflows in {periodLabel}
             </p>
           </div>
         </Card>
 
         {/* Net Profit / Loss */}
         <Card
-          className={`relative overflow-hidden rounded-2xl border p-5 shadow-xs hover:shadow-md transition-all ${isProfitable
+          className={`relative overflow-hidden rounded-2xl border p-5 shadow-xs hover:shadow-md transition-all ${
+            isProfitable
               ? "border-emerald-200 bg-gradient-to-br from-white via-emerald-50/40 to-emerald-100/30"
               : "border-rose-200 bg-gradient-to-br from-white via-rose-50/40 to-rose-100/30"
-            }`}
+          }`}
         >
           <div className="flex items-center justify-between mb-3">
-            <span
-              className={`text-xs font-bold uppercase tracking-wider ${isProfitable ? "text-emerald-800" : "text-rose-800"
+            <div className="flex items-center gap-2">
+              <span
+                className={`text-xs font-bold uppercase tracking-wider ${
+                  isProfitable ? "text-emerald-800" : "text-rose-800"
                 }`}
-            >
-              Net {isProfitable ? "Profit" : "Loss"}
-            </span>
+              >
+                Net {isProfitable ? "Profit" : "Loss"}
+              </span>
+              <span
+                className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${
+                  isProfitable
+                    ? "text-emerald-800 bg-emerald-100/80 border-emerald-200/60"
+                    : "text-rose-800 bg-rose-100/80 border-rose-200/60"
+                }`}
+              >
+                {periodLabel}
+              </span>
+            </div>
             <div
-              className={`p-2.5 rounded-xl ${isProfitable
+              className={`p-2.5 rounded-xl ${
+                isProfitable
                   ? "bg-emerald-500/10 text-emerald-600"
                   : "bg-rose-500/10 text-rose-600"
-                }`}
+              }`}
             >
               <DollarSign className="w-5 h-5" />
             </div>
@@ -249,7 +273,7 @@ export default function DashboardClient({
                 {isProfitable ? "Net Gain" : "Net Deficit"}
               </Badge>
               <span className="text-xs text-slate-500 font-medium">
-                (Income − Expense)
+                (Income − Expense, {periodLabel})
               </span>
             </div>
           </div>
