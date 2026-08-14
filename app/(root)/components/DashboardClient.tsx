@@ -169,245 +169,278 @@ export default function DashboardClient({
 
   return (
     <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto font-sans">
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Total Income */}
-        <Card className="relative overflow-hidden p-5 rounded-2xl border border-emerald-200/70 border-t-4 border-t-emerald-600 bg-gradient-to-br from-emerald-50/50 via-white to-white shadow-sm hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-900">
-                Total Income
-              </span>
-              <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md border border-emerald-200/60">
-                {periodLabel}
-              </span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight font-mono">
-              ৳{totalIncome.toLocaleString()}
-            </h3>
-            <p className="text-xs font-medium text-emerald-600 flex items-center gap-1">
-              <ArrowUpRight className="w-3.5 h-3.5" /> Total cash inflows in {periodLabel}
-            </p>
-          </div>
-        </Card>
+      {/* Section 1: Financial Overview */}
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-lg font-extrabold text-slate-800 tracking-tight">
+            Financial Overview
+          </h2>
+          <p className="text-xs text-slate-500 font-medium">
+            Key financial metrics for {periodLabel}
+          </p>
+        </div>
 
-        {/* Total Expenses */}
-        <Card className="relative overflow-hidden p-5 rounded-2xl border border-rose-200/70 border-t-4 border-t-rose-600 bg-gradient-to-br from-rose-50/50 via-white to-white shadow-sm hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-rose-900">
-                Total Expenses
-              </span>
-              <span className="text-[10px] font-extrabold text-rose-800 bg-rose-100/80 px-2 py-0.5 rounded-md border border-rose-200/60">
-                {periodLabel}
-              </span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-600">
-              <Wallet className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-2xl sm:text-3xl font-black text-rose-700 tracking-tight font-mono">
-              ৳{totalExpenses.toLocaleString()}
-            </h3>
-            <p className="text-xs font-medium text-rose-600 flex items-center gap-1">
-              <ArrowDownRight className="w-3.5 h-3.5" /> Total cash outflows in {periodLabel}
-            </p>
-          </div>
-        </Card>
-
-        {/* Net Profit / Loss */}
-        <Card
-          className={`relative overflow-hidden p-5 rounded-2xl border border-t-4 shadow-sm hover:shadow-md transition-all ${
-            isProfitable
-              ? "border-purple-300 border-t-purple-700 bg-gradient-to-br from-purple-100/60 via-purple-50/30 to-white"
-              : "border-rose-300 border-t-rose-700 bg-gradient-to-br from-rose-100/60 via-rose-50/30 to-white"
-          }`}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <span
-                className={`text-xs font-bold uppercase tracking-wider ${
-                  isProfitable ? "text-purple-900" : "text-rose-900"
-                }`}
-              >
-                Net {isProfitable ? "Profit" : "Loss"}
-              </span>
-              <span
-                className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${
-                  isProfitable
-                    ? "text-purple-800 bg-purple-100/80 border-purple-200/60"
-                    : "text-rose-800 bg-rose-100/80 border-rose-200/60"
-                }`}
-              >
-                {periodLabel}
-              </span>
-            </div>
-            <div
-              className={`p-2.5 rounded-xl ${
-                isProfitable
-                  ? "bg-purple-500/10 text-[#3e0078]"
-                  : "bg-rose-500/10 text-rose-600"
-              }`}
-            >
-              <DollarSign className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <h3
-              className={`text-2xl sm:text-3xl font-black tracking-tight font-mono ${
-                isProfitable ? "text-[#3e0078]" : "text-rose-700"
-              }`}
-            >
-              {netProfit >= 0 ? "+" : "-"}৳{Math.abs(netProfit).toLocaleString()}
-            </h3>
-            <div className="flex items-center gap-2">
-              <Badge
-                className={
-                  isProfitable
-                    ? "bg-[#3e0078] text-white font-bold text-[10px]"
-                    : "bg-rose-600 text-white font-bold text-[10px]"
-                }
-              >
-                {isProfitable ? "Net Gain" : "Net Deficit"}
-              </Badge>
-              <span className="text-xs text-slate-500 font-medium">
-                (Income − Expense, {periodLabel})
-              </span>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Main Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 6-Month Income vs Expense Bar Chart */}
-        <Card className="lg:col-span-2 rounded-2xl border border-slate-200/80 border-t-4 border-t-purple-600 bg-white p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div>
-              <h2 className="text-base font-extrabold text-slate-900 tracking-tight">
-                Income vs Expenses Comparison
-              </h2>
-              <p className="text-xs text-slate-500">6-Month historical financial trend</p>
-            </div>
-          </div>
-
-          <div className="h-[320px] w-full pt-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={data.charts.monthly}
-                margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
-              >
-                <XAxis
-                  dataKey="month"
-                  stroke="#94a3b8"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={{ stroke: "#e2e8f0" }}
-                />
-                <YAxis
-                  stroke="#94a3b8"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={{ stroke: "#e2e8f0" }}
-                  tickFormatter={(val) => `৳${val}`}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  verticalAlign="top"
-                  align="right"
-                  iconType="circle"
-                  wrapperStyle={{ paddingBottom: "15px", fontSize: "12px" }}
-                />
-                <Bar
-                  dataKey="income"
-                  name="Income"
-                  fill="#10b981"
-                  radius={[6, 6, 0, 0]}
-                  maxBarSize={40}
-                />
-                <Bar
-                  dataKey="expenses"
-                  name="Expenses"
-                  fill="#f43f5e"
-                  radius={[6, 6, 0, 0]}
-                  maxBarSize={40}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
-        {/* Expense Category Pie Chart */}
-        <Card className="rounded-2xl border border-slate-200/80 border-t-4 border-t-indigo-600 bg-white p-5 shadow-sm space-y-4 flex flex-col justify-between">
-          <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                <PieChartIcon className="w-4 h-4 text-purple-600" /> Expense Breakdown
-              </h2>
-              <p className="text-xs text-slate-500">By category in selected period</p>
-            </div>
-          </div>
-
-          {data.charts.expenseCategories.length > 0 ? (
-            <div className="h-[260px] w-full relative">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={data.charts.expenseCategories}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={85}
-                    paddingAngle={3}
-                    dataKey="value"
-                  >
-                    {data.charts.expenseCategories.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<CustomTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="h-[260px] flex items-center justify-center text-slate-400 text-xs">
-              No expense records found in this period
-            </div>
-          )}
-
-          {/* Legend list */}
-          <div className="space-y-1.5 max-h-[100px] overflow-y-auto pr-1">
-            {data.charts.expenseCategories.map((cat, idx) => (
-              <div
-                key={cat.name}
-                className="flex items-center justify-between text-xs py-0.5"
-              >
-                <div className="flex items-center gap-2 truncate">
-                  <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: COLORS[idx % COLORS.length] }}
-                  />
-                  <span className="text-slate-600 truncate font-medium">
-                    {cat.name}
-                  </span>
-                </div>
-                <span className="font-bold text-slate-800 font-mono">
-                  ৳{cat.value.toLocaleString()}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Total Income */}
+          <Card className="relative overflow-hidden p-5 rounded-2xl border border-emerald-200/70 border-t-4 border-t-emerald-600 bg-gradient-to-br from-emerald-50/50 via-white to-white shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-900">
+                  Total Income
+                </span>
+                <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md border border-emerald-200/60">
+                  {periodLabel}
                 </span>
               </div>
-            ))}
-          </div>
-        </Card>
+              <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight font-mono">
+                ৳{totalIncome.toLocaleString()}
+              </h3>
+              <p className="text-xs font-medium text-emerald-600 flex items-center gap-1">
+                <ArrowUpRight className="w-3.5 h-3.5" /> Total cash inflows in {periodLabel}
+              </p>
+            </div>
+          </Card>
+
+          {/* Total Expenses */}
+          <Card className="relative overflow-hidden p-5 rounded-2xl border border-rose-200/70 border-t-4 border-t-rose-600 bg-gradient-to-br from-rose-50/50 via-white to-white shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-rose-900">
+                  Total Expenses
+                </span>
+                <span className="text-[10px] font-extrabold text-rose-800 bg-rose-100/80 px-2 py-0.5 rounded-md border border-rose-200/60">
+                  {periodLabel}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-600">
+                <Wallet className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl sm:text-3xl font-black text-rose-700 tracking-tight font-mono">
+                ৳{totalExpenses.toLocaleString()}
+              </h3>
+              <p className="text-xs font-medium text-rose-600 flex items-center gap-1">
+                <ArrowDownRight className="w-3.5 h-3.5" /> Total cash outflows in {periodLabel}
+              </p>
+            </div>
+          </Card>
+
+          {/* Net Profit / Loss */}
+          <Card
+            className={`relative overflow-hidden p-5 rounded-2xl border border-t-4 shadow-sm hover:shadow-md transition-all ${
+              isProfitable
+                ? "border-purple-300 border-t-purple-700 bg-gradient-to-br from-purple-100/60 via-purple-50/30 to-white"
+                : "border-rose-300 border-t-rose-700 bg-gradient-to-br from-rose-100/60 via-rose-50/30 to-white"
+            }`}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`text-xs font-bold uppercase tracking-wider ${
+                    isProfitable ? "text-purple-900" : "text-rose-900"
+                  }`}
+                >
+                  Net {isProfitable ? "Profit" : "Loss"}
+                </span>
+                <span
+                  className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${
+                    isProfitable
+                      ? "text-purple-800 bg-purple-100/80 border-purple-200/60"
+                      : "text-rose-800 bg-rose-100/80 border-rose-200/60"
+                  }`}
+                >
+                  {periodLabel}
+                </span>
+              </div>
+              <div
+                className={`p-2.5 rounded-xl ${
+                  isProfitable
+                    ? "bg-purple-500/10 text-[#3e0078]"
+                    : "bg-rose-500/10 text-rose-600"
+                }`}
+              >
+                <DollarSign className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3
+                className={`text-2xl sm:text-3xl font-black tracking-tight font-mono ${
+                  isProfitable ? "text-[#3e0078]" : "text-rose-700"
+                }`}
+              >
+                {netProfit >= 0 ? "+" : "-"}৳{Math.abs(netProfit).toLocaleString()}
+              </h3>
+              <div className="flex items-center gap-2">
+                <Badge
+                  className={
+                    isProfitable
+                      ? "bg-[#3e0078] text-white font-bold text-[10px]"
+                      : "bg-rose-600 text-white font-bold text-[10px]"
+                  }
+                >
+                  {isProfitable ? "Net Gain" : "Net Deficit"}
+                </Badge>
+                <span className="text-xs text-slate-500 font-medium">
+                  (Income − Expense, {periodLabel})
+                </span>
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
+
+      {/* Section 2: Financial Analytics */}
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-lg font-extrabold text-slate-800 tracking-tight">
+            Financial Analytics
+          </h2>
+          <p className="text-xs text-slate-500 font-medium">
+            Comparative performance trends and category distribution
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 6-Month Income vs Expense Bar Chart */}
+          <Card className="lg:col-span-2 rounded-2xl border border-slate-200/80 border-t-4 border-t-purple-600 bg-white p-5 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h2 className="text-base font-extrabold text-slate-900 tracking-tight">
+                  Income vs Expenses Comparison
+                </h2>
+                <p className="text-xs text-slate-500">6-Month historical financial trend</p>
+              </div>
+            </div>
+
+            <div className="h-[320px] w-full pt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={data.charts.monthly}
+                  margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
+                >
+                  <XAxis
+                    dataKey="month"
+                    stroke="#94a3b8"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={{ stroke: "#e2e8f0" }}
+                  />
+                  <YAxis
+                    stroke="#94a3b8"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={{ stroke: "#e2e8f0" }}
+                    tickFormatter={(val) => `৳${val}`}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend
+                    verticalAlign="top"
+                    align="right"
+                    iconType="circle"
+                    wrapperStyle={{ paddingBottom: "15px", fontSize: "12px" }}
+                  />
+                  <Bar
+                    dataKey="income"
+                    name="Income"
+                    fill="#10b981"
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={40}
+                  />
+                  <Bar
+                    dataKey="expenses"
+                    name="Expenses"
+                    fill="#f43f5e"
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={40}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+
+          {/* Expense Category Pie Chart */}
+          <Card className="rounded-2xl border border-slate-200/80 border-t-4 border-t-indigo-600 bg-white p-5 shadow-sm space-y-4 flex flex-col justify-between">
+            <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+              <div>
+                <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                  <PieChartIcon className="w-4 h-4 text-purple-600" /> Expense Breakdown
+                </h2>
+                <p className="text-xs text-slate-500">By category in selected period</p>
+              </div>
+            </div>
+
+            {data.charts.expenseCategories.length > 0 ? (
+              <div className="h-[260px] w-full relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={data.charts.expenseCategories}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={85}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {data.charts.expenseCategories.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-[260px] flex items-center justify-center text-slate-400 text-xs">
+                No expense records found in this period
+              </div>
+            )}
+
+            {/* Legend list */}
+            <div className="space-y-1.5 max-h-[100px] overflow-y-auto pr-1">
+              {data.charts.expenseCategories.map((cat, idx) => (
+                <div
+                  key={cat.name}
+                  className="flex items-center justify-between text-xs py-0.5"
+                >
+                  <div className="flex items-center gap-2 truncate">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: COLORS[idx % COLORS.length] }}
+                    />
+                    <span className="text-slate-600 truncate font-medium">
+                      {cat.name}
+                    </span>
+                  </div>
+                  <span className="font-bold text-slate-800 font-mono">
+                    ৳{cat.value.toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      {/* Section 3: Recent Transactions */}
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-lg font-extrabold text-slate-800 tracking-tight">
+            Recent Transactions
+          </h2>
+          <p className="text-xs text-slate-500 font-medium">
+            Latest income entries and expense outflows
+          </p>
+        </div>
 
       {/* Recent Streams Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -509,6 +542,7 @@ export default function DashboardClient({
           </div>
         </Card>
       </div>
+    </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -76,8 +77,15 @@ const sidebarSections = [
 
 const AdminSidebar = () => {
   const currentPath = usePathname();
-  const { state } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const isCollapsed = state === "collapsed";
+
+  // Automatically close mobile sidebar menu on route change
+  useEffect(() => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }, [currentPath, isMobile, setOpenMobile]);
 
   return (
     <Sidebar
@@ -137,7 +145,14 @@ const AdminSidebar = () => {
                             : "text-slate-600 hover:text-[#3e0078] hover:bg-purple-50/70"
                         }`}
                       >
-                        <Link href={item.url}>
+                        <Link
+                          href={item.url}
+                          onClick={() => {
+                            if (isMobile) {
+                              setOpenMobile(false);
+                            }
+                          }}
+                        >
                           {/* Independent wrapper — Slot only merges classes onto the
                               <Link> itself, so this inner span is never touched by
                               the sidebar library's own collapsed-state classes and
