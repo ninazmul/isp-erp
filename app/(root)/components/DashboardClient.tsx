@@ -169,24 +169,6 @@ export default function DashboardClient({
 
   return (
     <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto font-sans">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-[#3e0078] via-[#5200a3] to-[#6b11c9] p-6 rounded-3xl text-white shadow-lg shadow-purple-950/10 relative overflow-hidden">
-        <div className="absolute right-0 top-0 translate-x-12 -translate-y-12 w-64 h-64 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-        <div className="relative z-10 space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-amber-300 bg-amber-400/20 px-3 py-1 rounded-full border border-amber-300/30">
-              Financial Overview
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight pt-1">
-            Accounting Dashboard
-          </h1>
-          <p className="text-xs sm:text-sm text-purple-100/90 max-w-xl font-medium">
-            Real-time income, expenses, and net profit analytics for {periodLabel}
-          </p>
-        </div>
-      </div>
-
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Total Income */}
@@ -231,26 +213,23 @@ export default function DashboardClient({
 
         {/* Net Profit / Loss */}
         <Card
-          className={`relative overflow-hidden rounded-2xl border p-5 shadow-xs hover:shadow-md transition-all ${
-            isProfitable
+          className={`relative overflow-hidden rounded-2xl border p-5 shadow-xs hover:shadow-md transition-all ${isProfitable
               ? "border-emerald-200 bg-gradient-to-br from-white via-emerald-50/40 to-emerald-100/30"
               : "border-rose-200 bg-gradient-to-br from-white via-rose-50/40 to-rose-100/30"
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between mb-3">
             <span
-              className={`text-xs font-bold uppercase tracking-wider ${
-                isProfitable ? "text-emerald-800" : "text-rose-800"
-              }`}
+              className={`text-xs font-bold uppercase tracking-wider ${isProfitable ? "text-emerald-800" : "text-rose-800"
+                }`}
             >
               Net {isProfitable ? "Profit" : "Loss"}
             </span>
             <div
-              className={`p-2.5 rounded-xl ${
-                isProfitable
+              className={`p-2.5 rounded-xl ${isProfitable
                   ? "bg-emerald-500/10 text-emerald-600"
                   : "bg-rose-500/10 text-rose-600"
-              }`}
+                }`}
             >
               <DollarSign className="w-5 h-5" />
             </div>
