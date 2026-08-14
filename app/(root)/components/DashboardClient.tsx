@@ -21,6 +21,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   PieChart as PieChartIcon,
+  Percent,
 } from "lucide-react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
@@ -166,6 +167,8 @@ export default function DashboardClient({
 
   const { totalIncome, totalExpenses, netProfit } = data.summary;
   const isProfitable = netProfit >= 0;
+  const profitMargin =
+    totalIncome > 0 ? ((netProfit / totalIncome) * 100).toFixed(1) : "0.0";
 
   return (
     <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto font-sans">
@@ -180,7 +183,7 @@ export default function DashboardClient({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Total Income */}
           <Card className="relative overflow-hidden p-5 rounded-2xl border border-emerald-200/70 border-t-4 border-t-emerald-600 bg-gradient-to-br from-emerald-50/50 via-white to-white shadow-sm hover:shadow-md transition-all">
             <div className="flex items-center justify-between mb-3">
@@ -198,7 +201,7 @@ export default function DashboardClient({
             </div>
             <div className="space-y-1">
               <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight font-mono">
-                ৳{totalIncome.toLocaleString()}
+                {totalIncome.toLocaleString()}
               </h3>
               <p className="text-xs font-medium text-emerald-600 flex items-center gap-1">
                 <ArrowUpRight className="w-3.5 h-3.5" /> Total cash inflows in {periodLabel}
@@ -223,7 +226,7 @@ export default function DashboardClient({
             </div>
             <div className="space-y-1">
               <h3 className="text-2xl sm:text-3xl font-black text-rose-700 tracking-tight font-mono">
-                ৳{totalExpenses.toLocaleString()}
+                {totalExpenses.toLocaleString()}
               </h3>
               <p className="text-xs font-medium text-rose-600 flex items-center gap-1">
                 <ArrowDownRight className="w-3.5 h-3.5" /> Total cash outflows in {periodLabel}
@@ -274,7 +277,7 @@ export default function DashboardClient({
                   isProfitable ? "text-[#3e0078]" : "text-rose-700"
                 }`}
               >
-                {netProfit >= 0 ? "+" : "-"}৳{Math.abs(netProfit).toLocaleString()}
+                {netProfit >= 0 ? "+" : "-"}{Math.abs(netProfit).toLocaleString()}
               </h3>
               <div className="flex items-center gap-2">
                 <Badge
@@ -288,6 +291,36 @@ export default function DashboardClient({
                 </Badge>
                 <span className="text-xs text-slate-500 font-medium">
                   (Income − Expense, {periodLabel})
+                </span>
+              </div>
+            </div>
+          </Card>
+
+          {/* Profit Margin */}
+          <Card className="relative overflow-hidden p-5 rounded-2xl border border-blue-200/70 border-t-4 border-t-blue-600 bg-gradient-to-br from-blue-50/50 via-white to-white shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-900">
+                  Profit Margin
+                </span>
+                <span className="text-[10px] font-extrabold text-blue-800 bg-blue-100/80 px-2 py-0.5 rounded-md border border-blue-200/60">
+                  {periodLabel}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-600">
+                <Percent className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-2xl sm:text-3xl font-black text-blue-700 tracking-tight font-mono">
+                {profitMargin}%
+              </h3>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-blue-600 text-white font-bold text-[10px]">
+                  Margin %
+                </Badge>
+                <span className="text-xs text-slate-500 font-medium">
+                  (Net Profit ÷ Income)
                 </span>
               </div>
             </div>
