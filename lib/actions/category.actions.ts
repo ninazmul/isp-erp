@@ -6,6 +6,11 @@ import Expense from "@/lib/database/models/expense.model";
 import Income from "@/lib/database/models/income.model";
 import { revalidatePath } from "next/cache";
 
+/** Escape special regex characters so MongoDB $regex is always safe. */
+function escapeRegex(str: string) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 interface CategoryDoc {
   _id: string;
   name: string;
@@ -26,7 +31,7 @@ export async function createCategory(name: string, type: "income" | "expense") {
   const trimmedName = name.trim();
 
   const existing = await Category.findOne({
-    name: { $regex: `^${trimmedName}$`, $options: "i" },
+    name: { $regex: `^${escapeRegex(trimmedName)}$`, $options: "i" },
     type,
   })
     .select("_id")
@@ -54,7 +59,7 @@ export async function updateCategory(id: string, newName: string) {
   if (oldName.toLowerCase() !== trimmedName.toLowerCase()) {
     const existing = await Category.findOne({
       _id: { $ne: id },
-      name: { $regex: `^${trimmedName}$`, $options: "i" },
+      name: { $regex: `^${escapeRegex(trimmedName)}$`, $options: "i" },
       type: category.type,
     })
       .select("_id")
