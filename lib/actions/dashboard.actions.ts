@@ -6,14 +6,20 @@ import Bill from "@/lib/database/models/bill.model";
 import Expense from "@/lib/database/models/expense.model";
 import Income from "@/lib/database/models/income.model";
 
-export async function getDashboardData() {
+export async function getDashboardData(selectedMonth?: number, selectedYear?: number) {
   await connectToDatabase();
 
   const now = new Date();
-  const currentMonth = now.getMonth() + 1;
-  const currentYear = now.getFullYear();
+  const currentMonth =
+    selectedMonth && selectedMonth >= 1 && selectedMonth <= 12
+      ? selectedMonth
+      : now.getMonth() + 1;
+  const currentYear =
+    selectedYear && selectedYear >= 2000 && selectedYear <= 2100
+      ? selectedYear
+      : now.getFullYear();
 
-  const startOfMonth = new Date(currentYear, currentMonth - 1, 1);
+  const startOfMonth = new Date(currentYear, currentMonth - 1, 1, 0, 0, 0, 0);
   const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
 
   // ── 1. Customer stats (Single aggregation facet) ──────────────────────────

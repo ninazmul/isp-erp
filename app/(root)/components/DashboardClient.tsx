@@ -12,10 +12,6 @@ import {
   Legend,
 } from "recharts";
 import {
-  Users,
-  UserCheck,
-  UserX,
-  UserMinus,
   CreditCard,
   Wallet,
   TrendingUp,
@@ -88,6 +84,8 @@ type DashboardClientProps = {
       incomes: Income[];
     };
   };
+  selectedMonth?: number;
+  selectedYear?: number;
 };
 
 interface CustomTooltipPayload {
@@ -101,6 +99,21 @@ interface CustomTooltipProps {
   payload?: CustomTooltipPayload[];
   label?: string;
 }
+
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 const CustomChartTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
@@ -138,224 +151,78 @@ const CustomChartTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   return null;
 };
 
-export default function DashboardClient({ data }: DashboardClientProps) {
+export default function DashboardClient({
+  data,
+  selectedMonth,
+  selectedYear,
+}: DashboardClientProps) {
   const isProfit = data.billing.currentMonthProfit >= 0;
   const getPaymentAmount = (payment: Payment) =>
     payment.paidAmount ?? payment.amount;
 
+  const now = new Date();
+  const displayMonthName = selectedMonth
+    ? MONTH_NAMES[selectedMonth - 1]
+    : MONTH_NAMES[now.getMonth()];
+  const displayYear = selectedYear || now.getFullYear();
+
   return (
     <div className="py-4 flex flex-col gap-6 px-3 lg:px-6">
-      {/* ── Customer Stats ───────────────────────────────────── */}
-      <section>
-        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">
-          Subscriber Metrics
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-fr">
-          {/* Total Customers */}
-          <Card className="p-4 rounded-2xl border border-slate-100 border-t-4 border-t-purple-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-purple-50/40 via-white to-white relative overflow-hidden h-full min-h-[120px]">
-            <div className="flex items-center gap-4 h-full">
-              <div className="flex-shrink-0 p-3.5 rounded-xl bg-purple-100/80 text-[#3e0078] shadow-2xs">
-                <Users className="w-7 h-7" />
-              </div>
-              <div className="flex flex-col justify-center min-w-0 flex-1">
-                <p className="text-xs font-bold text-slate-500 leading-none">
-                  Total Customers
-                </p>
-                <h3 className="text-2xl sm:text-3xl font-black text-[#3e0078] mt-1.5 leading-tight break-words min-w-0 truncate">
-                  {data.customers.total.toLocaleString()}
-                </h3>
-              </div>
-            </div>
-          </Card>
-
-          {/* Active */}
-          <Card className="p-4 rounded-2xl border border-slate-100 border-t-4 border-t-emerald-500 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-emerald-50/40 via-white to-white relative overflow-hidden h-full min-h-[120px]">
-            <div className="flex items-center gap-4 h-full">
-              <div className="flex-shrink-0 p-3.5 rounded-xl bg-emerald-100/80 text-emerald-700 shadow-2xs">
-                <UserCheck className="w-7 h-7" />
-              </div>
-              <div className="flex flex-col justify-center min-w-0 flex-1">
-                <p className="text-xs font-bold text-slate-500 leading-none">
-                  Active Connections
-                </p>
-                <h3 className="text-2xl sm:text-3xl font-black text-emerald-600 mt-1.5 leading-tight break-words min-w-0 truncate">
-                  {data.customers.active.toLocaleString()}
-                </h3>
-              </div>
-            </div>
-          </Card>
-
-          {/* Inactive */}
-          <Card className="p-4 rounded-2xl border border-slate-100 border-t-4 border-t-amber-500 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-amber-50/40 via-white to-white relative overflow-hidden h-full min-h-[120px]">
-            <div className="flex items-center gap-4 h-full">
-              <div className="flex-shrink-0 p-3.5 rounded-xl bg-amber-100/80 text-amber-700 shadow-2xs">
-                <UserMinus className="w-7 h-7" />
-              </div>
-              <div className="flex flex-col justify-center min-w-0 flex-1">
-                <p className="text-xs font-bold text-slate-500 leading-none">
-                  Inactive Subscribers
-                </p>
-                <h3 className="text-2xl sm:text-3xl font-black text-amber-600 mt-1.5 leading-tight break-words min-w-0 truncate">
-                  {data.customers.inactive.toLocaleString()}
-                </h3>
-              </div>
-            </div>
-          </Card>
-
-          {/* Disconnected */}
-          <Card className="p-4 rounded-2xl border border-slate-100 border-t-4 border-t-rose-500 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-rose-50/40 via-white to-white relative overflow-hidden h-full min-h-[120px]">
-            <div className="flex items-center gap-4 h-full">
-              <div className="flex-shrink-0 p-3.5 rounded-xl bg-rose-100/80 text-rose-700 shadow-2xs">
-                <UserX className="w-7 h-7" />
-              </div>
-              <div className="flex flex-col justify-center min-w-0 flex-1">
-                <p className="text-xs font-bold text-slate-500 leading-none">
-                  Disconnected
-                </p>
-                <h3 className="text-2xl sm:text-3xl font-black text-rose-600 mt-1.5 leading-tight break-words min-w-0 truncate">
-                  {data.customers.disconnected.toLocaleString()}
-                </h3>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </section>
-
       {/* ── Financial Summary ────────────────────────────────── */}
       <section>
         <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">
-          Current Month Financial Breakdown
+          {displayMonthName} {displayYear} Financial Summary
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-fr">
-          {/* Billing Collection */}
-          <Card className="p-4 rounded-2xl border border-emerald-200/70 border-t-4 border-t-emerald-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-emerald-50/50 via-white to-white h-full min-h-[130px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 auto-rows-fr">
+          {/* 1. Total Income */}
+          <Card className="p-5 rounded-2xl border border-emerald-200/70 border-t-4 border-t-emerald-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-emerald-50/50 via-white to-white h-full min-h-[130px]">
             <div className="flex items-center gap-4 h-full">
-              <div className="flex-shrink-0 p-3 rounded-xl bg-emerald-100/80 text-emerald-700 shadow-2xs">
-                <Receipt className="w-6 h-6" />
+              <div className="flex-shrink-0 p-3.5 rounded-xl bg-emerald-100/80 text-emerald-700 shadow-2xs">
+                <DollarSign className="w-7 h-7" />
               </div>
-              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
-                <span className="text-xs font-bold text-emerald-900 leading-none">
-                  Billing Collection
+              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1">
+                <span className="text-xs font-bold text-emerald-900 leading-none uppercase tracking-wider">
+                  Total Income
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black text-emerald-700 leading-tight break-words min-w-0 truncate">
+                <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 leading-tight break-words min-w-0 truncate">
                   ৳
-                  {data.billing.currentMonthCollection.toLocaleString("en-US", {
+                  {data.billing.currentMonthTotalIncome.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                   })}
                 </h3>
+                <span className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+                  Billing: ৳{data.billing.currentMonthCollection.toLocaleString()} | Manual: ৳{data.billing.currentMonthManualIncome.toLocaleString()}
+                </span>
               </div>
             </div>
           </Card>
 
-          {/* Manual Income */}
-          <Card className="p-4 rounded-2xl border border-cyan-200/70 border-t-4 border-t-cyan-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-cyan-50/50 via-white to-white h-full min-h-[130px]">
+          {/* 2. Total Expense */}
+          <Card className="p-5 rounded-2xl border border-rose-200/70 border-t-4 border-t-rose-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-rose-50/50 via-white to-white h-full min-h-[130px]">
             <div className="flex items-center gap-4 h-full">
-              <div className="flex-shrink-0 p-3 rounded-xl bg-cyan-100/80 text-cyan-700 shadow-2xs">
-                <TrendingUp className="w-6 h-6" />
+              <div className="flex-shrink-0 p-3.5 rounded-xl bg-rose-100/80 text-rose-700 shadow-2xs">
+                <Wallet className="w-7 h-7" />
               </div>
-              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
-                <span className="text-xs font-bold text-cyan-900 leading-none">
-                  Manual Income
+              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1">
+                <span className="text-xs font-bold text-rose-900 leading-none uppercase tracking-wider">
+                  Total Expense
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black text-cyan-700 leading-tight break-words min-w-0 truncate">
-                  ৳
-                  {data.billing.currentMonthManualIncome.toLocaleString(
-                    "en-US",
-                    {
-                      minimumFractionDigits: 2,
-                    },
-                  )}
-                </h3>
-              </div>
-            </div>
-          </Card>
-
-          {/* Total Income */}
-          <Card className="p-4 rounded-2xl border border-emerald-300 border-t-4 border-t-emerald-700 bg-gradient-to-br from-emerald-100/60 via-emerald-50/30 to-white shadow-md hover:shadow-lg transition-all duration-200 h-full min-h-[130px]">
-            <div className="flex items-center gap-4 h-full">
-              <div className="flex-shrink-0 p-3 rounded-xl bg-emerald-200/80 text-emerald-800 shadow-sm">
-                <DollarSign className="w-6 h-6" />
-              </div>
-              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
-                <span className="text-xs font-black text-emerald-950 leading-none">
-                  Total Revenue
-                </span>
-                <h3 className="text-xl sm:text-2xl font-black text-emerald-800 leading-tight break-words min-w-0 truncate">
-                  ৳
-                  {data.billing.currentMonthTotalIncome.toLocaleString(
-                    "en-US",
-                    {
-                      minimumFractionDigits: 2,
-                    },
-                  )}
-                </h3>
-              </div>
-            </div>
-          </Card>
-
-          {/* Expenses */}
-          <Card className="p-4 rounded-2xl border border-rose-200/70 border-t-4 border-t-rose-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-rose-50/50 via-white to-white h-full min-h-[130px]">
-            <div className="flex items-center gap-4 h-full">
-              <div className="flex-shrink-0 p-3 rounded-xl bg-rose-100/80 text-rose-700 shadow-2xs">
-                <Wallet className="w-6 h-6" />
-              </div>
-              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
-                <span className="text-xs font-bold text-rose-900 leading-none">
-                  Expenses
-                </span>
-                <h3 className="text-xl sm:text-2xl font-black text-rose-700 leading-tight break-words min-w-0 truncate">
+                <h3 className="text-2xl sm:text-3xl font-black text-rose-700 leading-tight break-words min-w-0 truncate">
                   ৳
                   {data.billing.currentMonthExpenses.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                   })}
                 </h3>
-              </div>
-            </div>
-          </Card>
-
-          {/* Due Amount */}
-          <Card className="p-4 rounded-2xl border border-amber-200/70 border-t-4 border-t-amber-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-amber-50/50 via-white to-white h-full min-h-[130px]">
-            <div className="flex items-center gap-4 h-full">
-              <div className="flex-shrink-0 p-3 rounded-xl bg-amber-100/80 text-amber-700 shadow-2xs">
-                <CreditCard className="w-6 h-6" />
-              </div>
-              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
-                <span className="text-xs font-bold text-amber-900 leading-none">
-                  Due Receivables
+                <span className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+                  Operational & overhead costs
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black text-amber-700 leading-tight break-words min-w-0 truncate">
-                  ৳
-                  {data.billing.currentMonthDue.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}
-                </h3>
               </div>
             </div>
           </Card>
 
-          {/* Advance Amount */}
-          <Card className="p-4 rounded-2xl border border-cyan-200/70 border-t-4 border-t-cyan-600 shadow-sm hover:shadow-md transition-all duration-200 bg-gradient-to-br from-cyan-50/50 via-white to-white h-full min-h-[130px]">
-            <div className="flex items-center gap-4 h-full">
-              <div className="flex-shrink-0 p-3 rounded-xl bg-cyan-100/80 text-cyan-700 shadow-2xs">
-                <CreditCard className="w-6 h-6" />
-              </div>
-              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
-                <span className="text-xs font-bold text-cyan-900 leading-none">
-                  Advance
-                </span>
-                <h3 className="text-xl sm:text-2xl font-black text-cyan-700 leading-tight break-words min-w-0 truncate">
-                  ৳
-                  {data.billing.currentMonthAdvance.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                  })}
-                </h3>
-              </div>
-            </div>
-          </Card>
-
-          {/* Net Profit */}
+          {/* 3. Balance / Profit */}
           <Card
-            className={`p-4 rounded-2xl border border-t-4 shadow-md hover:shadow-lg transition-all duration-200 h-full min-h-[130px] ${
+            className={`p-5 rounded-2xl border border-t-4 shadow-md hover:shadow-lg transition-all duration-200 h-full min-h-[130px] ${
               isProfit
                 ? "border-purple-300 border-t-purple-700 bg-gradient-to-br from-purple-100/60 via-purple-50/30 to-white"
                 : "border-rose-300 border-t-rose-700 bg-gradient-to-br from-rose-100/60 via-rose-50/30 to-white"
@@ -363,44 +230,47 @@ export default function DashboardClient({ data }: DashboardClientProps) {
           >
             <div className="flex items-center gap-4 h-full">
               <div
-                className={`flex-shrink-0 p-3 rounded-xl shadow-2xs ${
+                className={`flex-shrink-0 p-3.5 rounded-xl shadow-2xs ${
                   isProfit
                     ? "bg-purple-100/80 text-[#3e0078]"
                     : "bg-rose-100/80 text-rose-700"
                 }`}
               >
                 {isProfit ? (
-                  <ArrowUpRight className="w-6 h-6" />
+                  <ArrowUpRight className="w-7 h-7" />
                 ) : (
-                  <ArrowDownRight className="w-6 h-6" />
+                  <ArrowDownRight className="w-7 h-7" />
                 )}
               </div>
-              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1.5">
-                <span className="text-xs font-black text-slate-900 leading-none">
-                  Net Margin
-                </span>
-                <div>
-                  <h3
-                    className={`text-xl sm:text-2xl font-black leading-tight break-words min-w-0 truncate ${isProfit ? "text-[#3e0078]" : "text-rose-700"}`}
+              <div className="flex flex-col justify-center min-w-0 flex-1 gap-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-black text-slate-900 leading-none uppercase tracking-wider">
+                    Balance / Profit
+                  </span>
+                  <Badge
+                    variant={isProfit ? "default" : "destructive"}
+                    className={
+                      isProfit
+                        ? "text-[9px] py-0.5 px-2 font-extrabold bg-[#3e0078] text-white shadow-2xs"
+                        : "text-[9px] py-0.5 px-2 font-extrabold bg-rose-600 text-white shadow-2xs"
+                    }
                   >
-                    {isProfit ? "+" : ""}৳
-                    {data.billing.currentMonthProfit.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                    })}
-                  </h3>
-                  <div className="mt-1">
-                    <Badge
-                      variant={isProfit ? "default" : "destructive"}
-                      className={
-                        isProfit
-                          ? "text-[9px] py-0.5 px-2 font-extrabold bg-[#3e0078] text-white shadow-2xs"
-                          : "text-[9px] py-0.5 px-2 font-extrabold bg-rose-600 text-white shadow-2xs"
-                      }
-                    >
-                      {isProfit ? "NET PROFIT" : "NET LOSS"}
-                    </Badge>
-                  </div>
+                    {isProfit ? "NET PROFIT" : "NET LOSS"}
+                  </Badge>
                 </div>
+                <h3
+                  className={`text-2xl sm:text-3xl font-black leading-tight break-words min-w-0 truncate ${
+                    isProfit ? "text-[#3e0078]" : "text-rose-700"
+                  }`}
+                >
+                  {isProfit ? "+" : ""}৳
+                  {data.billing.currentMonthProfit.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                  })}
+                </h3>
+                <span className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+                  Net earnings (Income - Expense)
+                </span>
               </div>
             </div>
           </Card>

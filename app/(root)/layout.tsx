@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { checkIsAdmin } from "@/lib/actions/admin.actions";
+import { Suspense } from "react";
 import CurrentMonthBadge from "./components/CurrentMonthBadge";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +40,13 @@ export default async function AdminLayout({
           </div>
           <SignedIn>
             <div className="flex items-center gap-2">
-              <CurrentMonthBadge />
+              <Suspense
+                fallback={
+                  <div className="h-8 w-32 bg-white/10 animate-pulse rounded-xl" />
+                }
+              >
+                <CurrentMonthBadge />
+              </Suspense>
               <UserButton afterSwitchSessionUrl="/" />
             </div>
           </SignedIn>

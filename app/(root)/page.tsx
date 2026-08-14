@@ -3,14 +3,31 @@ import { getDashboardData } from "@/lib/actions/dashboard.actions";
 import DashboardClient from "./components/DashboardClient";
 import { redirect } from "next/navigation";
 
-const DashboardPage = async () => {
+interface DashboardPageProps {
+  searchParams: Promise<{
+    month?: string;
+    year?: string;
+  }>;
+}
+
+const DashboardPage = async ({ searchParams }: DashboardPageProps) => {
   const { userId } = await auth();
 
   if (!userId) redirect("/sign-in");
 
-  const dashboardData = await getDashboardData();
+  const resolvedParams = await searchParams;
+  const month = resolvedParams.month ? parseInt(resolvedParams.month, 10) : undefined;
+  const year = resolvedParams.year ? parseInt(resolvedParams.year, 10) : undefined;
 
-  return <DashboardClient data={dashboardData} />;
+  const dashboardData = await getDashboardData(month, year);
+
+  return (
+    <DashboardClient
+      data={dashboardData}
+      selectedMonth={month}
+      selectedYear={year}
+    />
+  );
 };
 
 export default DashboardPage;
