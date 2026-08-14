@@ -49,18 +49,39 @@ import ExcelImportExport, {
 } from "@/components/shared/ExcelImportExport";
 import { downloadTemplate, exportToExcel } from "@/lib/excel";
 
+const MONTHS_LONG = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 export default function CustomersClient({
   initialCustomers,
   initialTotal = 0,
   initialTotalPages = 1,
+  initialMonth = "all",
+  initialYear = new Date().getFullYear().toString(),
 }: {
   initialCustomers: Customer[];
   initialTotal?: number;
   initialTotalPages?: number;
+  initialMonth?: string;
+  initialYear?: string;
 }) {
   const [customers, setCustomers] = useState(initialCustomers);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [month, setMonth] = useState(initialMonth);
+  const [year, setYear] = useState(initialYear);
 
   // Pagination State
   const [page, setPage] = useState(1);
@@ -76,13 +97,15 @@ export default function CustomersClient({
     const res = await getCustomers({
       search,
       status,
+      month: month && month !== "all" ? parseInt(month) : undefined,
+      year: parseInt(year),
       page,
       limit,
     });
     setCustomers(res.customers);
     setTotal(res.total);
     setTotalPages(res.totalPages || 1);
-  }, [search, status, page, limit]);
+  }, [search, status, month, year, page, limit]);
 
   useEffect(() => {
     loadCustomers();
@@ -95,6 +118,16 @@ export default function CustomersClient({
 
   const handleStatusChange = (val: string) => {
     setStatus(val === "all" ? "" : val);
+    setPage(1);
+  };
+
+  const handleMonthChange = (val: string) => {
+    setMonth(val);
+    setPage(1);
+  };
+
+  const handleYearChange = (val: string) => {
+    setYear(val);
     setPage(1);
   };
 
@@ -284,7 +317,7 @@ export default function CustomersClient({
             />
           </div>
           <Select value={status || "all"} onValueChange={handleStatusChange}>
-            <SelectTrigger className="w-full sm:w-[180px] rounded-xl border-slate-200 text-sm">
+            <SelectTrigger className="w-full sm:w-[150px] rounded-xl border-slate-200 text-sm">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
@@ -292,6 +325,33 @@ export default function CustomersClient({
               <SelectItem value="Active">Active</SelectItem>
               <SelectItem value="Inactive">Inactive</SelectItem>
               <SelectItem value="Disconnected">Disconnected</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={month} onValueChange={handleMonthChange}>
+            <SelectTrigger className="w-full sm:w-[140px] rounded-xl border-slate-200 text-sm">
+              <SelectValue placeholder="Select month" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Months</SelectItem>
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <SelectItem key={m} value={m.toString()}>
+                  {MONTHS_LONG[m - 1]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={year} onValueChange={handleYearChange}>
+            <SelectTrigger className="w-full sm:w-[120px] rounded-xl border-slate-200 text-sm">
+              <SelectValue placeholder="Select year" />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map((y) => (
+                <SelectItem key={y} value={y.toString()}>
+                  {y}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

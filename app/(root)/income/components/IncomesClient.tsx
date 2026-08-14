@@ -50,18 +50,22 @@ export default function IncomesClient({
   initialIncomes,
   initialTotal = 0,
   initialTotalPages = 1,
+  initialMonth = (new Date().getMonth() + 1).toString(),
+  initialYear = new Date().getFullYear().toString(),
 }: {
   initialIncomes: Income[];
   initialTotal?: number;
   initialTotalPages?: number;
+  initialMonth?: string;
+  initialYear?: string;
 }) {
   const [mounted, setMounted] = useState(false);
   const [incomes, setIncomes] = useState(initialIncomes);
   const [categories, setCategories] = useState<{ _id: string; name: string }[]>([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
-  const [month, setMonth] = useState("");
-  const [year, setYear] = useState(new Date().getFullYear().toString());
+  const [month, setMonth] = useState(initialMonth);
+  const [year, setYear] = useState(initialYear);
   
   // Pagination State
   const [page, setPage] = useState(1);

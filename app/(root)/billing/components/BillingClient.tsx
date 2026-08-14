@@ -50,16 +50,20 @@ export default function BillingClient({
   initialBills,
   initialTotal = 0,
   initialTotalPages = 1,
+  initialMonth = (new Date().getMonth() + 1).toString(),
+  initialYear = new Date().getFullYear().toString(),
 }: {
   initialBills: Bill[];
   initialTotal?: number;
   initialTotalPages?: number;
+  initialMonth?: string;
+  initialYear?: string;
 }) {
   const [mounted, setMounted] = useState(false);
   const [bills, setBills] = useState(initialBills);
   const [search, setSearch] = useState("");
-  const [month, setMonth] = useState("");
-  const [year, setYear] = useState(new Date().getFullYear().toString());
+  const [month, setMonth] = useState(initialMonth);
+  const [year, setYear] = useState(initialYear);
   const [status, setStatus] = useState("");
 
   // Pagination State

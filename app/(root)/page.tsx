@@ -3,6 +3,8 @@ import { getDashboardData } from "@/lib/actions/dashboard.actions";
 import DashboardClient from "./components/DashboardClient";
 import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 interface DashboardPageProps {
   searchParams: Promise<{
     month?: string;

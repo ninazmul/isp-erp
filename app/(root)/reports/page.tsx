@@ -170,7 +170,7 @@ export default function ReportsPage() {
     );
   };
 
-  const monthLabel = new Date(0, parseInt(month) - 1).toLocaleString("default", { month: "long" });
+  const monthLabel = month === "all" ? "All Months" : new Date(0, parseInt(month) - 1).toLocaleString("default", { month: "long" });
 
   return (
     <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto">
@@ -185,7 +185,7 @@ export default function ReportsPage() {
               Financial Reports & Audits
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Comprehensive statement for {monthLabel} {year}
+              Comprehensive financial statement for {monthLabel} {year}
             </p>
           </div>
         </div>
@@ -196,6 +196,7 @@ export default function ReportsPage() {
               <SelectValue placeholder="Select month" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="all">All Months</SelectItem>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
                 <SelectItem key={m} value={m.toString()}>
                   {new Date(0, m - 1).toLocaleString("default", { month: "long" })}
@@ -226,43 +227,51 @@ export default function ReportsPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        {/* 1. Total Income */}
+        <Card className="p-4 rounded-2xl border border-emerald-200/70 border-t-4 border-t-emerald-600 bg-gradient-to-br from-emerald-50/50 via-white to-white shadow-sm">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-semibold text-slate-400">Total Revenue</span>
-            <TrendingUp className="w-4 h-4 text-emerald-500" />
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-900">Total Income</span>
+            <TrendingUp className="w-4 h-4 text-emerald-600" />
           </div>
-          <p className="text-xl font-bold text-emerald-600">৳{totalRevenue.toFixed(2)}</p>
-          <p className="text-[10px] text-slate-400 mt-1">Billing + Manual Income</p>
+          <p className="text-xl sm:text-2xl font-black text-emerald-700">৳{totalRevenue.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+          <p className="text-[10px] text-slate-500 mt-1 font-medium">Billing (৳{billingIncome.toLocaleString()}) + Manual (৳{manualIncome.toLocaleString()})</p>
         </Card>
 
-        <Card className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
+        {/* 2. Total Expense */}
+        <Card className="p-4 rounded-2xl border border-rose-200/70 border-t-4 border-t-rose-600 bg-gradient-to-br from-rose-50/50 via-white to-white shadow-sm">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-semibold text-slate-400">Total Expenses</span>
-            <Wallet className="w-4 h-4 text-rose-500" />
+            <span className="text-xs font-bold uppercase tracking-wider text-rose-900">Total Expense</span>
+            <Wallet className="w-4 h-4 text-rose-600" />
           </div>
-          <p className="text-xl font-bold text-rose-600">৳{totalExpenses.toFixed(2)}</p>
-          <p className="text-[10px] text-slate-400 mt-1">Operational Outflows</p>
+          <p className="text-xl sm:text-2xl font-black text-rose-700">৳{totalExpenses.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+          <p className="text-[10px] text-slate-500 mt-1 font-medium">Operational Outflows</p>
         </Card>
 
-        <Card className="p-4 rounded-2xl border border-purple-200 bg-gradient-to-br from-purple-50/50 to-white shadow-sm">
+        {/* 3. Balance / Profit */}
+        <Card className={`p-4 rounded-2xl border border-t-4 shadow-sm ${
+          netProfit >= 0
+            ? "border-purple-300 border-t-purple-700 bg-gradient-to-br from-purple-100/60 via-purple-50/30 to-white"
+            : "border-rose-300 border-t-rose-700 bg-gradient-to-br from-rose-100/60 via-rose-50/30 to-white"
+        }`}>
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-semibold text-[#3e0078]">Net Margin</span>
-            <DollarSign className="w-4 h-4 text-[#3e0078]" />
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-900">Balance / Profit</span>
+            <DollarSign className={`w-4 h-4 ${netProfit >= 0 ? "text-[#3e0078]" : "text-rose-600"}`} />
           </div>
-          <p className={`text-xl font-extrabold ${netProfit >= 0 ? "text-[#3e0078]" : "text-rose-600"}`}>
-            {netProfit >= 0 ? "+" : ""}৳{netProfit.toFixed(2)}
+          <p className={`text-xl sm:text-2xl font-black ${netProfit >= 0 ? "text-[#3e0078]" : "text-rose-700"}`}>
+            {netProfit >= 0 ? "+" : ""}৳{netProfit.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
-          <p className="text-[10px] text-purple-700/80 font-medium mt-1">Revenue - Expenses</p>
+          <p className="text-[10px] text-slate-500 font-medium mt-1">Net Margin (Income - Expense)</p>
         </Card>
 
-        <Card className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
+        {/* 4. Due Receivables */}
+        <Card className="p-4 rounded-2xl border border-amber-200/70 border-t-4 border-t-amber-600 bg-gradient-to-br from-amber-50/50 via-white to-white shadow-sm">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-semibold text-slate-400">Pending Receivables</span>
-            <TrendingDown className="w-4 h-4 text-amber-500" />
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-900">Pending Receivables</span>
+            <TrendingDown className="w-4 h-4 text-amber-600" />
           </div>
-          <p className="text-xl font-bold text-amber-600">৳{totalDue.toFixed(2)}</p>
-          <p className="text-[10px] text-slate-400 mt-1">Unpaid Billing Invoices</p>
+          <p className="text-xl sm:text-2xl font-black text-amber-700">৳{totalDue.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+          <p className="text-[10px] text-slate-500 mt-1 font-medium">Unpaid Billing Invoices</p>
         </Card>
       </div>
 

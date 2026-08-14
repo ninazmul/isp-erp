@@ -65,12 +65,14 @@ export async function createCustomer(data: {
 export async function getCustomers(params?: {
   search?: string;
   status?: string;
+  month?: number;
+  year?: number;
   page?: number;
   limit?: number;
 }) {
   await connectToDatabase();
 
-  const { search = "", status, page = 1, limit = 10 } = params || {};
+  const { search = "", status, month, year, page = 1, limit = 10 } = params || {};
   const skip = (page - 1) * limit;
 
   const query: FilterQuery<CustomerDoc> = { isDeleted: false };
@@ -88,6 +90,24 @@ export async function getCustomers(params?: {
 
   if (status) {
     query.status = status;
+  }
+
+  if (month || year) {
+    const startDate = new Date(
+      year || new Date().getFullYear(),
+      month ? month - 1 : 0,
+      1
+    );
+    const endDate = new Date(
+      year || new Date().getFullYear(),
+      month ? month : 12,
+      month ? 0 : 31,
+      23,
+      59,
+      59,
+      999
+    );
+    query.connectionDate = { $gte: startDate, $lte: endDate };
   }
 
   const [customers, total] = await Promise.all([
