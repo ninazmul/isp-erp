@@ -355,7 +355,7 @@ export default function DashboardClient({
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={data.charts.monthly}
-                  margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
+                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                 >
                   <XAxis
                     dataKey="month"
@@ -369,7 +369,10 @@ export default function DashboardClient({
                     fontSize={11}
                     tickLine={false}
                     axisLine={{ stroke: "#e2e8f0" }}
-                    tickFormatter={(val) => `৳${val}`}
+                    width={45}
+                    tickFormatter={(val) =>
+                      val >= 1000 ? `৳${val / 1000}k` : `৳${val}`
+                    }
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend
