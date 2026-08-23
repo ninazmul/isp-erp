@@ -22,6 +22,8 @@ import {
   UserPlus,
   Settings,
   Sparkles,
+  Users,
+  Receipt,
 } from "lucide-react";
 
 import Link from "next/link";
@@ -41,6 +43,16 @@ const sidebarSections = [
   {
     label: "Management",
     items: [
+      {
+        title: "Customers",
+        url: "/customers",
+        icon: Users,
+      },
+      {
+        title: "Billing",
+        url: "/billing",
+        icon: Receipt,
+      },
       {
         title: "Income",
         url: "/income",

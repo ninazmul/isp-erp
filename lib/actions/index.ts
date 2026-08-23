@@ -12,3 +12,15 @@ export * from "./dashboard.actions";
 
 // Admins
 export * from "./admin.actions";
+
+// Customers
+export * from "./customer.actions";
+
+// Bills
+export * from "./bill.actions";
+
+// Packages
+export * from "./package.actions";
+
+// Locations
+export * from "./location.actions";
