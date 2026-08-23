@@ -213,7 +213,7 @@ export default function ResellerInvoiceTemplate({
                   Period
                 </th>
                 <th className="py-3 px-4 text-xs font-bold uppercase tracking-wider text-right">
-                  Amount (৳)
+                  Amount ($)
                 </th>
               </tr>
             </thead>
@@ -234,7 +234,7 @@ export default function ResellerInvoiceTemplate({
                   {monthName.slice(0, 3)} {bill.year}
                 </td>
                 <td className="py-3.5 px-4 text-right font-extrabold text-slate-900 text-sm">
-                  ৳{bill.amount.toFixed(2)}
+                  $ {bill.amount.toFixed(2)}
                 </td>
               </tr>
             </tbody>
@@ -250,19 +250,19 @@ export default function ResellerInvoiceTemplate({
             <div className="flex justify-between text-slate-600">
               <span>Subtotal</span>
               <span className="font-semibold text-slate-800">
-                ৳{bill.amount.toFixed(2)}
+                $ {bill.amount.toFixed(2)}
               </span>
             </div>
             <div className="flex justify-between text-slate-600">
               <span>Tax / VAT (0%)</span>
-              <span className="font-semibold text-slate-800">৳0.00</span>
+              <span className="font-semibold text-slate-800">$ 0.00</span>
             </div>
             <div
               className="flex justify-between text-sm font-black pt-2.5 border-t border-slate-200"
               style={{ color: "#4c1d95" }}
             >
               <span>Total Bill Amount</span>
-              <span>৳{bill.amount.toFixed(2)}</span>
+              <span>$ {bill.amount.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-slate-600 pt-1">
               <span>Payment Status</span>

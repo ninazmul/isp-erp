@@ -217,7 +217,7 @@ export default function CustomerForm({
                     <SelectContent>
                       {packages.map((pkg) => (
                         <SelectItem key={pkg._id} value={pkg.name}>
-                          {pkg.name} (৳{pkg.monthlyFee}/mo)
+                          {pkg.name} (${pkg.monthlyFee}/mo)
                         </SelectItem>
                       ))}
                       {packages.length === 0 && (
@@ -278,7 +278,7 @@ export default function CustomerForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs font-bold text-slate-700">
-                    Monthly Fee (৳) *
+                    Monthly Fee ($) *
                   </FormLabel>
                   <FormControl>
                     <Input

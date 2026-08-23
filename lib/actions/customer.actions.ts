@@ -257,7 +257,7 @@ export async function bulkCreateCustomers(
             const rawPackage = getFlexibleField(raw, "Package", "packageName", "Package Name", "Plan");
             const packageName = safeParseString(rawPackage, "Standard");
 
-            const rawFee = getFlexibleField(raw, "Monthly Fee (৳)", "Monthly Fee", "monthlyFee", "Fee", "Price", "Amount");
+            const rawFee = getFlexibleField(raw, "Monthly Fee ($)", "Monthly Fee", "monthlyFee", "Fee", "Price", "Amount");
             const monthlyFee = safeParseNumber(rawFee, 0);
 
             const rawDate = getFlexibleField(raw, "Connection Date (YYYY-MM-DD)", "Connection Date", "connectionDate", "Date");

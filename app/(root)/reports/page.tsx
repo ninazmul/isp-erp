@@ -196,7 +196,7 @@ export default function ReportsPage() {
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-900">Total Income</span>
             <TrendingUp className="w-4 h-4 text-emerald-600" />
           </div>
-          <p className="text-xl sm:text-2xl font-black text-emerald-700">৳{totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+          <p className="text-xl sm:text-2xl font-black text-emerald-700">$ {totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           <p className="text-[10px] text-slate-500 mt-1 font-medium">All revenue inflows</p>
         </Card>
 
@@ -206,7 +206,7 @@ export default function ReportsPage() {
             <span className="text-xs font-bold uppercase tracking-wider text-rose-900">Total Expense</span>
             <Wallet className="w-4 h-4 text-rose-600" />
           </div>
-          <p className="text-xl sm:text-2xl font-black text-rose-700">৳{totalExpenses.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+          <p className="text-xl sm:text-2xl font-black text-rose-700">$ {totalExpenses.toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
           <p className="text-[10px] text-slate-500 mt-1 font-medium">Operational outflows</p>
         </Card>
 
@@ -221,7 +221,7 @@ export default function ReportsPage() {
             <DollarSign className={`w-4 h-4 ${netProfit >= 0 ? "text-[#3e0078]" : "text-rose-600"}`} />
           </div>
           <p className={`text-xl sm:text-2xl font-black ${netProfit >= 0 ? "text-[#3e0078]" : "text-rose-700"}`}>
-            {netProfit >= 0 ? "+" : ""}৳{netProfit.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            {netProfit >= 0 ? "+" : ""}$ {netProfit.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
           <p className="text-[10px] text-slate-500 font-medium mt-1">Income − Expense</p>
         </Card>
@@ -287,7 +287,7 @@ export default function ReportsPage() {
                     incomes.map((inc) => (
                       <TableRow key={inc._id}>
                         <TableCell className="font-semibold text-slate-800">{inc.category}</TableCell>
-                        <TableCell className="font-bold text-emerald-600">৳{inc.amount.toFixed(2)}</TableCell>
+                        <TableCell className="font-bold text-emerald-600">$ {inc.amount.toFixed(2)}</TableCell>
                         <TableCell className="text-xs text-slate-500">
                           {formatDate(inc.incomeDate)}
                         </TableCell>
@@ -342,7 +342,7 @@ export default function ReportsPage() {
                     expenses.map((expense) => (
                       <TableRow key={expense._id}>
                         <TableCell className="font-semibold text-slate-800">{expense.category}</TableCell>
-                        <TableCell className="font-bold text-rose-600">৳{expense.amount.toFixed(2)}</TableCell>
+                        <TableCell className="font-bold text-rose-600">$ {expense.amount.toFixed(2)}</TableCell>
                         <TableCell className="text-xs text-slate-500">
                           {formatDate(expense.expenseDate)}
                         </TableCell>

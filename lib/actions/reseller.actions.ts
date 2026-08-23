@@ -212,7 +212,7 @@ export async function bulkCreateResellers(
                     ""
                 ) || undefined;
             const monthlyFee = safeParseNumber(
-                getFlexibleField(raw, "Monthly Fee (৳)", "Monthly Fee", "monthlyFee", "Fee", "Amount"),
+                getFlexibleField(raw, "Monthly Fee ($)", "Monthly Fee (৳)", "Monthly Fee", "monthlyFee", "Fee", "Amount"),
                 0
             );
             const activeClients = safeParseNumber(

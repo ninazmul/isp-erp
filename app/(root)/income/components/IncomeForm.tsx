@@ -196,7 +196,7 @@ export default function IncomeForm({ income, onSuccess }: IncomeFormProps) {
             }}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Amount (৳)</FormLabel>
+                <FormLabel>Amount ($)</FormLabel>
                 <FormControl>
                   <Input
                     type="number"

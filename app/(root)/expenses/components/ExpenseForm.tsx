@@ -185,7 +185,7 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
             rules={{ required: "Amount is required", min: { value: 0.01, message: "Amount must be greater than 0" } }}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Amount (৳)</FormLabel>
+                <FormLabel>Amount ($)</FormLabel>
                 <FormControl>
                   <Input
                     type="number"

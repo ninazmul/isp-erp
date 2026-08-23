@@ -93,7 +93,7 @@ export default function EditResellerBillForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs font-bold text-slate-700">
-                  Bill Amount (৳) *
+                  Bill Amount ($) *
                 </FormLabel>
                 <FormControl>
                   <Input

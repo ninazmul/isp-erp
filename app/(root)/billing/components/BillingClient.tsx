@@ -266,7 +266,7 @@ export default function BillingClient({
                         </h1>
                         <p className="text-xs text-slate-500 mt-0.5">
                             Total Invoices: <span className="font-bold text-slate-800">{total}</span> | Page Subtotal:{" "}
-                            <span className="font-bold text-emerald-600">৳{pageTotalAmount.toFixed(2)}</span>
+                            <span className="font-bold text-emerald-600">$ {pageTotalAmount.toFixed(2)}</span>
                         </p>
                     </div>
                 </div>
@@ -397,16 +397,16 @@ export default function BillingClient({
                                             {MONTHS_SHORT[bill.month - 1]} {bill.year}
                                         </TableCell>
                                         <TableCell className="font-bold text-sm text-slate-800 whitespace-nowrap">
-                                            ৳{bill.amount.toFixed(2)}
+                                            $ {bill.amount.toFixed(2)}
                                         </TableCell>
                                         <TableCell className="font-bold text-sm text-emerald-700 whitespace-nowrap">
-                                            ৳{getPaidAmount(bill).toFixed(2)}
+                                            $ {getPaidAmount(bill).toFixed(2)}
                                         </TableCell>
                                         <TableCell className="font-bold text-sm text-amber-700 whitespace-nowrap">
-                                            ৳{getDueAmount(bill).toFixed(2)}
+                                            $ {getDueAmount(bill).toFixed(2)}
                                         </TableCell>
                                         <TableCell className="font-bold text-sm text-cyan-700 whitespace-nowrap">
-                                            ৳{getAdvanceAmount(bill).toFixed(2)}
+                                            $ {getAdvanceAmount(bill).toFixed(2)}
                                         </TableCell>
                                         <TableCell className="whitespace-nowrap">
                                             {getStatusBadge(bill.status)}

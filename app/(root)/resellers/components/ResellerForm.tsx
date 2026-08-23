@@ -212,7 +212,7 @@ export default function ResellerForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs font-bold text-slate-700">
-                    Monthly Fee (৳) *
+                    Monthly Fee ($) *
                   </FormLabel>
                   <FormControl>
                     <Input

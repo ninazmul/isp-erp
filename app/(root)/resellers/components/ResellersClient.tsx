@@ -189,7 +189,7 @@ export default function ResellersClient({
   const handleDownloadTemplate = () => {
     const headers = [
       "Name","Phone","Email","Location",
-      "Package / Bandwidth","Monthly Fee (৳)",
+      "Package / Bandwidth","Monthly Fee ($)",
       "Active Clients","Inactive Clients",
       "Connection Date (YYYY-MM-DD)","Status","Notes",
     ];
@@ -199,7 +199,7 @@ export default function ResellersClient({
       Email: "dhaka@fibernet.bd",
       Location: "Mirpur, Dhaka",
       "Package / Bandwidth": "Dedicated 200 Mbps",
-      "Monthly Fee (৳)": 15000,
+      "Monthly Fee ($)": 15000,
       "Active Clients": 45,
       "Inactive Clients": 5,
       "Connection Date (YYYY-MM-DD)": "2025-01-15",
@@ -358,7 +358,7 @@ export default function ResellersClient({
 
                     <TableCell>
                       <span className="text-xs font-extrabold text-slate-900">
-                        ৳{r.monthlyFee.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                        $ {r.monthlyFee.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                       </span>
                     </TableCell>
 

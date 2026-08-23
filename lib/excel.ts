@@ -37,7 +37,7 @@ export function getFlexibleField(raw: Record<string, unknown>, ...possibleKeys: 
 
 /**
  * Safely parses any value to a number.
- * Handles numbers, numeric strings, currency formatting ("৳ 1,500.00"), and empty values.
+ * Handles numbers, numeric strings, currency formatting ("$ 1,500.00"), and empty values.
  */
 export function safeParseNumber(val: unknown, fallback: number = 0): number {
   if (val === null || val === undefined || val === "") return fallback;

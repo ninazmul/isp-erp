@@ -201,7 +201,7 @@ export default function ExpensesClient({
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
               Total Records: <span className="font-bold text-slate-800">{total}</span> | Page Subtotal:{" "}
-              <span className="font-bold text-rose-600">৳{pageAmountTotal.toFixed(2)}</span>
+              <span className="font-bold text-rose-600">$ {pageAmountTotal.toFixed(2)}</span>
             </p>
           </div>
         </div>
@@ -334,7 +334,7 @@ export default function ExpensesClient({
                       </Badge>
                     </TableCell>
                     <TableCell className="font-bold text-sm text-rose-600 whitespace-nowrap">
-                      ৳{expense.amount.toFixed(2)}
+                      $ {expense.amount.toFixed(2)}
                     </TableCell>
                     <TableCell className="text-xs text-slate-600 whitespace-nowrap">
                       {formatDate(expense.expenseDate)}

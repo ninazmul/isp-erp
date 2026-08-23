@@ -338,7 +338,7 @@ function PackageTab() {
         <Input
           type="number"
           min="0"
-          placeholder="Monthly Fee (৳)..."
+          placeholder="Monthly Fee ($)..."
           value={monthlyFee}
           onChange={(e) => setMonthlyFee(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
@@ -408,7 +408,7 @@ function PackageTab() {
                     {pkg.name}
                   </span>
                   <span className="text-[11px] font-black text-indigo-700 bg-indigo-100/70 px-1.5 py-0.5 rounded-md">
-                    ৳{pkg.monthlyFee}/mo
+                    $ {pkg.monthlyFee}/mo
                   </span>
                 </div>
 

@@ -51,7 +51,7 @@ const sidebarSections = [
         icon: Users,
       },
       {
-        title: "Billing",
+        title: "Customer Billing",
         url: "/billing",
         icon: Receipt,
       },

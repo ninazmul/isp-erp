@@ -83,7 +83,7 @@ export default function MarkResellerPaidForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-xs font-bold text-slate-700">
-                Payment Amount (৳) *
+                Payment Amount ($) *
               </FormLabel>
               <FormControl>
                 <Input

@@ -201,7 +201,7 @@ export default function IncomesClient({
             </h1>
             <p className="text-xs text-slate-500 mt-0.5">
               Total Receipts: <span className="font-bold text-slate-800">{total}</span> | Page Subtotal:{" "}
-              <span className="font-bold text-emerald-600">৳{pageAmountTotal.toFixed(2)}</span>
+              <span className="font-bold text-emerald-600">$ {pageAmountTotal.toFixed(2)}</span>
             </p>
           </div>
         </div>
@@ -334,7 +334,7 @@ export default function IncomesClient({
                       </Badge>
                     </TableCell>
                     <TableCell className="font-bold text-sm text-emerald-600 whitespace-nowrap">
-                      ৳{income.amount.toFixed(2)}
+                      $ {income.amount.toFixed(2)}
                     </TableCell>
                     <TableCell className="text-xs text-slate-600 whitespace-nowrap">
                       {formatDate(income.incomeDate)}

@@ -82,11 +82,11 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
                             <span className="text-[13px] font-semibold text-slate-500">Bill Amount</span>
                             <div className="text-right">
                                 <span className="text-[15px] font-extrabold text-slate-900">
-                                    ৳{bill.amount.toFixed(2)}
+                                    $ {bill.amount.toFixed(2)}
                                 </span>
                                 {paidSoFar > 0 && (
                                     <span className="ml-2 text-[12px] font-semibold text-emerald-600">
-                                        (৳{paidSoFar.toFixed(2)} paid)
+                                        ($ {paidSoFar.toFixed(2)} paid)
                                     </span>
                                 )}
                             </div>
@@ -110,7 +110,7 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
                                     className={`text-[17px] font-black leading-none ${afterPaymentDue > 0 ? "text-amber-700" : "text-emerald-700"
                                         }`}
                                 >
-                                    ৳{afterPaymentDue.toFixed(2)}
+                                    $ {afterPaymentDue.toFixed(2)}
                                 </p>
                             </div>
 
@@ -130,7 +130,7 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
                                     className={`text-[17px] font-black leading-none ${afterPaymentAdvance > 0 ? "text-cyan-700" : "text-slate-400"
                                         }`}
                                 >
-                                    ৳{afterPaymentAdvance.toFixed(2)}
+                                    $ {afterPaymentAdvance.toFixed(2)}
                                 </p>
                             </div>
                         </div>
@@ -145,14 +145,14 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
                                     <div>
                                         <p className="text-[11px] text-rose-400 font-medium">Existing Due</p>
                                         <p className="text-[14px] font-extrabold text-rose-700">
-                                            ৳{previousDueAmount.toFixed(2)}
+                                            $ {previousDueAmount.toFixed(2)}
                                         </p>
                                     </div>
                                     {previousAdvanceAmount > 0 && (
                                         <div className="text-right">
                                             <p className="text-[11px] text-sky-400 font-medium">Existing Advance</p>
                                             <p className="text-[14px] font-extrabold text-sky-700">
-                                                ৳{previousAdvanceAmount.toFixed(2)}
+                                                $ {previousAdvanceAmount.toFixed(2)}
                                             </p>
                                         </div>
                                     )}
@@ -172,7 +172,7 @@ export default function MarkPaidForm({ bill, onSubmit }: MarkPaidFormProps) {
                                 className={`text-[15px] font-extrabold ${isFullyPaid ? "text-emerald-600" : "text-violet-700"
                                     }`}
                             >
-                                ৳{suggestedPaidAmount.toFixed(2)}
+                                $ {suggestedPaidAmount.toFixed(2)}
                             </span>
                         </div>
                     </div>

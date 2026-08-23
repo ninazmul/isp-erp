@@ -478,7 +478,7 @@ export default function CustomersClient({
 
                     <TableCell>
                       <span className="text-xs font-extrabold text-slate-900">
-                        ৳{c.monthlyFee.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                        $ {c.monthlyFee.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                       </span>
                     </TableCell>
 

@@ -202,7 +202,7 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                                     Period
                                 </th>
                                 <th className="py-3 px-4 text-xs font-bold uppercase tracking-wider text-right">
-                                    Amount (৳)
+                                    Amount ($)
                                 </th>
                             </tr>
                         </thead>
@@ -223,7 +223,7 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                                     {monthName.slice(0, 3)} {bill.year}
                                 </td>
                                 <td className="py-3.5 px-4 text-right font-extrabold text-slate-900 text-sm">
-                                    ৳{bill.amount.toFixed(2)}
+                                    $ {bill.amount.toFixed(2)}
                                 </td>
                             </tr>
                         </tbody>
@@ -239,37 +239,37 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                         <div className="flex justify-between text-slate-600">
                             <span>Subtotal</span>
                             <span className="font-semibold text-slate-800">
-                                ৳{bill.amount.toFixed(2)}
+                                $ {bill.amount.toFixed(2)}
                             </span>
                         </div>
                         <div className="flex justify-between text-slate-600">
                             <span>Tax / VAT (0%)</span>
-                            <span className="font-semibold text-slate-800">৳0.00</span>
+                            <span className="font-semibold text-slate-800">$ 0.00</span>
                         </div>
                         <div
                             className="flex justify-between text-sm font-black pt-2.5 border-t border-slate-200"
                             style={{ color: "#3e0078" }}
                         >
                             <span>Total Amount</span>
-                            <span>৳{bill.amount.toFixed(2)}</span>
+                            <span>$ {bill.amount.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-slate-600 pt-1">
                             <span>Paid Amount</span>
                             <span className="font-semibold text-emerald-700">
-                                ৳{paidAmount.toFixed(2)}
+                                $ {paidAmount.toFixed(2)}
                             </span>
                         </div>
                         <div className="flex justify-between text-slate-600">
                             <span>Due Amount</span>
                             <span className="font-semibold text-amber-700">
-                                ৳{dueAmount.toFixed(2)}
+                                $ {dueAmount.toFixed(2)}
                             </span>
                         </div>
                         {advanceAmount > 0 && (
                             <div className="flex justify-between text-slate-600">
                                 <span>Advance Amount</span>
                                 <span className="font-semibold text-cyan-700">
-                                    ৳{advanceAmount.toFixed(2)}
+                                    $ {advanceAmount.toFixed(2)}
                                 </span>
                             </div>
                         )}

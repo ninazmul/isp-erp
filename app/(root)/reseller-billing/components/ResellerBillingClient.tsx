@@ -477,7 +477,7 @@ export default function ResellerBillingClient({
                       <TableCell>
                         <div className="flex items-center gap-1.5">
                           <span className="text-xs font-extrabold text-slate-900">
-                            ৳{bill.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                            $ {bill.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                           </span>
                           <Button
                             size="sm"
