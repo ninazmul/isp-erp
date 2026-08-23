@@ -166,7 +166,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
                 />
                 <span className="text-slate-600 font-medium">{entry.name}</span>
               </div>
-              <span className="font-extrabold text-slate-900 font-mono">
+              <span className="font-extrabold text-slate-900">
                 $ {entry.value.toLocaleString()}
               </span>
             </div>
@@ -235,7 +235,7 @@ export default function DashboardClient({
               </div>
             </div>
             <div className="space-y-1">
-              <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight font-mono">
+              <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight">
                 $ {totalIncome.toLocaleString()}
               </h3>
               <p className="text-xs font-medium text-emerald-600 flex items-center gap-1">
@@ -260,7 +260,7 @@ export default function DashboardClient({
               </div>
             </div>
             <div className="space-y-1">
-              <h3 className="text-2xl sm:text-3xl font-black text-rose-700 tracking-tight font-mono">
+              <h3 className="text-2xl sm:text-3xl font-black text-rose-700 tracking-tight">
                 $ {totalExpenses.toLocaleString()}
               </h3>
               <p className="text-xs font-medium text-rose-600 flex items-center gap-1">
@@ -308,7 +308,7 @@ export default function DashboardClient({
             </div>
             <div className="space-y-1">
               <h3
-                className={`text-2xl sm:text-3xl font-black tracking-tight font-mono ${
+                className={`text-2xl sm:text-3xl font-black tracking-tight ${
                   isProfitable ? "text-[#3e0078]" : "text-rose-700"
                 }`}
               >
@@ -347,7 +347,7 @@ export default function DashboardClient({
               </div>
             </div>
             <div className="space-y-1">
-              <h3 className="text-2xl sm:text-3xl font-black text-blue-700 tracking-tight font-mono">
+              <h3 className="text-2xl sm:text-3xl font-black text-blue-700 tracking-tight">
                 {profitMargin}%
               </h3>
               <div className="flex items-center gap-2">
@@ -392,7 +392,7 @@ export default function DashboardClient({
                 <Receipt className="w-4 h-4" />
               </div>
             </div>
-            <h3 className="text-2xl font-black text-slate-900 font-mono tracking-tight">
+            <h3 className="text-2xl font-black text-slate-900 tracking-tight">
               $ {customerBilling.totalBilled.toLocaleString()}
             </h3>
             <p className="text-xs text-slate-500 mt-1">
@@ -410,7 +410,7 @@ export default function DashboardClient({
                 <CheckCircle className="w-4 h-4" />
               </div>
             </div>
-            <h3 className="text-2xl font-black text-emerald-700 font-mono tracking-tight">
+            <h3 className="text-2xl font-black text-emerald-700 tracking-tight">
               $ {customerBilling.totalCollected.toLocaleString()}
             </h3>
             <div className="flex items-center gap-2 mt-1">
@@ -433,7 +433,7 @@ export default function DashboardClient({
                 <Clock className="w-4 h-4" />
               </div>
             </div>
-            <h3 className="text-2xl font-black text-amber-700 font-mono tracking-tight">
+            <h3 className="text-2xl font-black text-amber-700 tracking-tight">
               $ {customerBilling.totalDue.toLocaleString()}
             </h3>
             <p className="text-xs text-amber-600/90 font-medium mt-1">
@@ -451,7 +451,7 @@ export default function DashboardClient({
                 <Users className="w-4 h-4" />
               </div>
             </div>
-            <h3 className="text-2xl font-black text-slate-900 font-mono tracking-tight">
+            <h3 className="text-2xl font-black text-slate-900 tracking-tight">
               {customerBilling.activeCustomers.toLocaleString()}
             </h3>
             <p className="text-xs text-slate-500 mt-1">
@@ -490,7 +490,7 @@ export default function DashboardClient({
                 <ReceiptText className="w-4 h-4" />
               </div>
             </div>
-            <h3 className="text-2xl font-black text-slate-900 font-mono tracking-tight">
+            <h3 className="text-2xl font-black text-slate-900 tracking-tight">
               $ {resellerBilling.totalBilled.toLocaleString()}
             </h3>
             <p className="text-xs text-slate-500 mt-1">
@@ -508,7 +508,7 @@ export default function DashboardClient({
                 <CheckCircle className="w-4 h-4" />
               </div>
             </div>
-            <h3 className="text-2xl font-black text-emerald-700 font-mono tracking-tight">
+            <h3 className="text-2xl font-black text-emerald-700 tracking-tight">
               $ {resellerBilling.totalCollected.toLocaleString()}
             </h3>
             <div className="flex items-center gap-2 mt-1">
@@ -531,7 +531,7 @@ export default function DashboardClient({
                 <AlertCircle className="w-4 h-4" />
               </div>
             </div>
-            <h3 className="text-2xl font-black text-rose-700 font-mono tracking-tight">
+            <h3 className="text-2xl font-black text-rose-700 tracking-tight">
               $ {resellerBilling.totalPending.toLocaleString()}
             </h3>
             <p className="text-xs text-rose-600/90 font-medium mt-1">
@@ -549,7 +549,7 @@ export default function DashboardClient({
                 <Network className="w-4 h-4" />
               </div>
             </div>
-            <h3 className="text-2xl font-black text-purple-900 font-mono tracking-tight">
+            <h3 className="text-2xl font-black text-purple-900 tracking-tight">
               {resellerBilling.activeResellers.toLocaleString()}{" "}
               <span className="text-xs font-semibold text-slate-400">
                 ({resellerBilling.totalResellers} total)
@@ -691,7 +691,7 @@ export default function DashboardClient({
                       {cat.name}
                     </span>
                   </div>
-                  <span className="font-bold text-slate-800 font-mono">
+                  <span className="font-bold text-slate-800">
                     $ {cat.value.toLocaleString()}
                   </span>
                 </div>
@@ -742,7 +742,7 @@ export default function DashboardClient({
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-black text-emerald-600 font-mono">
+                      <p className="text-sm font-black text-emerald-600">
                         +$ {inc.amount.toLocaleString()}
                       </p>
                       {inc.reference && (
@@ -791,7 +791,7 @@ export default function DashboardClient({
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-black text-rose-600 font-mono">
+                      <p className="text-sm font-black text-rose-600">
                         -$ {exp.amount.toLocaleString()}
                       </p>
                       {exp.reference && (
