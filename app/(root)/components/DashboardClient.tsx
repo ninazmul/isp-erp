@@ -22,6 +22,13 @@ import {
   ArrowDownRight,
   PieChart as PieChartIcon,
   Percent,
+  Users,
+  Receipt,
+  Network,
+  ReceiptText,
+  Clock,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { formatDate } from "@/lib/utils";
@@ -46,12 +53,36 @@ interface Income {
   description?: string;
 }
 
-type DashboardClientProps = {
+export type DashboardClientProps = {
   data: {
     summary: {
       totalIncome: number;
       totalExpenses: number;
       netProfit: number;
+    };
+    customerBilling: {
+      totalBilled: number;
+      totalCollected: number;
+      totalDue: number;
+      totalBills: number;
+      paidBills: number;
+      unpaidBills: number;
+      activeCustomers: number;
+      totalCustomers: number;
+      collectionRate: number;
+    };
+    resellerBilling: {
+      totalBilled: number;
+      totalCollected: number;
+      totalPending: number;
+      totalBills: number;
+      paidBills: number;
+      unpaidBills: number;
+      activeResellers: number;
+      totalResellers: number;
+      activeClients: number;
+      inactiveClients: number;
+      collectionRate: number;
     };
     charts: {
       monthly: {
@@ -170,17 +201,24 @@ export default function DashboardClient({
   const profitMargin =
     totalIncome > 0 ? ((netProfit / totalIncome) * 100).toFixed(1) : "0.0";
 
+  const { customerBilling, resellerBilling } = data;
+
   return (
-    <div className="p-3 sm:p-6 space-y-6 max-w-[1600px] mx-auto font-sans">
-      {/* Section 1: Financial Overview */}
+    <div className="p-3 sm:p-6 space-y-7 max-w-[1600px] mx-auto font-sans">
+      
+      {/* ─────────────────────────────────────────────────────────────
+          SECTION 1: FINANCIAL OVERVIEW
+          ───────────────────────────────────────────────────────────── */}
       <div className="space-y-3">
-        <div>
-          <h2 className="text-lg font-extrabold text-slate-800 tracking-tight">
-            Financial Overview
-          </h2>
-          <p className="text-xs text-slate-500 font-medium">
-            Key financial metrics for {periodLabel}
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-extrabold text-slate-800 tracking-tight">
+              Financial Overview
+            </h2>
+            <p className="text-xs text-slate-500 font-medium">
+              Overall cashflow and net performance for {periodLabel}
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -201,10 +239,10 @@ export default function DashboardClient({
             </div>
             <div className="space-y-1">
               <h3 className="text-2xl sm:text-3xl font-black text-emerald-700 tracking-tight font-mono">
-                {totalIncome.toLocaleString()}
+                ৳{totalIncome.toLocaleString()}
               </h3>
               <p className="text-xs font-medium text-emerald-600 flex items-center gap-1">
-                <ArrowUpRight className="w-3.5 h-3.5" /> Total cash inflows in {periodLabel}
+                <ArrowUpRight className="w-3.5 h-3.5" /> Total cash inflows
               </p>
             </div>
           </Card>
@@ -226,10 +264,10 @@ export default function DashboardClient({
             </div>
             <div className="space-y-1">
               <h3 className="text-2xl sm:text-3xl font-black text-rose-700 tracking-tight font-mono">
-                {totalExpenses.toLocaleString()}
+                ৳{totalExpenses.toLocaleString()}
               </h3>
               <p className="text-xs font-medium text-rose-600 flex items-center gap-1">
-                <ArrowDownRight className="w-3.5 h-3.5" /> Total cash outflows in {periodLabel}
+                <ArrowDownRight className="w-3.5 h-3.5" /> Total cash outflows
               </p>
             </div>
           </Card>
@@ -277,7 +315,7 @@ export default function DashboardClient({
                   isProfitable ? "text-[#3e0078]" : "text-rose-700"
                 }`}
               >
-                {netProfit >= 0 ? "+" : "-"}{Math.abs(netProfit).toLocaleString()}
+                {netProfit >= 0 ? "+" : "-"}৳{Math.abs(netProfit).toLocaleString()}
               </h3>
               <div className="flex items-center gap-2">
                 <Badge
@@ -290,7 +328,7 @@ export default function DashboardClient({
                   {isProfitable ? "Net Gain" : "Net Deficit"}
                 </Badge>
                 <span className="text-xs text-slate-500 font-medium">
-                  (Income − Expense, {periodLabel})
+                  (Income − Expense)
                 </span>
               </div>
             </div>
@@ -328,7 +366,215 @@ export default function DashboardClient({
         </div>
       </div>
 
-      {/* Section 2: Financial Analytics */}
+      {/* ─────────────────────────────────────────────────────────────
+          SECTION 2: CUSTOMER BILLING METRICS
+          ───────────────────────────────────────────────────────────── */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+              <Users className="w-5 h-5 text-indigo-600" /> Customer Billing Metrics
+            </h2>
+            <p className="text-xs text-slate-500 font-medium">
+              Subscriber revenue, collections, and dues for {periodLabel}
+            </p>
+          </div>
+          <Link
+            href="/billing"
+            className="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1"
+          >
+            Go to Billing →
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Customer Billed */}
+          <Card className="p-5 rounded-2xl border border-indigo-100 border-t-4 border-t-indigo-600 bg-white shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                Total Billed
+              </span>
+              <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600">
+                <Receipt className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-black text-slate-900 font-mono tracking-tight">
+              ৳{customerBilling.totalBilled.toLocaleString()}
+            </h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Across <strong className="text-slate-700">{customerBilling.totalBills}</strong> invoices generated
+            </p>
+          </Card>
+
+          {/* Customer Collected */}
+          <Card className="p-5 rounded-2xl border border-emerald-100 border-t-4 border-t-emerald-600 bg-white shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                Collected Amount
+              </span>
+              <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+                <CheckCircle className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-black text-emerald-700 font-mono tracking-tight">
+              ৳{customerBilling.totalCollected.toLocaleString()}
+            </h3>
+            <div className="flex items-center gap-2 mt-1">
+              <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-[10px] font-bold">
+                {customerBilling.collectionRate}% Collected
+              </Badge>
+              <span className="text-xs text-slate-400">
+                ({customerBilling.paidBills} paid)
+              </span>
+            </div>
+          </Card>
+
+          {/* Customer Due */}
+          <Card className="p-5 rounded-2xl border border-amber-100 border-t-4 border-t-amber-500 bg-white shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-800">
+                Outstanding Dues
+              </span>
+              <div className="p-2 rounded-xl bg-amber-50 text-amber-600">
+                <Clock className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-black text-amber-700 font-mono tracking-tight">
+              ৳{customerBilling.totalDue.toLocaleString()}
+            </h3>
+            <p className="text-xs text-amber-600/90 font-medium mt-1">
+              <strong className="text-amber-800">{customerBilling.unpaidBills}</strong> unpaid / partially paid bills
+            </p>
+          </Card>
+
+          {/* Customer Subscriber Count */}
+          <Card className="p-5 rounded-2xl border border-slate-100 border-t-4 border-t-slate-700 bg-white shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                Active Customers
+              </span>
+              <div className="p-2 rounded-xl bg-slate-100 text-slate-700">
+                <Users className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-black text-slate-900 font-mono tracking-tight">
+              {customerBilling.activeCustomers.toLocaleString()}
+            </h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Out of <strong className="text-slate-700">{customerBilling.totalCustomers}</strong> registered users
+            </p>
+          </Card>
+        </div>
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────────
+          SECTION 3: RESELLER BILLING METRICS (Clean Billed/Collected/Pending)
+          ───────────────────────────────────────────────────────────── */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+              <Network className="w-5 h-5 text-violet-700" /> Reseller Billing Metrics
+            </h2>
+            <p className="text-xs text-slate-500 font-medium">
+              Upstream distribution revenue and partner payments for {periodLabel}
+            </p>
+          </div>
+          <Link
+            href="/reseller-billing"
+            className="text-xs font-bold text-violet-700 hover:text-violet-900 hover:underline flex items-center gap-1"
+          >
+            Go to Reseller Billing →
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Reseller Billed */}
+          <Card className="p-5 rounded-2xl border border-violet-100 border-t-4 border-t-violet-700 bg-white shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                Total Billed
+              </span>
+              <div className="p-2 rounded-xl bg-violet-50 text-violet-700">
+                <ReceiptText className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-black text-slate-900 font-mono tracking-tight">
+              ৳{resellerBilling.totalBilled.toLocaleString()}
+            </h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Across <strong className="text-slate-700">{resellerBilling.totalBills}</strong> partner invoices
+            </p>
+          </Card>
+
+          {/* Reseller Collected */}
+          <Card className="p-5 rounded-2xl border border-emerald-100 border-t-4 border-t-emerald-600 bg-white shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+                Collected Amount
+              </span>
+              <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+                <CheckCircle className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-black text-emerald-700 font-mono tracking-tight">
+              ৳{resellerBilling.totalCollected.toLocaleString()}
+            </h3>
+            <div className="flex items-center gap-2 mt-1">
+              <Badge className="bg-emerald-100 text-emerald-800 border-emerald-200 text-[10px] font-bold">
+                {resellerBilling.collectionRate}% Collected
+              </Badge>
+              <span className="text-xs text-slate-400">
+                ({resellerBilling.paidBills} paid)
+              </span>
+            </div>
+          </Card>
+
+          {/* Reseller Pending */}
+          <Card className="p-5 rounded-2xl border border-rose-100 border-t-4 border-t-rose-500 bg-white shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-rose-800">
+                Pending Bills Amount
+              </span>
+              <div className="p-2 rounded-xl bg-rose-50 text-rose-600">
+                <AlertCircle className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-black text-rose-700 font-mono tracking-tight">
+              ৳{resellerBilling.totalPending.toLocaleString()}
+            </h3>
+            <p className="text-xs text-rose-600/90 font-medium mt-1">
+              <strong className="text-rose-800">{resellerBilling.unpaidBills}</strong> unpaid partner bills
+            </p>
+          </Card>
+
+          {/* Reseller Count & Clients */}
+          <Card className="p-5 rounded-2xl border border-purple-100 border-t-4 border-t-purple-600 bg-white shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                Active Resellers
+              </span>
+              <div className="p-2 rounded-xl bg-purple-50 text-purple-700">
+                <Network className="w-4 h-4" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-black text-purple-900 font-mono tracking-tight">
+              {resellerBilling.activeResellers.toLocaleString()}{" "}
+              <span className="text-xs font-semibold text-slate-400">
+                ({resellerBilling.totalResellers} total)
+              </span>
+            </h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Serving <strong className="text-emerald-700">{resellerBilling.activeClients}</strong> active /{" "}
+              <strong className="text-slate-600">{resellerBilling.inactiveClients}</strong> inactive clients
+            </p>
+          </Card>
+        </div>
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────────
+          SECTION 4: FINANCIAL ANALYTICS & CHARTS
+          ───────────────────────────────────────────────────────────── */}
       <div className="space-y-3">
         <div>
           <h2 className="text-lg font-extrabold text-slate-800 tracking-tight">
@@ -467,7 +713,9 @@ export default function DashboardClient({
         </div>
       </div>
 
-      {/* Section 3: Recent Transactions */}
+      {/* ─────────────────────────────────────────────────────────────
+          SECTION 5: RECENT TRANSACTIONS
+          ───────────────────────────────────────────────────────────── */}
       <div className="space-y-3">
         <div>
           <h2 className="text-lg font-extrabold text-slate-800 tracking-tight">
@@ -478,107 +726,107 @@ export default function DashboardClient({
           </p>
         </div>
 
-      {/* Recent Streams Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Income */}
-        <Card className="rounded-2xl border border-slate-200/80 border-t-4 border-t-emerald-600 bg-white p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-emerald-600" /> Recent Income Receipts
-            </h2>
-            <Link
-              href="/income"
-              className="text-xs font-bold text-emerald-600 hover:text-emerald-800 hover:underline"
-            >
-              View All →
-            </Link>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent Income */}
+          <Card className="rounded-2xl border border-slate-200/80 border-t-4 border-t-emerald-600 bg-white p-5 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-emerald-600" /> Recent Income Receipts
+              </h2>
+              <Link
+                href="/income"
+                className="text-xs font-bold text-emerald-600 hover:text-emerald-800 hover:underline"
+              >
+                View All →
+              </Link>
+            </div>
 
-          <div className="space-y-2.5">
-            {data.recent.incomes.length > 0 ? (
-              data.recent.incomes.map((inc) => (
-                <div
-                  key={inc._id}
-                  className="flex items-center justify-between p-3 rounded-xl bg-slate-50/80 hover:bg-slate-100/80 transition-all border border-slate-100"
-                >
-                  <div className="space-y-0.5">
-                    <p className="text-xs font-bold text-slate-800">
-                      {inc.category}
-                    </p>
-                    <p className="text-[11px] text-slate-500 font-medium">
-                      {formatDate(inc.incomeDate)} • {inc.paymentMethod || "Cash"}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-black text-emerald-600 font-mono">
-                      +৳{inc.amount.toLocaleString()}
-                    </p>
-                    {inc.reference && (
-                      <p className="text-[10px] text-slate-400 truncate max-w-[120px]">
-                        Ref: {inc.reference}
+            <div className="space-y-2.5">
+              {data.recent.incomes.length > 0 ? (
+                data.recent.incomes.map((inc) => (
+                  <div
+                    key={inc._id}
+                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50/80 hover:bg-slate-100/80 transition-all border border-slate-100"
+                  >
+                    <div className="space-y-0.5">
+                      <p className="text-xs font-bold text-slate-800">
+                        {inc.category}
                       </p>
-                    )}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-xs text-slate-400 py-6 text-center">
-                No recent income records
-              </p>
-            )}
-          </div>
-        </Card>
-
-        {/* Recent Expenses */}
-        <Card className="rounded-2xl border border-slate-200/80 border-t-4 border-t-rose-600 bg-white p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-              <Wallet className="w-4 h-4 text-rose-600" /> Recent Expenses
-            </h2>
-            <Link
-              href="/expenses"
-              className="text-xs font-bold text-rose-600 hover:text-rose-800 hover:underline"
-            >
-              View All →
-            </Link>
-          </div>
-
-          <div className="space-y-2.5">
-            {data.recent.expenses.length > 0 ? (
-              data.recent.expenses.map((exp) => (
-                <div
-                  key={exp._id}
-                  className="flex items-center justify-between p-3 rounded-xl bg-slate-50/80 hover:bg-slate-100/80 transition-all border border-slate-100"
-                >
-                  <div className="space-y-0.5">
-                    <p className="text-xs font-bold text-slate-800">
-                      {exp.category}
-                    </p>
-                    <p className="text-[11px] text-slate-500 font-medium">
-                      {formatDate(exp.expenseDate)} • {exp.paymentMethod || "Cash"}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-black text-rose-600 font-mono">
-                      -৳{exp.amount.toLocaleString()}
-                    </p>
-                    {exp.reference && (
-                      <p className="text-[10px] text-slate-400 truncate max-w-[120px]">
-                        Ref: {exp.reference}
+                      <p className="text-[11px] text-slate-500 font-medium">
+                        {formatDate(inc.incomeDate)} • {inc.paymentMethod || "Cash"}
                       </p>
-                    )}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-black text-emerald-600 font-mono">
+                        +৳{inc.amount.toLocaleString()}
+                      </p>
+                      {inc.reference && (
+                        <p className="text-[10px] text-slate-400 truncate max-w-[120px]">
+                          Ref: {inc.reference}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-xs text-slate-400 py-6 text-center">
-                No recent expense records
-              </p>
-            )}
-          </div>
-        </Card>
+                ))
+              ) : (
+                <p className="text-xs text-slate-400 py-6 text-center">
+                  No recent income records
+                </p>
+              )}
+            </div>
+          </Card>
+
+          {/* Recent Expenses */}
+          <Card className="rounded-2xl border border-slate-200/80 border-t-4 border-t-rose-600 bg-white p-5 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h2 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                <Wallet className="w-4 h-4 text-rose-600" /> Recent Expenses
+              </h2>
+              <Link
+                href="/expenses"
+                className="text-xs font-bold text-rose-600 hover:text-rose-800 hover:underline"
+              >
+                View All →
+              </Link>
+            </div>
+
+            <div className="space-y-2.5">
+              {data.recent.expenses.length > 0 ? (
+                data.recent.expenses.map((exp) => (
+                  <div
+                    key={exp._id}
+                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50/80 hover:bg-slate-100/80 transition-all border border-slate-100"
+                  >
+                    <div className="space-y-0.5">
+                      <p className="text-xs font-bold text-slate-800">
+                        {exp.category}
+                      </p>
+                      <p className="text-[11px] text-slate-500 font-medium">
+                        {formatDate(exp.expenseDate)} • {exp.paymentMethod || "Cash"}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-black text-rose-600 font-mono">
+                        -৳{exp.amount.toLocaleString()}
+                      </p>
+                      {exp.reference && (
+                        <p className="text-[10px] text-slate-400 truncate max-w-[120px]">
+                          Ref: {exp.reference}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-slate-400 py-6 text-center">
+                  No recent expense records
+                </p>
+              )}
+            </div>
+          </Card>
+        </div>
       </div>
-    </div>
+
     </div>
   );
 }

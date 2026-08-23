@@ -24,6 +24,8 @@ import {
   Sparkles,
   Users,
   Receipt,
+  Network,
+  ReceiptText,
 } from "lucide-react";
 
 import Link from "next/link";
@@ -52,6 +54,16 @@ const sidebarSections = [
         title: "Billing",
         url: "/billing",
         icon: Receipt,
+      },
+      {
+        title: "Resellers",
+        url: "/resellers",
+        icon: Network,
+      },
+      {
+        title: "Reseller Billing",
+        url: "/reseller-billing",
+        icon: ReceiptText,
       },
       {
         title: "Income",

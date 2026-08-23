@@ -92,3 +92,41 @@ export interface Bill {
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }
+export interface Reseller {
+  _id: string;
+  resellerCode: string;
+  name: string;
+  phone: string;
+  email?: string;
+  location: string;
+  packageDesc?: string;
+  monthlyFee: number;
+  activeClients: number;
+  inactiveClients: number;
+  connectionDate: Date | string;
+  status: "Active" | "Inactive" | string;
+  notes?: string;
+  isDeleted?: boolean;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}
+
+export interface ResellerBill {
+  _id: string;
+  reseller: Reseller;
+  month: number;
+  year: number;
+  amount: number;
+  paidAmount?: number;
+  dueAmount?: number;
+  advanceAmount?: number;
+  status: "Paid" | "Unpaid" | string;
+  paymentDate?: Date | string;
+  paymentMethod?: string;
+  remarks?: string;
+  invoiceNumber: string;
+  previousDueAmount?: number;
+  previousAdvanceAmount?: number;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+}
