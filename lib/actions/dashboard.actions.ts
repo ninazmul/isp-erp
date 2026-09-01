@@ -11,18 +11,23 @@ import Reseller from "@/lib/database/models/reseller.model";
 export async function getDashboardData(selectedMonth?: number, selectedYear?: number) {
   await connectToDatabase();
 
-  const now = new Date();
+  // Use Bangladesh Standard Time (UTC+6) so the monthly reset happens at
+  // exactly 12:00 AM on the 1st of each month in local time, not UTC.
+  const nowUtc = new Date();
+  const BST_OFFSET_MS = 6 * 60 * 60 * 1000; // UTC+6
+  const now = new Date(nowUtc.getTime() + BST_OFFSET_MS);
+
   const isAllTime = selectedMonth === 0;
 
   const currentMonth =
     !isAllTime && selectedMonth && selectedMonth >= 1 && selectedMonth <= 12
       ? selectedMonth
-      : now.getMonth() + 1;
+      : now.getUTCMonth() + 1; // getUTCMonth on the BST-shifted date = local month
 
   const currentYear =
     !isAllTime && selectedYear && selectedYear >= 2000 && selectedYear <= 2100
       ? selectedYear
-      : now.getFullYear();
+      : now.getUTCFullYear(); // getUTCFullYear on the BST-shifted date = local year
 
   const startOfMonth = new Date(currentYear, currentMonth - 1, 1, 0, 0, 0, 0);
   const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
