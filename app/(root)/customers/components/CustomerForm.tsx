@@ -26,7 +26,7 @@ interface CustomerFormProps {
   customer?: Customer | null;
   packages: PackageType[];
   locations: LocationType[];
-  onSubmit: (data: CustomerFormValues) => Promise<void>;
+  onSubmit: (data: CustomerFormValues, customerId?: string) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -45,6 +45,18 @@ export type CustomerFormValues = {
   notes?: string;
 };
 
+function safeDateToIsoDate(dateVal?: unknown): string {
+  if (!dateVal) return new Date().toISOString().split("T")[0];
+  try {
+    const d = new Date(dateVal as string | number | Date);
+    return isNaN(d.getTime())
+      ? new Date().toISOString().split("T")[0]
+      : d.toISOString().split("T")[0];
+  } catch {
+    return new Date().toISOString().split("T")[0];
+  }
+}
+
 export default function CustomerForm({
   customer,
   packages,
@@ -52,9 +64,7 @@ export default function CustomerForm({
   onSubmit,
   isLoading = false,
 }: CustomerFormProps) {
-  const defaultConnectionDate = customer?.connectionDate
-    ? new Date(customer.connectionDate).toISOString().split("T")[0]
-    : new Date().toISOString().split("T")[0];
+  const defaultConnectionDate = safeDateToIsoDate(customer?.connectionDate);
 
   const form = useForm<CustomerFormValues>({
     defaultValues: {
@@ -73,14 +83,18 @@ export default function CustomerForm({
     },
   });
 
-  // When selected package changes in add mode, automatically update monthly fee if not custom edited
+  // When selected package changes, automatically update package name and monthly fee (both add and edit modes)
   const handlePackageChange = (selectedPkgName: string) => {
-    form.setValue("packageName", selectedPkgName);
+    form.setValue("packageName", selectedPkgName, { shouldValidate: true, shouldDirty: true });
     const matchedPkg = packages.find((p) => p.name === selectedPkgName);
-    if (matchedPkg && !customer) {
-      form.setValue("monthlyFee", matchedPkg.monthlyFee);
+    if (matchedPkg) {
+      form.setValue("monthlyFee", matchedPkg.monthlyFee, { shouldValidate: true, shouldDirty: true });
     }
   };
+
+  const currentPackageName = form.watch("packageName");
+  const currentMonthlyFee = form.watch("monthlyFee");
+  const matchedPkg = packages.find((p) => p.name === currentPackageName);
 
   useEffect(() => {
     if (customer) {
@@ -92,7 +106,7 @@ export default function CustomerForm({
         location: customer.location,
         packageName: customer.packageName,
         monthlyFee: customer.monthlyFee,
-        connectionDate: new Date(customer.connectionDate).toISOString().split("T")[0],
+        connectionDate: safeDateToIsoDate(customer.connectionDate),
         router: customer.router || "",
         ipAddress: customer.ipAddress || "",
         status: (customer.status as "Active" | "Inactive" | "Disconnected") || "Active",
@@ -103,7 +117,7 @@ export default function CustomerForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit((data) => onSubmit(data, customer?._id))} className="space-y-4">
         <div className="max-h-[68vh] overflow-y-auto space-y-4 pr-2 pb-2">
           {/* Basic Identity */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -277,9 +291,25 @@ export default function CustomerForm({
               }}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-bold text-slate-700">
-                    Monthly Fee ($) *
-                  </FormLabel>
+                  <div className="flex items-center justify-between">
+                    <FormLabel className="text-xs font-bold text-slate-700">
+                      Monthly Fee ($) *
+                    </FormLabel>
+                    {matchedPkg && matchedPkg.monthlyFee !== currentMonthlyFee && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          form.setValue("monthlyFee", matchedPkg.monthlyFee, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          })
+                        }
+                        className="text-[11px] font-semibold text-purple-600 hover:text-purple-800 underline transition-colors"
+                      >
+                        Reset to pkg fee (${matchedPkg.monthlyFee})
+                      </button>
+                    )}
+                  </div>
                   <FormControl>
                     <Input
                       type="number"
@@ -287,7 +317,10 @@ export default function CustomerForm({
                       step="1"
                       className="rounded-xl border-slate-200 font-bold"
                       {...field}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      onChange={(e) => {
+                        const val = e.target.valueAsNumber;
+                        field.onChange(isNaN(val) ? 0 : val);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />

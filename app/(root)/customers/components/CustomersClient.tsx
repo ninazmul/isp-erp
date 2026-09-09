@@ -146,17 +146,25 @@ export default function CustomersClient({
     }
   };
 
-  const handleUpdate = async (data: CustomerFormValues) => {
-    if (!editingCustomer) return;
+  const handleUpdate = async (data: CustomerFormValues, targetCustomerId?: string) => {
+    const idToUpdate = targetCustomerId || editingCustomer?._id;
+    if (!idToUpdate) {
+      toast.error("No customer selected for update");
+      return;
+    }
     setIsSubmitting(true);
     try {
-      await updateCustomer(editingCustomer._id, {
+      const updated = await updateCustomer(idToUpdate, {
         ...data,
         connectionDate: new Date(data.connectionDate),
       });
       toast.success("Customer updated successfully");
       setIsEditOpen(false);
       setEditingCustomer(null);
+      // Immediately reflect update in table
+      setCustomers((prev) =>
+        prev.map((c) => (c._id === idToUpdate ? { ...c, ...updated } : c))
+      );
       loadData();
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Failed to update customer");
@@ -598,14 +606,16 @@ export default function CustomersClient({
             <DialogTitle className="text-base font-extrabold text-slate-800 flex items-center gap-2">
               <Pencil className="w-5 h-5 text-[#3e0078]" />
               Edit Customer - {editingCustomer?.customerCode}
+              {editingCustomer?.name ? ` (${editingCustomer.name})` : ""}
             </DialogTitle>
           </DialogHeader>
           {editingCustomer && (
             <CustomerForm
+              key={editingCustomer._id}
               customer={editingCustomer}
               packages={packages}
               locations={locations}
-              onSubmit={handleUpdate}
+              onSubmit={(data) => handleUpdate(data, editingCustomer._id)}
               isLoading={isSubmitting}
             />
           )}

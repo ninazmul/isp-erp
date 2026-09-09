@@ -169,14 +169,35 @@ export async function getCustomerById(id: string) {
 }
 
 export async function updateCustomer(id: string, data: Partial<CustomerDoc>) {
+    if (!id || typeof id !== "string") {
+        throw new Error("Invalid or missing customer ID");
+    }
+
     await connectToDatabase();
     
     const updateData: Record<string, unknown> = { ...data };
+    delete updateData._id;
+
     if (data.monthlyFee !== undefined) {
         updateData.monthlyFee = Number(data.monthlyFee) || 0;
     }
     if (data.connectionDate !== undefined) {
-        updateData.connectionDate = new Date(data.connectionDate);
+        const dateObj = new Date(data.connectionDate);
+        if (!isNaN(dateObj.getTime())) {
+            updateData.connectionDate = dateObj;
+        }
+    }
+    if (typeof data.username === "string") {
+        updateData.username = data.username.trim();
+    }
+    if (typeof data.name === "string") {
+        updateData.name = data.name.trim();
+    }
+    if (typeof data.phone === "string") {
+        updateData.phone = data.phone.trim();
+    }
+    if (typeof data.email === "string") {
+        updateData.email = data.email.trim();
     }
 
     const customer = await Customer.findByIdAndUpdate<CustomerDoc>(id, updateData, {
