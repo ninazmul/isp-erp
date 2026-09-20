@@ -65,38 +65,31 @@ export default function InvoiceDownloader({ bill }: { bill: Bill }) {
         const targetElement = modalInvoiceRef.current || invoiceRef.current;
         if (!targetElement) return;
 
-        const printContent = targetElement.innerHTML;
+        const printContent = targetElement.outerHTML;
         const printWindow = window.open("", "_blank");
         if (!printWindow) return;
-
-        const styles = Array.from(
-            document.querySelectorAll('link[rel="stylesheet"], style'),
-        )
-            .map((node) => node.outerHTML)
-            .join("\n");
 
         printWindow.document.write(`
       <!DOCTYPE html>
       <html>
         <head>
           <title>Invoice - ${bill.invoiceNumber}</title>
-          ${styles}
           <style>
             @page {
               size: A4 portrait;
               margin: 0;
             }
-            body {
+            html, body {
               margin: 0;
               padding: 0;
+              background: #ffffff;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
-              background: #ffffff !important;
-              font-family: 'Inter', system-ui, -apple-system, sans-serif;
             }
             * {
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
+              box-sizing: border-box;
             }
           </style>
         </head>
@@ -105,7 +98,7 @@ export default function InvoiceDownloader({ bill }: { bill: Bill }) {
           <script>
             window.onload = function() {
               window.print();
-              window.onafterprint = () => window.close();
+              window.onafterprint = function() { window.close(); };
             };
           </script>
         </body>
@@ -136,11 +129,11 @@ export default function InvoiceDownloader({ bill }: { bill: Bill }) {
                     </Button>
                 </DialogTrigger>
 
-                <DialogContent className="max-w-4xl bg-slate-100 max-h-[92vh] overflow-y-auto p-0 rounded-2xl border-none">
+                <DialogContent className="max-w-4xl bg-gray-100 max-h-[92vh] overflow-y-auto p-0 rounded-none border border-gray-300">
                     {/* Modal Top Actions Toolbar */}
-                    <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md px-6 py-3 border-b border-slate-200 flex items-center justify-between shadow-xs">
-                        <DialogTitle className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                            Invoice #{bill.invoiceNumber}
+                    <div className="sticky top-0 z-30 bg-white px-6 py-3 border-b border-gray-200 flex items-center justify-between">
+                        <DialogTitle className="text-sm font-bold text-gray-900 tracking-tight">
+                            Invoice &nbsp;#{bill.invoiceNumber}
                         </DialogTitle>
 
                         <div className="flex items-center gap-2">
@@ -148,7 +141,7 @@ export default function InvoiceDownloader({ bill }: { bill: Bill }) {
                                 size="sm"
                                 variant="outline"
                                 onClick={handlePrint}
-                                className="h-8 text-xs rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50 gap-1.5"
+                                className="h-8 text-xs border-gray-300 text-gray-700 hover:bg-gray-50 gap-1.5 rounded-none"
                             >
                                 <Printer className="h-3.5 w-3.5" /> Print
                             </Button>
@@ -156,7 +149,7 @@ export default function InvoiceDownloader({ bill }: { bill: Bill }) {
                                 size="sm"
                                 onClick={handleDownload}
                                 disabled={downloading}
-                                className="h-8 text-xs rounded-xl bg-[#3e0078] hover:bg-[#52029d] text-white gap-1.5 shadow-sm"
+                                className="h-8 text-xs bg-black hover:bg-gray-800 text-white gap-1.5 rounded-none"
                             >
                                 <DownloadCloud className="h-3.5 w-3.5" />
                                 {downloading ? "Downloading…" : "Download PDF"}
@@ -165,10 +158,10 @@ export default function InvoiceDownloader({ bill }: { bill: Bill }) {
                     </div>
 
                     {/* Invoice Document Wrapper */}
-                    <div className="p-6 flex justify-center bg-slate-200/60 min-h-screen">
+                    <div className="p-6 flex justify-center bg-gray-200 min-h-screen">
                         <div
                             ref={modalInvoiceRef}
-                            className="bg-white shadow-xl rounded-xl overflow-hidden"
+                            className="bg-white shadow-md"
                         >
                             <InvoiceTemplate bill={bill} />
                         </div>
@@ -182,20 +175,20 @@ export default function InvoiceDownloader({ bill }: { bill: Bill }) {
                 variant="ghost"
                 onClick={handleDownload}
                 disabled={downloading}
-                className="h-8 w-8 p-0 text-slate-500 hover:text-purple-700 hover:bg-purple-50 rounded-lg"
+                className="h-8 w-8 p-0 text-gray-500 hover:text-black hover:bg-gray-100 rounded-none"
                 title="Download PDF"
             >
-                <DownloadCloud className="h-4 w-4 text-slate-600" />
+                <DownloadCloud className="h-4 w-4" />
             </Button>
 
             <Button
                 size="sm"
                 variant="ghost"
                 onClick={handlePrint}
-                className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg"
+                className="h-8 w-8 p-0 text-gray-500 hover:text-black hover:bg-gray-100 rounded-none"
                 title="Print Invoice"
             >
-                <Printer className="h-4 w-4 text-slate-600" />
+                <Printer className="h-4 w-4" />
             </Button>
         </div>
     );

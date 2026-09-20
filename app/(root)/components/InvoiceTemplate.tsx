@@ -17,306 +17,485 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
 
     return (
         <div
-            className="w-[210mm] min-h-[297mm] p-10 bg-white text-slate-800 font-sans relative flex flex-col justify-between"
             style={{
-                boxSizing: "border-box",
+                width: "210mm",
+                minHeight: "297mm",
+                padding: "14mm 14mm 12mm 14mm",
                 backgroundColor: "#ffffff",
-                color: "#1e293b",
-                fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+                color: "#000000",
+                fontFamily: "'Arial', 'Helvetica Neue', Helvetica, sans-serif",
+                boxSizing: "border-box",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                fontSize: "11px",
+                lineHeight: "1.5",
             }}
         >
-            {/* Top Accent Bar */}
-            <div
-                className="absolute top-0 left-0 right-0 h-3"
-                style={{
-                    background: "linear-gradient(to right, #3e0078, #6b11c9, #a855f7)",
-                }}
-            />
-
             <div>
-                {/* Header Section */}
-                <div className="flex justify-between items-start pt-2 pb-6 border-b border-slate-200">
+                {/* Header */}
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        borderBottom: "2px solid #000000",
+                        paddingBottom: "10px",
+                        marginBottom: "14px",
+                    }}
+                >
                     <div>
-                        <div className="flex items-center gap-2 mb-1.5">
-                            <div
-                                className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-sm tracking-tighter"
-                                style={{
-                                    background: "linear-gradient(135deg, #3e0078, #6b11c9)",
-                                }}
-                            >
-                                SBN
-                            </div>
-                            <h1 className="text-2xl font-black text-[#3e0078] tracking-tight">
-                                SBN Enterprise
-                            </h1>
-                        </div>
-                        <p className="text-xs text-slate-500 font-semibold tracking-wide uppercase">
-                            Internet & Enterprise Service Provider
-                        </p>
-                        <p className="text-[11px] text-slate-400 mt-1">
-                            Support: +880 1700-000000 | Billing: info@sbnsolutions.com
-                        </p>
-                    </div>
-
-                    <div className="text-right">
-                        <span
-                            className="inline-block px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-widest mb-2"
+                        <div
                             style={{
-                                backgroundColor: isPaid ? "#ecfdf5" : "#fff1f2",
-                                color: isPaid ? "#047857" : "#be123c",
-                                border: `1px solid ${isPaid ? "#a7f3d0" : "#fecdd3"}`,
+                                fontSize: "22px",
+                                fontWeight: "900",
+                                letterSpacing: "-0.5px",
+                                color: "#000000",
+                                lineHeight: "1.1",
                             }}
                         >
-                            {isPaid ? "✓ PAID INVOICE" : "⚠ UNPAID INVOICE"}
-                        </span>
-                        <h2 className="text-xl font-black text-slate-900 tracking-tight">
-                            {bill.invoiceNumber}
-                        </h2>
-                        <p className="text-xs text-slate-500 font-medium">
-                            Billing Period:{" "}
-                            <span className="font-bold text-slate-700">
-                                {monthName} {bill.year}
-                            </span>
-                        </p>
+                            SBN Enterprise
+                        </div>
+                        <div
+                            style={{
+                                fontSize: "10px",
+                                color: "#555555",
+                                marginTop: "3px",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.8px",
+                                fontWeight: "600",
+                            }}
+                        >
+                            Internet & Enterprise Service Provider
+                        </div>
+                        <div
+                            style={{
+                                fontSize: "10px",
+                                color: "#666666",
+                                marginTop: "2px",
+                            }}
+                        >
+                            Support: +880 1700-000000 &nbsp;|&nbsp; info@sbnsolutions.com
+                        </div>
+                    </div>
+
+                    <div style={{ textAlign: "right" }}>
+                        <div
+                            style={{
+                                fontSize: "18px",
+                                fontWeight: "800",
+                                color: "#000000",
+                                letterSpacing: "-0.3px",
+                            }}
+                        >
+                            INVOICE
+                        </div>
+                        <div
+                            style={{
+                                fontSize: "11px",
+                                fontWeight: "700",
+                                color: "#000000",
+                                marginTop: "2px",
+                                fontFamily: "monospace",
+                            }}
+                        >
+                            #{bill.invoiceNumber}
+                        </div>
+                        <div
+                            style={{
+                                display: "inline-block",
+                                marginTop: "6px",
+                                padding: "2px 10px",
+                                border: "1.5px solid #000000",
+                                fontSize: "10px",
+                                fontWeight: "700",
+                                letterSpacing: "1px",
+                                textTransform: "uppercase",
+                                backgroundColor: isPaid ? "#000000" : "#ffffff",
+                                color: isPaid ? "#ffffff" : "#000000",
+                            }}
+                        >
+                            {isPaid ? "PAID" : "UNPAID"}
+                        </div>
                     </div>
                 </div>
 
-                {/* Info Grid: Bill To & Invoice Info */}
-                <div className="grid grid-cols-2 gap-8 my-7">
-                    {/* Customer Details */}
+                {/* Bill To / Invoice Info Grid */}
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: "16px",
+                        marginBottom: "16px",
+                    }}
+                >
+                    {/* Bill To */}
                     <div
-                        className="p-4 rounded-xl border border-slate-100"
-                        style={{ backgroundColor: "#f8fafc" }}
+                        style={{
+                            border: "1px solid #cccccc",
+                            padding: "10px 12px",
+                        }}
                     >
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                            Billed To (Customer Details)
-                        </p>
-                        <h3 className="text-base font-bold text-slate-900 mb-1">
+                        <div
+                            style={{
+                                fontSize: "9px",
+                                fontWeight: "700",
+                                textTransform: "uppercase",
+                                letterSpacing: "1px",
+                                color: "#555555",
+                                marginBottom: "6px",
+                                borderBottom: "1px solid #eeeeee",
+                                paddingBottom: "4px",
+                            }}
+                        >
+                            Billed To
+                        </div>
+                        <div
+                            style={{
+                                fontSize: "12px",
+                                fontWeight: "800",
+                                color: "#000000",
+                                marginBottom: "4px",
+                            }}
+                        >
                             {bill.customer?.name ?? "N/A"}
-                        </h3>
-                        <div className="space-y-1 text-xs text-slate-600">
-                            <p>
-                                <span className="font-semibold text-slate-500">
-                                    Customer ID:
-                                </span>{" "}
-                                <span className="font-mono font-bold text-[#3e0078]">
+                        </div>
+                        <div style={{ color: "#444444", lineHeight: "1.6" }}>
+                            <div>
+                                <span style={{ fontWeight: "600" }}>Customer ID: </span>
+                                <span style={{ fontFamily: "monospace", fontWeight: "700" }}>
                                     {bill.customer?.customerCode ?? "—"}
                                 </span>
-                            </p>
-                            <p>
-                                <span className="font-semibold text-slate-500">Phone:</span>{" "}
+                            </div>
+                            <div>
+                                <span style={{ fontWeight: "600" }}>Phone: </span>
                                 {bill.customer?.phone ?? "—"}
-                            </p>
+                            </div>
                             {bill.customer?.email && (
-                                <p>
-                                    <span className="font-semibold text-slate-500">Email:</span>{" "}
+                                <div>
+                                    <span style={{ fontWeight: "600" }}>Email: </span>
                                     {bill.customer.email}
-                                </p>
+                                </div>
                             )}
                             {bill.customer?.location && (
-                                <p>
-                                    <span className="font-semibold text-slate-500">Location:</span>{" "}
+                                <div>
+                                    <span style={{ fontWeight: "600" }}>Location: </span>
                                     {bill.customer.location}
-                                </p>
+                                </div>
                             )}
                         </div>
                     </div>
 
-                    {/* Invoice Summary Details */}
+                    {/* Invoice Info */}
                     <div
-                        className="p-4 rounded-xl border border-slate-100"
-                        style={{ backgroundColor: "#f8fafc" }}
+                        style={{
+                            border: "1px solid #cccccc",
+                            padding: "10px 12px",
+                        }}
                     >
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                            Invoice Information
-                        </p>
-                        <div className="space-y-2 text-xs text-slate-600">
-                            <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
-                                <span className="text-slate-500 font-medium">
-                                    Invoice Number:
-                                </span>
-                                <span className="font-mono font-bold text-slate-800">
-                                    {bill.invoiceNumber}
-                                </span>
-                            </div>
-                            <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
-                                <span className="text-slate-500 font-medium">
-                                    Billing Cycle:
-                                </span>
-                                <span className="font-bold text-slate-800">
-                                    {monthName} {bill.year}
-                                </span>
-                            </div>
-                            <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
-                                <span className="text-slate-500 font-medium">
-                                    Payment Status:
-                                </span>
-                                <span
-                                    className="font-bold"
-                                    style={{ color: isPaid ? "#059669" : "#dc2626" }}
-                                >
-                                    {bill.status}
-                                </span>
-                            </div>
-                            {isPaid && (
-                                <>
-                                    <div className="flex justify-between border-b border-slate-200/60 pb-1.5">
-                                        <span className="text-slate-500 font-medium">
-                                            Payment Date:
-                                        </span>
-                                        <span className="font-bold text-slate-800">
-                                            {formatDate(bill.paymentDate)}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-slate-500 font-medium">
-                                            Payment Method:
-                                        </span>
-                                        <span className="font-bold text-slate-800">
-                                            {bill.paymentMethod ?? "Cash"}
-                                        </span>
-                                    </div>
-                                </>
-                            )}
+                        <div
+                            style={{
+                                fontSize: "9px",
+                                fontWeight: "700",
+                                textTransform: "uppercase",
+                                letterSpacing: "1px",
+                                color: "#555555",
+                                marginBottom: "6px",
+                                borderBottom: "1px solid #eeeeee",
+                                paddingBottom: "4px",
+                            }}
+                        >
+                            Invoice Details
                         </div>
+                        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                            <tbody>
+                                <InvoiceRow label="Invoice No." value={bill.invoiceNumber} mono />
+                                <InvoiceRow label="Billing Period" value={`${monthName} ${bill.year}`} />
+                                <InvoiceRow
+                                    label="Status"
+                                    value={bill.status}
+                                    bold
+                                />
+                                {isPaid && (
+                                    <>
+                                        <InvoiceRow
+                                            label="Payment Date"
+                                            value={formatDate(bill.paymentDate)}
+                                        />
+                                        <InvoiceRow
+                                            label="Payment Method"
+                                            value={bill.paymentMethod ?? "Cash"}
+                                        />
+                                    </>
+                                )}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
                 {/* Line Items Table */}
-                <div className="mb-6 overflow-hidden rounded-xl border border-slate-200">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr
+                <table
+                    style={{
+                        width: "100%",
+                        borderCollapse: "collapse",
+                        marginBottom: "14px",
+                        border: "1px solid #000000",
+                    }}
+                >
+                    <thead>
+                        <tr
+                            style={{
+                                backgroundColor: "#000000",
+                                color: "#ffffff",
+                            }}
+                        >
+                            <th
                                 style={{
-                                    backgroundColor: "#3e0078",
-                                    color: "#ffffff",
+                                    padding: "8px 10px",
+                                    textAlign: "left",
+                                    fontSize: "9px",
+                                    fontWeight: "700",
+                                    textTransform: "uppercase",
+                                    letterSpacing: "0.8px",
                                 }}
                             >
-                                <th className="py-3 px-4 text-xs font-bold uppercase tracking-wider">
-                                    Description / Service
-                                </th>
-                                <th className="py-3 px-4 text-xs font-bold uppercase tracking-wider text-center">
-                                    Package
-                                </th>
-                                <th className="py-3 px-4 text-xs font-bold uppercase tracking-wider text-center">
-                                    Period
-                                </th>
-                                <th className="py-3 px-4 text-xs font-bold uppercase tracking-wider text-right">
-                                    Amount ($)
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 text-xs">
-                            <tr style={{ backgroundColor: "#ffffff" }}>
-                                <td className="py-3.5 px-4">
-                                    <p className="font-bold text-slate-800">
-                                        Internet Service Subscription
-                                    </p>
-                                    <p className="text-[11px] text-slate-400 mt-0.5">
-                                        Monthly internet connection & network bandwidth service
-                                    </p>
-                                </td>
-                                <td className="py-3.5 px-4 text-center font-medium text-slate-700">
-                                    {bill.customer?.packageName ?? "Standard Package"}
-                                </td>
-                                <td className="py-3.5 px-4 text-center font-medium text-slate-700">
-                                    {monthName.slice(0, 3)} {bill.year}
-                                </td>
-                                <td className="py-3.5 px-4 text-right font-extrabold text-slate-900 text-sm">
-                                    $ {bill.amount.toFixed(2)}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                Description / Service
+                            </th>
+                            <th
+                                style={{
+                                    padding: "8px 10px",
+                                    textAlign: "center",
+                                    fontSize: "9px",
+                                    fontWeight: "700",
+                                    textTransform: "uppercase",
+                                    letterSpacing: "0.8px",
+                                    width: "120px",
+                                }}
+                            >
+                                Package
+                            </th>
+                            <th
+                                style={{
+                                    padding: "8px 10px",
+                                    textAlign: "center",
+                                    fontSize: "9px",
+                                    fontWeight: "700",
+                                    textTransform: "uppercase",
+                                    letterSpacing: "0.8px",
+                                    width: "80px",
+                                }}
+                            >
+                                Period
+                            </th>
+                            <th
+                                style={{
+                                    padding: "8px 10px",
+                                    textAlign: "right",
+                                    fontSize: "9px",
+                                    fontWeight: "700",
+                                    textTransform: "uppercase",
+                                    letterSpacing: "0.8px",
+                                    width: "90px",
+                                }}
+                            >
+                                Amount
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style={{ borderBottom: "1px solid #dddddd" }}>
+                            <td style={{ padding: "10px 10px" }}>
+                                <div style={{ fontWeight: "700", color: "#000000" }}>
+                                    Internet Service Subscription
+                                </div>
+                                <div style={{ fontSize: "10px", color: "#777777", marginTop: "2px" }}>
+                                    Monthly internet connection & network bandwidth service
+                                </div>
+                            </td>
+                            <td
+                                style={{
+                                    padding: "10px 10px",
+                                    textAlign: "center",
+                                    fontWeight: "600",
+                                    color: "#222222",
+                                }}
+                            >
+                                {bill.customer?.packageName ?? "Standard Package"}
+                            </td>
+                            <td
+                                style={{
+                                    padding: "10px 10px",
+                                    textAlign: "center",
+                                    fontWeight: "600",
+                                    color: "#222222",
+                                }}
+                            >
+                                {monthName.slice(0, 3)} {bill.year}
+                            </td>
+                            <td
+                                style={{
+                                    padding: "10px 10px",
+                                    textAlign: "right",
+                                    fontWeight: "800",
+                                    fontSize: "12px",
+                                    color: "#000000",
+                                }}
+                            >
+                                ৳ {bill.amount.toFixed(2)}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-                {/* Financial Summary Box */}
-                <div className="flex justify-end mb-8">
+                {/* Financial Summary */}
+                <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
                     <div
-                        className="w-72 rounded-xl border border-slate-200 p-4 space-y-2 text-xs"
-                        style={{ backgroundColor: "#f8fafc" }}
+                        style={{
+                            width: "260px",
+                            border: "1px solid #000000",
+                        }}
                     >
-                        <div className="flex justify-between text-slate-600">
-                            <span>Subtotal</span>
-                            <span className="font-semibold text-slate-800">
-                                $ {bill.amount.toFixed(2)}
-                            </span>
-                        </div>
-                        <div className="flex justify-between text-slate-600">
-                            <span>Tax / VAT (0%)</span>
-                            <span className="font-semibold text-slate-800">$ 0.00</span>
-                        </div>
+                        <SummaryRow label="Subtotal" value={`৳ ${bill.amount.toFixed(2)}`} />
+                        <SummaryRow label="Tax / VAT (0%)" value="৳ 0.00" />
                         <div
-                            className="flex justify-between text-sm font-black pt-2.5 border-t border-slate-200"
-                            style={{ color: "#3e0078" }}
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                padding: "8px 12px",
+                                borderTop: "2px solid #000000",
+                                backgroundColor: "#000000",
+                                color: "#ffffff",
+                                fontWeight: "800",
+                                fontSize: "12px",
+                            }}
                         >
                             <span>Total Amount</span>
-                            <span>$ {bill.amount.toFixed(2)}</span>
+                            <span>৳ {bill.amount.toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between text-slate-600 pt-1">
-                            <span>Paid Amount</span>
-                            <span className="font-semibold text-emerald-700">
-                                $ {paidAmount.toFixed(2)}
-                            </span>
-                        </div>
-                        <div className="flex justify-between text-slate-600">
-                            <span>Due Amount</span>
-                            <span className="font-semibold text-amber-700">
-                                $ {dueAmount.toFixed(2)}
-                            </span>
-                        </div>
+                        <SummaryRow label="Paid Amount" value={`৳ ${paidAmount.toFixed(2)}`} />
+                        <SummaryRow label="Due Amount" value={`৳ ${dueAmount.toFixed(2)}`} />
                         {advanceAmount > 0 && (
-                            <div className="flex justify-between text-slate-600">
-                                <span>Advance Amount</span>
-                                <span className="font-semibold text-cyan-700">
-                                    $ {advanceAmount.toFixed(2)}
-                                </span>
-                            </div>
+                            <SummaryRow label="Advance Amount" value={`৳ ${advanceAmount.toFixed(2)}`} />
                         )}
                     </div>
                 </div>
 
-                {/* Remarks / Notes */}
+                {/* Remarks */}
                 {bill.remarks && (
                     <div
-                        className="p-3.5 rounded-xl border border-purple-100 text-xs mb-6"
-                        style={{ backgroundColor: "#faf5ff" }}
+                        style={{
+                            border: "1px solid #cccccc",
+                            padding: "8px 12px",
+                            marginBottom: "14px",
+                        }}
                     >
-                        <p className="font-bold text-[#3e0078] mb-0.5">Invoice Remarks:</p>
-                        <p className="text-slate-600">{bill.remarks}</p>
+                        <div style={{ fontWeight: "700", marginBottom: "3px", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                            Remarks:
+                        </div>
+                        <div style={{ color: "#444444" }}>{bill.remarks}</div>
                     </div>
                 )}
             </div>
 
-            {/* Footer & Signatures */}
+            {/* Footer / Signatures */}
             <div>
-                {/* Signature Area */}
-                <div className="flex justify-between items-end pt-12 pb-6 text-xs">
-                    <div className="text-center w-48">
-                        <div className="border-b border-slate-300 pb-1 mb-1.5" />
-                        <p className="font-bold text-slate-700">Customer Signature</p>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-end",
+                        paddingTop: "32px",
+                        paddingBottom: "12px",
+                    }}
+                >
+                    <div style={{ textAlign: "center", width: "160px" }}>
+                        <div style={{ borderBottom: "1px solid #000000", marginBottom: "6px" }} />
+                        <div style={{ fontWeight: "700", fontSize: "10px" }}>Customer Signature</div>
                     </div>
-
-                    <div className="text-center w-48">
-                        <div className="border-b border-slate-300 pb-1 mb-1.5" />
-                        <p className="font-bold text-[#3e0078]">Authorized Signature</p>
-                        <p className="text-[10px] text-slate-400">
-                            SBN Enterprise Accounts
-                        </p>
+                    <div style={{ textAlign: "center", width: "160px" }}>
+                        <div style={{ borderBottom: "1px solid #000000", marginBottom: "6px" }} />
+                        <div style={{ fontWeight: "700", fontSize: "10px" }}>Authorized Signature</div>
+                        <div style={{ fontSize: "9px", color: "#666666" }}>SBN Enterprise Accounts</div>
                     </div>
                 </div>
 
-                {/* Bottom Banner */}
-                <div className="border-t border-slate-200 pt-3 text-center text-[10px] text-slate-400">
-                    <p className="font-semibold text-slate-500">
+                <div
+                    style={{
+                        borderTop: "1px solid #cccccc",
+                        paddingTop: "8px",
+                        textAlign: "center",
+                        fontSize: "9px",
+                        color: "#777777",
+                    }}
+                >
+                    <div style={{ fontWeight: "600", marginBottom: "2px" }}>
                         Thank you for choosing SBN Enterprise!
-                    </p>
-                    <p className="mt-0.5">
-                        This is a computer-generated invoice document. For billing support
-                        or inquiries, please contact our helpline.
-                    </p>
+                    </div>
+                    <div>
+                        This is a computer-generated invoice. For billing inquiries, please contact our helpline.
+                    </div>
                 </div>
             </div>
+        </div>
+    );
+}
+
+// Helper components
+function InvoiceRow({
+    label,
+    value,
+    mono,
+    bold,
+}: {
+    label: string;
+    value: string | number | null | undefined;
+    mono?: boolean;
+    bold?: boolean;
+}) {
+    return (
+        <tr>
+            <td
+                style={{
+                    padding: "2px 0",
+                    fontSize: "10px",
+                    color: "#555555",
+                    fontWeight: "600",
+                    width: "45%",
+                    verticalAlign: "top",
+                }}
+            >
+                {label}
+            </td>
+            <td
+                style={{
+                    padding: "2px 0",
+                    fontSize: "10px",
+                    color: "#000000",
+                    fontWeight: bold ? "700" : "500",
+                    fontFamily: mono ? "monospace" : "inherit",
+                    textAlign: "right",
+                }}
+            >
+                {value ?? "—"}
+            </td>
+        </tr>
+    );
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+    return (
+        <div
+            style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "6px 12px",
+                borderBottom: "1px solid #eeeeee",
+                fontSize: "10px",
+                color: "#333333",
+            }}
+        >
+            <span>{label}</span>
+            <span style={{ fontWeight: "600" }}>{value}</span>
         </div>
     );
 }
