@@ -54,7 +54,7 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                                 lineHeight: "1.1",
                             }}
                         >
-                            SBN Enterprise
+                            ABUZZ IT LIMITED
                         </div>
                         <div
                             style={{
@@ -70,12 +70,14 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                         </div>
                         <div
                             style={{
-                                fontSize: "10px",
+                                fontSize: "9px",
                                 color: "#666666",
                                 marginTop: "2px",
                             }}
                         >
-                            Support: +880 1700-000000 &nbsp;|&nbsp; info@sbnsolutions.com
+                            <div>Head Office: GA-130, Progati Sarani, Middle Badda, Dhaka-1212</div>
+                            <div>Sundarganj Regional Office: Sundarganj Bazar, Sundarganj, Gaibandha</div>
+                            <div>Cell: +88 01611090104, +88 01781584484</div>
                         </div>
                     </div>
 
@@ -415,7 +417,7 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                     <div style={{ textAlign: "center", width: "160px" }}>
                         <div style={{ borderBottom: "1px solid #000000", marginBottom: "6px" }} />
                         <div style={{ fontWeight: "700", fontSize: "10px" }}>Authorized Signature</div>
-                        <div style={{ fontSize: "9px", color: "#666666" }}>SBN Enterprise Accounts</div>
+                        <div style={{ fontSize: "9px", color: "#666666" }}>ABUZZ IT LIMITED</div>
                     </div>
                 </div>
 
@@ -429,7 +431,7 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                     }}
                 >
                     <div style={{ fontWeight: "600", marginBottom: "2px" }}>
-                        Thank you for choosing SBN Enterprise!
+                        Thank you for choosing ABUZZ IT LIMITED!
                     </div>
                     <div>
                         This is a computer-generated invoice. For billing inquiries, please contact our helpline.

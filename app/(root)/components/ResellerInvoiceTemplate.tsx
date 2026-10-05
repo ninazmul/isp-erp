@@ -53,7 +53,7 @@ export default function ResellerInvoiceTemplate({
                 lineHeight: "1.1",
               }}
             >
-              SBN Enterprise
+              ABUZZ IT LIMITED
             </div>
             <div
               style={{
@@ -69,12 +69,14 @@ export default function ResellerInvoiceTemplate({
             </div>
             <div
               style={{
-                fontSize: "10px",
+                fontSize: "9px",
                 color: "#666666",
                 marginTop: "2px",
               }}
             >
-              Support: +880 1700-000000 &nbsp;|&nbsp; info@sbnsolutions.com
+              <div>Head Office: GA-130, Progati Sarani, Middle Badda, Dhaka-1212</div>
+              <div>Sundarganj Regional Office: Sundarganj Bazar, Sundarganj, Gaibandha</div>
+              <div>Cell: +88 01611090104, +88 01781584484</div>
             </div>
           </div>
 
@@ -446,7 +448,7 @@ export default function ResellerInvoiceTemplate({
           <div style={{ textAlign: "center", width: "160px" }}>
             <div style={{ borderBottom: "1px solid #000000", marginBottom: "6px" }} />
             <div style={{ fontWeight: "700", fontSize: "10px" }}>Authorized Signature</div>
-            <div style={{ fontSize: "9px", color: "#666666" }}>SBN Enterprise Accounts</div>
+            <div style={{ fontSize: "9px", color: "#666666" }}>ABUZZ IT LIMITED</div>
           </div>
         </div>
 
@@ -460,7 +462,7 @@ export default function ResellerInvoiceTemplate({
           }}
         >
           <div style={{ fontWeight: "600", marginBottom: "2px" }}>
-            Thank you for your partnership with SBN Enterprise!
+            Thank you for your partnership with ABUZZ IT LIMITED!
           </div>
           <div>
             This is a computer-generated invoice. For reseller billing queries, please contact corporate accounts.
