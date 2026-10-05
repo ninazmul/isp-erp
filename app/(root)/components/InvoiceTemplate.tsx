@@ -105,11 +105,14 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                         </div>
                         <div
                             style={{
-                                display: "inline-block",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                justifyContent: "center",
                                 marginTop: "6px",
                                 padding: "2px 10px",
                                 border: "1.5px solid #000000",
                                 fontSize: "10px",
+                                lineHeight: "1.2",
                                 fontWeight: "700",
                                 letterSpacing: "1px",
                                 textTransform: "uppercase",
@@ -256,9 +259,11 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                                     padding: "8px 10px",
                                     textAlign: "left",
                                     fontSize: "9px",
+                                    lineHeight: "1",
                                     fontWeight: "700",
                                     textTransform: "uppercase",
                                     letterSpacing: "0.8px",
+                                    verticalAlign: "middle",
                                 }}
                             >
                                 Description / Service
@@ -268,9 +273,11 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                                     padding: "8px 10px",
                                     textAlign: "center",
                                     fontSize: "9px",
+                                    lineHeight: "1",
                                     fontWeight: "700",
                                     textTransform: "uppercase",
                                     letterSpacing: "0.8px",
+                                    verticalAlign: "middle",
                                     width: "120px",
                                 }}
                             >
@@ -281,9 +288,11 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                                     padding: "8px 10px",
                                     textAlign: "center",
                                     fontSize: "9px",
+                                    lineHeight: "1",
                                     fontWeight: "700",
                                     textTransform: "uppercase",
                                     letterSpacing: "0.8px",
+                                    verticalAlign: "middle",
                                     width: "80px",
                                 }}
                             >
@@ -294,9 +303,11 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                                     padding: "8px 10px",
                                     textAlign: "right",
                                     fontSize: "9px",
+                                    lineHeight: "1",
                                     fontWeight: "700",
                                     textTransform: "uppercase",
                                     letterSpacing: "0.8px",
+                                    verticalAlign: "middle",
                                     width: "90px",
                                 }}
                             >
@@ -405,7 +416,7 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                     style={{
                         display: "flex",
                         justifyContent: "space-between",
-                        alignItems: "flex-end",
+                        alignItems: "flex-start",
                         paddingTop: "32px",
                         paddingBottom: "12px",
                     }}
