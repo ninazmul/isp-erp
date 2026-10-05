@@ -164,7 +164,7 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                         </div>
                         <div style={{ color: "#444444", lineHeight: "1.6" }}>
                             <div>
-                                <span style={{ fontWeight: "600" }}>Customer Username: </span>
+                                <span style={{ fontWeight: "600" }}>Username: </span>
                                 <span style={{ fontFamily: "monospace", fontWeight: "700" }}>
                                     {bill.customer?.username ?? "—"}
                                 </span>
