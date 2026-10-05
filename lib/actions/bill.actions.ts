@@ -166,7 +166,7 @@ export async function getBills(params?: {
 
     const [bills, total] = await Promise.all([
         Bill.find(query)
-            .populate("customer", "name customerCode phone monthlyFee status location packageName email")
+            .populate("customer", "name customerCode username phone monthlyFee status location packageName email")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
