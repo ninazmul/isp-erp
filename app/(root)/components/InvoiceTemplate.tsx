@@ -66,7 +66,7 @@ export default function InvoiceTemplate({ bill }: InvoiceTemplateProps) {
                                 fontWeight: "600",
                             }}
                         >
-                            Internet & Enterprise Service Provider
+                            Nationwide Internet Service Provider
                         </div>
                         <div
                             style={{

@@ -65,7 +65,7 @@ export default function ResellerInvoiceTemplate({
                 fontWeight: "600",
               }}
             >
-              Reseller &amp; Upstream Distribution Billing
+              Nationwide Internet Service Provider
             </div>
             <div
               style={{
