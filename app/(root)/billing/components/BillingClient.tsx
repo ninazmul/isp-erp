@@ -36,6 +36,7 @@ import {
     bulkImportBills,
 } from "@/lib/actions/bill.actions";
 import GenerateBillsForm from "./GenerateBillsForm";
+import { getSimulatedOperationError } from "@/lib/simulated-operation-error";
 import MarkPaidForm from "./MarkPaidForm";
 import InvoiceDownloader from "../../components/InvoiceDownloader";
 import type { Bill } from "@/types";
@@ -127,14 +128,17 @@ export default function BillingClient({
 
     const handleGenerate = async (data: { month: number; year: number }) => {
         try {
+            const simulatedError = getSimulatedOperationError();
+            if (simulatedError) throw new Error(simulatedError);
+
             const result = await generateMonthlyBills(data.month, data.year);
             toast.success(
                 `Generated ${result.generated} bills, skipped ${result.skipped} existing bills`
             );
             setIsGenerateOpen(false);
             loadBills();
-        } catch {
-            toast.error("Failed to generate bills");
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Failed to generate bills");
         }
     };
 
