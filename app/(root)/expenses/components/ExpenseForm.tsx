@@ -25,7 +25,6 @@ import { getCategories, createCategory } from "@/lib/actions/category.actions";
 import { Plus } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { PAYMENT_METHODS } from "@/lib/constants";
-import { getSimulatedOperationError } from "@/lib/simulated-operation-error";
 
 interface Expense {
   _id: string;
@@ -104,11 +103,6 @@ export default function ExpenseForm({ expense, onSuccess }: ExpenseFormProps) {
 
   const onSubmit = async (data: ExpenseFormData) => {
     try {
-      if (!expense) {
-        const simulatedError = getSimulatedOperationError();
-        if (simulatedError) throw new Error(simulatedError);
-      }
-
       const payload = {
         ...data,
         expenseDate: new Date(data.expenseDate),
